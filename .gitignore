@@ -1,0 +1,19 @@
+# Folder views
+Desktop.ini
+.DS_Store
+
+# Thumbnail cache 
+Thumbs.db
+._*
+
+# Eclipse folders
+.recommenders/
+.dictionaries/
+.metadata/
+.settings/
+
+# Java clases
+bin/
+
+# Project files
+compTest.jar
