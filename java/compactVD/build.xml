@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="create_run_jar" name="Create Runnable Jar for Project compactVD">
+    <property name="dir.buildfile" value="."/>
+    <property name="dir.jarfile" value="${user.home}/Desktop"/>
+    <target name="create_run_jar">
+    	<replaceregexp match="io.github.eternalbits.compacttu.DebugAccessFile"
+    		replace="java.io.RandomAccessFile" byline="true">
+    	    <fileset dir="${dir.buildfile}/src" includes="**/*DiskImage.java"/>
+    	</replaceregexp>
+    	<replaceregexp match="DebugAccessFile"
+    		replace="RandomAccessFile" byline="true">
+    	    <fileset dir="${dir.buildfile}/src" includes="**/*DiskImage.java"/>
+    	</replaceregexp>
+    	<eclipse.refreshLocal resource="compactVD/src" depth="infinite" />
+    	<eclipse.incrementalBuild project="compactVD" kind="incremental"/>
+    	<jar destfile="${dir.jarfile}/CompactVD.jar" filesetmanifest="mergewithoutmain">
+            <manifest>
+                <attribute name="Main-Class" value="io.github.eternalbits.compactvd.CompactVD"/>
+                <attribute name="Class-Path" value="."/>
+            </manifest>
+            <fileset dir="${dir.buildfile}/bin"/>
+        	<metainf dir="${dir.buildfile}" includes="LICENSE*"/>
+        </jar>
+    </target>
+</project>
