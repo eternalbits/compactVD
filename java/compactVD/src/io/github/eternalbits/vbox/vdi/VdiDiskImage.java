@@ -24,7 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.UUID;
 
-import io.github.eternalbits.compacttu.DebugAccessFile;
+import java.io.RandomAccessFile;
 import io.github.eternalbits.compactvd.Static;
 import io.github.eternalbits.disk.DiskImage;
 import io.github.eternalbits.disk.DiskImageJournal;
@@ -51,7 +51,7 @@ public class VdiDiskImage extends DiskImage {
 	final VdiImageBlockTable blockTable;
 
 	public VdiDiskImage(File file, long diskSize) throws IOException {
-		media = new DebugAccessFile(file, "rw");
+		media = new RandomAccessFile(file, "rw");
 		try { // Always close media on Exception
 			path = file.getPath();
 			readOnly = false;
@@ -75,7 +75,7 @@ public class VdiDiskImage extends DiskImage {
 	}
 	
 	public VdiDiskImage(File file, String mode) throws IOException, WrongHeaderException {
-		media = new DebugAccessFile(file, mode);
+		media = new RandomAccessFile(file, mode);
 		try { // Always close media on Exception
 			readOnly = mode.equals("r");
 			path = file.getPath();
@@ -96,7 +96,7 @@ public class VdiDiskImage extends DiskImage {
 		}
 	}
 	
-	DebugAccessFile getMedia() {
+	RandomAccessFile getMedia() {
 		return media;
 	}
 

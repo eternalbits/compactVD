@@ -22,7 +22,7 @@ import java.nio.channels.FileLock;
 import java.util.HashMap;
 import java.util.Vector;
 
-import io.github.eternalbits.compacttu.DebugAccessFile;
+import java.io.RandomAccessFile;
 import io.github.eternalbits.compactvd.Static;
 
 /**
@@ -36,7 +36,7 @@ public abstract class DiskImage implements AutoCloseable {
 	
 	protected DiskImageBlockTable imageTable = null;
 	
-	protected DebugAccessFile media = null;
+	protected RandomAccessFile media = null;
 	protected String path = null;
 
 	protected long diskPointer = 0;			// The public disk pointer. Changed by seek, read and write.

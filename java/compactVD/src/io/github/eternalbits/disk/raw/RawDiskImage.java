@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import io.github.eternalbits.compacttu.DebugAccessFile;
+import java.io.RandomAccessFile;
 import io.github.eternalbits.disk.DiskImage;
 import io.github.eternalbits.disk.DiskImageProgress;
 import io.github.eternalbits.disk.DiskLayout;
@@ -54,7 +54,7 @@ public class RawDiskImage extends DiskImage {
 		if (diskSize < 0 || diskSize % blockSize != 0)
 			throw new IllegalArgumentException(String.format("Disk size: %d must be multiple of block size %d", diskSize, blockSize));
 		
-		media = new DebugAccessFile(file, "rw");
+		media = new RandomAccessFile(file, "rw");
 		try { // Always close media on Exception
 			path = file.getPath();
 			readOnly = false;
@@ -78,7 +78,7 @@ public class RawDiskImage extends DiskImage {
 		if (!DiskLayout.isValidBlockSize(blockSize))
 			throw new IllegalArgumentException(String.format("Block size: %d", blockSize));
 
-		media = new DebugAccessFile(file, mode);
+		media = new RandomAccessFile(file, mode);
 		try { // Always close media on Exception
 			readOnly = mode.equals("r");
 			path = file.getPath();
