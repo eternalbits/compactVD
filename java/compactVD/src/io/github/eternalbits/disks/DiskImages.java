@@ -50,8 +50,8 @@ public class DiskImages {
 		throw new InitializationException(DiskImage.class, file.getPath());
 	}
 
-	public static DiskImage open(String path, String type, String mode) throws IOException {
-		return open(new File(path), mode);
+	public static DiskImage open(String type, String path, String mode) throws IOException, WrongHeaderException {
+		return open(type, new File(path), mode);
 	}
 
 	public static DiskImage open(String type, File file, String mode) throws IOException, WrongHeaderException {
