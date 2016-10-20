@@ -1,4 +1,4 @@
-/*
+ï»¿/*
  * Copyright 2016 Rui Baptista
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -65,7 +65,7 @@ public class CompactTestUnit {
 			}
 			if (t.isAlive())
 				t.join();
-			exit(String.format("%s » %s", args[1], args[2]), timer);
+			exit(String.format("%s Â» %s", args[1], args[2]), timer);
 		}
 		
 		if ("INLINE".equals(args[0])) {
@@ -85,7 +85,7 @@ public class CompactTestUnit {
 			}
 			if (t.isAlive())
 				t.join();
-			exit(String.format("%s %s » %s", args[0], args[2], args[1]), timer);
+			exit(String.format("%s %s Â» %s", args[0], args[2], args[1]), timer);
 		}
 		
 		System.exit(0);

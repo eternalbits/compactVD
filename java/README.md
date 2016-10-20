@@ -1,7 +1,7 @@
 #### Building compactVD
 
-The files `.classpath`, `.project` and `build.xml` are specific to edit
- compactVD with the Eclipse IDE and build it with Ant, and can be ignored
+The files `.classpath`, `.project` `build.xml` and `.settings\` are specific
+ to edit compactVD with the Eclipse IDE and Ant build, and can be ignored
  in other environments. The Ant Build must be run in the same JRE as the
  workspace, this is an Ant Build setting.
 
