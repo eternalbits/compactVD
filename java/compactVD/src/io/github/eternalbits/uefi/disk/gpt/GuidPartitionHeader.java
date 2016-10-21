@@ -21,15 +21,12 @@ import java.nio.ByteBuffer;
 import java.util.UUID;
 import java.util.zip.CRC32;
 
-import io.github.eternalbits.disk.InitializationException;
+import io.github.eternalbits.disk.WrongHeaderException;
 
 class GuidPartitionHeader {
 	static final int HEADER_SIZE = 92;
 	
 	private static final long EFI_PART_SIGNATURE = 0x5452415020494645L; //LITTLE_ENDIAN "EFI PART"
-	private static final int DOCUMENTED_REVISION = 1 << 16 + 0; //1.0
-
-	private static final int DEFAULT_PARTITION_COUNT = 128;
 	
 	final GptDiskLayout layout;
 	
@@ -44,33 +41,11 @@ class GuidPartitionHeader {
 	long	lastUsableLBA;			// Last block that may be used by a partition
 	UUID	diskGUID;				// GUID that can be used to uniquely identify the disk
 	long	partitionLBA;			// Starting block of the GUID partition table
-	long	alternateLBA;			// Starting block of the GUID alternate table
 	int		partitionCount;			// Capacity of the GUID partition table
 	int		partitionSize;			// Size of each GUID partition entry
 	int		partitionCrc32;			// CRC32 of the GUID partition table
 
-	GuidPartitionHeader(GptDiskLayout gpt, long blockCount) {
-		this.layout		= gpt;
-		int tableCount	= DEFAULT_PARTITION_COUNT * GuidPartitionTable.ENTRY_SIZE / layout.blockSize;
-		
-		signature 		= EFI_PART_SIGNATURE;
-		revision		= DOCUMENTED_REVISION;
-		headerSize		= HEADER_SIZE;
-		headerCrc32		= 0;
-		reservedInt		= 0;
-		currentLBA		= 1;
-		backupLBA		= blockCount - 1;
-		firstUsableLBA	= 2 + tableCount;
-		lastUsableLBA	= blockCount - tableCount - 2;
-		diskGUID		= UUID.randomUUID();
-		partitionLBA	= 2;
-		alternateLBA	= blockCount - tableCount - 1;
-		partitionCount	= DEFAULT_PARTITION_COUNT;
-		partitionSize	= GuidPartitionTable.ENTRY_SIZE;
-		partitionCrc32	= 0;
-	}
-
-	GuidPartitionHeader(GptDiskLayout gpt, long blockCount, ByteBuffer in) throws IOException {
+	GuidPartitionHeader(GptDiskLayout gpt, ByteBuffer in) throws IOException, WrongHeaderException {
 		this.layout		= gpt;
 		
 		if (in.remaining() >= HEADER_SIZE) {
@@ -92,58 +67,26 @@ class GuidPartitionHeader {
 			partitionSize		= in.getInt();
 			partitionCrc32		= in.getInt();
 			
-			int tableCount 		= partitionCount * partitionSize / layout.blockSize;
-			alternateLBA		= blockCount - tableCount - 1;
+			int tableBlockCount = partitionCount * partitionSize / layout.blockSize;
 			
 			in.putInt(hcrcIndex, 0);
 			CRC32 crc32 = new CRC32();
-			crc32.update(in.array(), 0, HEADER_SIZE);
+			crc32.update(in.array(), 0, Math.min(headerSize, in.capacity()));
 			in.putInt(hcrcIndex, headerCrc32);
 			
 			if (signature == EFI_PART_SIGNATURE 
-					&& headerSize == HEADER_SIZE
 					&& headerCrc32 == (int)crc32.getValue()
-					&& currentLBA == 1 && partitionLBA == 2
+					&& currentLBA == 1
 					&& partitionCount > 0 && partitionSize >= 128
-					&& firstUsableLBA == partitionLBA + tableCount
-					&& lastUsableLBA == alternateLBA - 1
-					&& backupLBA == blockCount - 1) {
+					&& firstUsableLBA >= partitionLBA + tableBlockCount
+					&& lastUsableLBA >= firstUsableLBA - 1
+					// The backup structure is ignored
+					) {
 				return;
 			}
 		}
 		
-		throw new InitializationException(getClass(), layout.toString());
+		throw new WrongHeaderException(getClass(), layout.toString());
 	}
 
-	void update(boolean isBackup) throws IOException {
-		
-		byte[] buffer = new byte[HEADER_SIZE];
-		ByteBuffer bb = ByteBuffer.wrap(buffer);
-		bb.order(GptDiskLayout.BYTE_ORDER);
-		
-		bb.putLong(signature);
-		bb.putInt(revision);
-		bb.putInt(headerSize);
-		int hcrcIndex = bb.position();
-		bb.putInt(0);
-		bb.putInt(reservedInt);
-		bb.putLong(isBackup? backupLBA: currentLBA);
-		bb.putLong(isBackup? currentLBA: backupLBA);
-		bb.putLong(firstUsableLBA);
-		bb.putLong(lastUsableLBA);
-		bb.putLong(diskGUID.getMostSignificantBits());
-		bb.putLong(diskGUID.getLeastSignificantBits());
-		bb.putLong(isBackup? alternateLBA: partitionLBA);
-		bb.putInt(partitionCount);
-		bb.putInt(partitionSize);
-		bb.putInt(partitionCrc32);
-		
-		CRC32 crc32 = new CRC32();
-		crc32.update(bb.array());
-		headerCrc32 = (int)crc32.getValue();
-		bb.putInt(hcrcIndex, headerCrc32);
-		
-		layout.getImage().seek(layout.blockSize * (isBackup? backupLBA: currentLBA));
-		layout.getImage().write(buffer, 0, buffer.length);
-	}
 }

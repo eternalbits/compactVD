@@ -38,7 +38,6 @@ public class GptDiskLayout extends DiskLayout { // http://www.uefi.org/sites/def
 	public GptDiskLayout(DiskImage img) throws IOException, WrongHeaderException {
 		this.image 		= img;
 		blockSize 		= img.getLogicalBlockSize();
-		long blockCount	= img.getDiskSize() / blockSize;
 
 		byte[] buffer = new byte[DiskBootRecord.bufferSize()];
 		int read = image.readAll(0L, buffer, 0, buffer.length);
@@ -47,11 +46,11 @@ public class GptDiskLayout extends DiskLayout { // http://www.uefi.org/sites/def
 		if (!isValidPmbr())
 			throw new WrongHeaderException(getClass(), image.toString());
 		
-		buffer = new byte[GuidPartitionHeader.HEADER_SIZE];
+		buffer = new byte[blockSize];
 		read = image.readAll(blockSize, buffer, 0, buffer.length);
-		header = new GuidPartitionHeader(this, blockCount, ByteBuffer.wrap(buffer, 0, read));
+		header = new GuidPartitionHeader(this, ByteBuffer.wrap(buffer, 0, read));
 		
-		buffer = new byte[GuidPartitionTable.ENTRY_SIZE * header.partitionCount];
+		buffer = new byte[header.partitionSize * header.partitionCount];
 		read = image.readAll(header.partitionLBA * blockSize, buffer, 0, buffer.length);
 		table = new GuidPartitionTable(this, ByteBuffer.wrap(buffer, 0, read));
 		
@@ -60,7 +59,9 @@ public class GptDiskLayout extends DiskLayout { // http://www.uefi.org/sites/def
 	private boolean isValidPmbr() {
 		return pmbr.getType(0) == GPT_PROTECTIVE_PART 
 				&& pmbr.getFirstSector(0) == 1
-				&& pmbr.getSectorCount(0) + 1 == image.getDiskSize() / image.getLogicalBlockSize()
+				&& pmbr.getSectorCount(0) > 0
+				// The following check is not critical and may count out resized disk images
+				// pmbr.getSectorCount(0) + 1 == image.getDiskSize() / image.getLogicalBlockSize()
 				&& pmbr.isPartEmpty(1) && pmbr.isPartEmpty(2) && pmbr.isPartEmpty(3);
 	}
 	

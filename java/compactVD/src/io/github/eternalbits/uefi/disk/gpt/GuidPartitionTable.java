@@ -22,11 +22,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 import io.github.eternalbits.compactvd.Static;
+import io.github.eternalbits.disk.InitializationException;
 import io.github.eternalbits.disk.NullFileSystem;
 import io.github.eternalbits.disks.DiskFileSystems;
 
 class GuidPartitionTable {
-	static final int ENTRY_SIZE = 128;
 	
 	private static final UUID EFI_SYSTEM_GUID = new UUID(0x11D2F81FC12A7328L, 0x3BC93EC9A0004BBAL);
 	private static final UUID NULL_UUID = new UUID(0, 0);
@@ -35,14 +35,6 @@ class GuidPartitionTable {
 	final GuidPartitionHeader header;
 	final GuidPartitionEntry[] array;
 	final GptDiskLayout layout;
-
-	GuidPartitionTable(GptDiskLayout gpt) {
-		this.layout		= gpt;
-		this.header		= gpt.header;
-		
-		array = new GuidPartitionEntry[header.partitionCount];
-
-	}
 
 	GuidPartitionTable(GptDiskLayout gpt, ByteBuffer in) throws IOException {
 		this.layout		= gpt;
@@ -59,6 +51,11 @@ class GuidPartitionTable {
 				if (array[i].partitionType.equals(NULL_UUID)) {
 					array[i] = null;
 				} else {
+					if (array[i].startingLBA < header.firstUsableLBA
+							|| array[i].endingLBA > header.lastUsableLBA
+							|| array[i].endingLBA < array[i].startingLBA - 1) {
+						throw new InitializationException(getClass(), layout.toString());
+					}
 					long length = (array[i].endingLBA - array[i].startingLBA + 1) * layout.blockSize;
 					long offset = array[i].startingLBA * layout.blockSize;
 					if (array[i].partitionType.equals(EFI_SYSTEM_GUID)) {
@@ -71,16 +68,6 @@ class GuidPartitionTable {
 		}
 	}
 
-	void update() throws IOException {
-		
-		byte[] buffer = new byte[header.partitionSize];
-		ByteBuffer bb = ByteBuffer.wrap(buffer);
-		bb.order(GptDiskLayout.BYTE_ORDER);
-		
-		layout.getImage().seek(header.partitionLBA * layout.blockSize);
-		layout.getImage().write(buffer);
-	}
-	
 	class GuidPartitionEntry {
 		
 		UUID	partitionType;
