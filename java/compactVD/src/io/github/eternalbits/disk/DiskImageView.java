@@ -37,6 +37,7 @@ public class DiskImageView {
 	public final int blocksMapped;
 	public final Integer blocksNotInUse;
 	public final Integer blocksZeroed;
+	public final String diskLayout;
 	
 	public final List<DiskFileSystemView> fileSystems;
 	
@@ -53,6 +54,7 @@ public class DiskImageView {
 		blocksNotInUse 	= image.blocksNotInUse;
 		blocksZeroed 	= image.blocksZeroed;
 		
+		diskLayout		= image.getLayout() == null? null: image.getLayout().getType();
 		List<DiskFileSystemView> local = new ArrayList<DiskFileSystemView>();
 		if (image.getLayout() != null) {
 			for (DiskFileSystem fs: image.getLayout().getFileSystems()) {
