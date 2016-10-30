@@ -85,11 +85,23 @@ public class Static {
 		return num > 0 && (num & (num - 1)) == 0;
 	}
 
+	/**
+	 * Decodes a {@code String} from the byte buffer {@code in} using at most
+	 *  {@code length} bytes. If the resulting string is null terminated then
+	 *  the first null and the remaining characters are ignored. The byte
+	 *  buffer position is always incremented with {@code length}.
+	 * 
+	 * @param in		The source byte buffer.
+	 * @param length	The maximum number of bytes to decode.
+	 * @param charset	The charset to decode the bytes.
+	 * @return			The decoded string.
+	 */
 	public static String getString(ByteBuffer in, int length, Charset charset) {
 		byte[] buffer = new byte[length];
 		in.get(buffer);
 		String text = new String(buffer, charset);
-		return text.substring(0, Math.max(0, text.indexOf(0)));
+		int i = text.indexOf(0);
+		return i == -1? text: text.substring(0, i);
 	}
 
 	public static String removeExtension(String path) {
