@@ -26,6 +26,12 @@ import io.github.eternalbits.compactvd.Static;
 import io.github.eternalbits.disk.InitializationException;
 import io.github.eternalbits.disk.WrongHeaderException;
 
+/**
+ * The class {@code ExtVolumeHeader} represents the Extended File System "Super Block"
+ *  that holds information about the enclosing file system and the data block bitmaps.
+ * Source: <a href="https://ext4.wiki.kernel.org/index.php/Ext4_Disk_Layout"
+ *  >Ext4 Wiki: Ext4 Disk Layout</a>.
+ */
 class ExtVolumeHeader {
 	final static int HEADER_SIZE = 1024;
 
@@ -84,12 +90,12 @@ class ExtVolumeHeader {
 	int 	lastOrphan;				// Start of list of orphaned inodes to delete
 	byte[] 	hashSeed;				// HTREE hash seed [16 bytes]
 	byte 	defHashVersion;			// Default hash algorithm to use for directory hashes
-	byte 	journalBackupType;		// If this value is 0 or EXT3_JNL_BACKUP_BLOCKS, then�journalBlocks contains a backup
+	byte 	journalBackupType;		// If this value is 0 or EXT3_JNL_BACKUP_BLOCKS, then journalBlocks contains a backup
 	short 	descSize;				// Size of group descriptors, in bytes, if the 64bit feature flag is set. Default is 32 bytes
 	int 	defaultMountOpts;		// Default mount options
 	int 	firstMetaBG;			// First meta block group, if the meta_bg feature is enabled
 	int 	mkfsTime;				// When the file system was created, in seconds since the epoch
-	byte[] 	journalBlocks;			// Backup copy of the journal inode's�array in the first 15 elements, i_size_high and i_size [17 integers]
+	byte[] 	journalBlocks;			// Backup copy of the journal inode's array in the first 15 elements, i_size_high and i_size [17 integers]
 	int 	blocksCountHigh;		// High 32-bits of the total block count
 	int 	resBlocksCountHigh;		// High 32-bits of the reserved block count
 	int 	freeBlocksCountHigh;	// High 32-bits of the free block count
@@ -100,7 +106,7 @@ class ExtVolumeHeader {
 	short 	mmpInterval;			// Number of seconds to wait in multi-mount prevention (MMP) checking
 	long 	mmpBlock;				// Block number for multi-mount protection data
 	int 	raidStripeWidth;		// RAID stripe width. Used by the block allocator to try to reduce read-modify-write operations
-	int 	groupsPerFlex;			// Size of a flexible block group is 2 ^�logGroupsPerFlex !disk size of logGroupsPerFlex is byte!
+	int 	groupsPerFlex;			// Size of a flexible block group is 2 ^ logGroupsPerFlex !disk size of logGroupsPerFlex is byte!
 	byte 	checksumType;			// Metadata checksum algorithm type. The only valid value is 1 (crc32c)
 	short 	reservedPad;			// 
 	long 	kbytesWritten;			// Number of KiB written to this file system over its lifetime
@@ -120,8 +126,8 @@ class ExtVolumeHeader {
 	long 	lastErrorBlock;			// Number of block involved in most recent error
 	String 	lastErrorFunc;			// Name of function where the most recent error happened [32 bytes]
 	String 	mountOpts;				// ASCIIZ string of mount options [64 bytes]
-	int 	userQuotaInode;			// Inode number of user�quota�file
-	int 	groupQuotaInode;		// Inode number of group�quota�file
+	int 	userQuotaInode;			// Inode number of user quota file
+	int 	groupQuotaInode;		// Inode number of group quota file
 	int 	overheadBlocks;			// Overhead blocks/clusters in the file system. This field is always zero?
 	long 	backupBG;				// Block groups containing super block backups (if sparse_super2)
 	int 	encryptAlgos;			// Encryption algorithms in use. There can be up to four algorithms in use at any time
