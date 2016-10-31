@@ -283,7 +283,7 @@ class ExtVolumeHeader {
 	 * 	consecutive, starting at the first cluster in the group. 
 	 * 
 	 * @return the handler to read or make the bitmap data.
-	 * @throws WrongHeaderException if an invalid group group descriptor is found. 
+	 * @throws WrongHeaderException if an invalid group descriptor is found. 
 	 * @throws IOException if some I/O error occurs.
 	 */
 	private int[] getBitmapHandler() throws IOException, WrongHeaderException {
@@ -309,6 +309,10 @@ class ExtVolumeHeader {
 		return handler;
 	}
 	
+	// Use some more bytes than ehMagic to switch journal inode type 
+	private static long INODE_TYPE_EXTENTS 	= 0x000000040007F30AL;
+	private static long INODE_TYPE_MASK 	= 0x0000000000070000L;
+	
 	/**
 	 * Checks if the journal has transactions. Implementations accessing a journaled volume
 	 *  with transactions must either refuse to access the volume, or replay the journal.
@@ -326,25 +330,32 @@ class ExtVolumeHeader {
 		
 		ByteBuffer bb = ByteBuffer.wrap(journalBlocks);
 		bb.order(ExtFileSystem.BYTE_ORDER);
-		// This is the extents header
-		short ehMagic 	= bb.getShort();		// 0xF30A
-		short ehEntries = bb.getShort();		// One entry must be present
-		short ehMax 	= bb.getShort();		// There is room  for 4 entries
-		short ehDepth 	= bb.getShort();		// Only leaf nodes are expected
-		bb.position(bb.position() + 4);
-		if (ehMagic != (short)0xF30A || ehMax !=4 || ehDepth != 0 
-				|| ehEntries < 1 || ehEntries > ehMax)
-			return false;
-		// Now read the first extent
-		int eeBlock 	= bb.getInt();			// First file block number that this extent covers
-		int eeCount 	= bb.getShort();		// Number of blocks covered by this extent
-		int eeStartHi	= bb.getShort();		// This is expected to be zero, in this 32 bits world
-		int eeStartLo 	= bb.getInt();			// Disk block number to which this extent points
-		if (eeBlock != 0 || eeCount < 1 && eeCount != -32768 
-				|| eeStartHi != 0 || eeStartLo < 0)
-			return false;
+		int journalBlockNumber;
 		
-		ByteBuffer in = fileSystem.readImage(eeStartLo * (long)blockSize, 12+12+12);
+		if ((bb.getLong(0) | INODE_TYPE_MASK) == INODE_TYPE_EXTENTS) {
+			// This is the extents header
+			short ehMagic 	= bb.getShort();		// 0xF30A
+			short ehEntries = bb.getShort();		// One entry must be present
+			short ehMax 	= bb.getShort();		// There is room  for 4 entries
+			short ehDepth 	= bb.getShort();		// Only leaf nodes are expected
+			bb.position(bb.position() + 4);
+			if (ehMagic != (short)0xF30A || ehMax !=4 || ehDepth != 0 
+					|| ehEntries < 1 || ehEntries > ehMax)
+				return false;
+			// Now read the first extent
+			int eeBlock 	= bb.getInt();			// First file block number that this extent covers
+			int eeCount 	= bb.getShort();		// Number of blocks covered by this extent
+			int eeStartHi	= bb.getShort();		// This is expected to be zero, in this 32 bits world
+			int eeStartLo 	= bb.getInt();			// Disk block number to which this extent points
+			if (eeBlock != 0 || eeCount < 1 && eeCount != -32768 
+					|| eeStartHi != 0 || eeStartLo < 0)
+				return false;
+			journalBlockNumber = eeStartLo;
+		} else {
+			journalBlockNumber = bb.getInt();		// First file block number
+		}
+		
+		ByteBuffer in = fileSystem.readImage(journalBlockNumber * (long)blockSize, 12+12+12);
 		in.order(ByteOrder.BIG_ENDIAN);
 		int magic = in.getInt();
 		if (magic != 0xC03B3998) // The header is invalid
