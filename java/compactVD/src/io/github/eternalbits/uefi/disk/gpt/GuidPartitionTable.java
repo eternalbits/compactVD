@@ -22,13 +22,18 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 import io.github.eternalbits.compactvd.Static;
+import io.github.eternalbits.disk.DiskFileSystem;
 import io.github.eternalbits.disk.InitializationException;
 import io.github.eternalbits.disk.NullFileSystem;
+import io.github.eternalbits.disk.WrongHeaderException;
 import io.github.eternalbits.disks.DiskFileSystems;
+import io.github.eternalbits.linux.disk.lvm.LvmSimpleDiskLayout;
 
 class GuidPartitionTable {
 	
 	private static final UUID EFI_SYSTEM_GUID = new UUID(0x11D2F81FC12A7328L, 0x3BC93EC9A0004BBAL);
+	private static final UUID LINUX_SWAP_GUID = new UUID(0x43C4A4AB0657FD6DL, 0x4F4F4BC83309E584L);
+	private static final UUID LINUX_LVM_GUID = new UUID(0x44C2F507E6D6D379L, 0x28F93D2A8F233CA2L);
 	private static final UUID NULL_UUID = new UUID(0, 0);
 	private static final int NAME_SIZE = 72;
 
@@ -58,16 +63,35 @@ class GuidPartitionTable {
 					}
 					long length = (array[i].endingLBA - array[i].startingLBA + 1) * layout.blockSize;
 					long offset = array[i].startingLBA * layout.blockSize;
+					
 					if (array[i].partitionType.equals(EFI_SYSTEM_GUID)) {
-						gpt.getFileSystems().add(new NullFileSystem(gpt, offset, length, "EFI", "EFI System Partition"));
+						addNullFileSystem(offset, length, "EFI", "EFI System Partition");
+					} else
+					if (array[i].partitionType.equals(LINUX_SWAP_GUID)) {
+						addNullFileSystem(offset, length, "SWAP", "Linux Swap Space");
+					} else
+					if (array[i].partitionType.equals(LINUX_LVM_GUID)) {
+						try {
+							LvmSimpleDiskLayout lvm = new LvmSimpleDiskLayout(gpt.getImage(), offset, length);
+							for (DiskFileSystem fs: lvm.getFileSystems()) gpt.getFileSystems().add(fs);
+						}
+						catch(WrongHeaderException e) { tryDefault(offset, length); }
 					} else {
-						gpt.getFileSystems().add(DiskFileSystems.map(gpt, offset, length, null));
+						tryDefault(offset, length);
 					}
 				}
 			}
 		}
 	}
-
+	
+	private void addNullFileSystem(long offset, long length, String type, String description) {
+		layout.getFileSystems().add(new NullFileSystem(layout, offset, length, type, description));
+	}
+	
+	private void tryDefault(long offset, long length) throws IOException {
+		layout.getFileSystems().add(DiskFileSystems.map(layout, offset, length, null));
+	}
+	
 	class GuidPartitionEntry {
 		
 		UUID	partitionType;

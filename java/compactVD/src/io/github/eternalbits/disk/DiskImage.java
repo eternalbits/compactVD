@@ -19,7 +19,8 @@ package io.github.eternalbits.disk;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileLock;
-import java.util.HashMap;
+import java.util.Comparator;
+import java.util.TreeMap;
 import java.util.Vector;
 
 import java.io.RandomAccessFile;
@@ -51,7 +52,13 @@ public abstract class DiskImage implements AutoCloseable {
 	 */
 	Integer blocksNotInUse = null;
 	Integer blocksZeroed = null;
-	HashMap<DiskFileSystem, FileSysData> blockView = new HashMap<DiskFileSystem, FileSysData>();
+	TreeMap<DiskFileSystem, FileSysData> blockView 
+	= new TreeMap<DiskFileSystem, FileSysData>(new Comparator<DiskFileSystem>() {
+		@Override
+		public int compare(DiskFileSystem fs1, DiskFileSystem fs2) {
+	        return Long.signum(fs1.diskOffset - fs2.diskOffset);
+	    }
+	});
 	class FileSysData {
 		int blockStart = 0;
 		int blockEnd = 0;
@@ -60,19 +67,37 @@ public abstract class DiskImage implements AutoCloseable {
 		int blocksZeroed = 0;
 	}
 	
-	protected void setLayout(DiskLayout layout) {
+	/**
+	 * Sets a layout for this disk image. If {@code layout} is not null this
+	 *  method checks that file systems inside the layout do not overlap each
+	 *  other and do not overflow the disk image. Overlap check between file
+	 *  systems and layout metadata is performed by each layout.
+	 * 
+	 * @param layout	The {@code DiskLayout} for this disk image.
+	 * @throws InitializationException If file systems overlap or overflow.
+	 */
+	protected void setLayout(DiskLayout layout) throws InitializationException {
 		this.layout = layout;
 		if (layout != null) {
-			long length = getImageBlockSize();
+			
+			long blockSize = getImageBlockSize();
 			for (DiskFileSystem fs: layout.getFileSystems()) {
+				// Add a FileSysData for each file system 
 				FileSysData fsd = new FileSysData();
-				long offset = fs.getOffset();
-				fsd.blockStart = (int)Static.ceilDiv(offset, length);;
-				fsd.blockEnd = (int)((offset + fs.getLength()) / length);
+				long offset = fs.diskOffset;
+				fsd.blockStart = (int)Static.ceilDiv(offset, blockSize);
+				fsd.blockEnd = (int)((offset + fs.diskLength) / blockSize);
 				if (imageTable != null) {
 					fsd.blocksMapped = imageTable.countBlocksMapped(fsd.blockStart, fsd.blockEnd);
 				}
 				blockView.put(fs, fsd);
+			}
+			
+			long lastOffset = 0;
+			for (DiskFileSystem fs: blockView.keySet()) { // Get file systems in ascending order.
+				if (fs.diskOffset < lastOffset || fs.diskOffset + fs.diskLength - getDiskSize() > 0)
+					throw new InitializationException(getClass(), toString());
+				lastOffset = fs.diskOffset + fs.diskLength;
 			}
 		}
 	}

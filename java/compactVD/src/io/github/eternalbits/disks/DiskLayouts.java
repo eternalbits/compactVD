@@ -23,6 +23,7 @@ import io.github.eternalbits.disk.DiskLayout;
 import io.github.eternalbits.disk.InitializationException;
 import io.github.eternalbits.disk.WrongHeaderException;
 import io.github.eternalbits.ibmpc.disk.mbr.MbrDiskLayout;
+import io.github.eternalbits.linux.disk.lvm.LvmSimpleDiskLayout;
 import io.github.eternalbits.uefi.disk.gpt.GptDiskLayout;
 
 public class DiskLayouts {
@@ -35,6 +36,10 @@ public class DiskLayouts {
 		
 		try {
 			return new MbrDiskLayout(img);
+		} catch (WrongHeaderException e) {}
+		
+		try {
+			return new LvmSimpleDiskLayout(img);
 		} catch (WrongHeaderException e) {}
 		
 		throw new InitializationException(DiskLayout.class, img.toString());

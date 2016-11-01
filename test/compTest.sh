@@ -92,5 +92,35 @@ if [ $? -eq 1 ]; then echo "************* MD5 CHECK MISMATCH *************"; fi
 rm out.vdi
 rm 3ext.vdi
 
+echo "Expanding 3lvm.vdi..."
+xz -dfk 3lvm.vdi.xz
+echo .
+echo .
+java -jar compTest.jar COPY 3lvm.vdi out.vdi
+java -jar compTest.jar MD5VDI out.vdi 009D8EF0F43CF3342ED1E6785DFEFFE2
+if [ $? -eq 1 ]; then echo "************* MD5 CHECK MISMATCH *************"; fi
+rm out.vdi
+echo .
+echo .
+java -jar -Dcrash=header compTest.jar INLINE 3lvm.vdi N
+java -jar -Dstop=33x compTest.jar INLINE 3lvm.vdi N
+java -jar -Dstop=88 compTest.jar INLINE 3lvm.vdi N
+java -jar compTest.jar INLINE 3lvm.vdi N
+java -jar compTest.jar MD5VDI 3lvm.vdi D5A26F0970F474BE2ECB3318282F21D0
+if [ $? -eq 1 ]; then echo "************* MD5 CHECK MISMATCH *************"; fi
+echo .
+echo .
+java -jar -Dcrash=table compTest.jar INLINE 3lvm.vdi +Z
+java -jar compTest.jar INLINE 3lvm.vdi +Z
+java -jar compTest.jar MD5VDI 3lvm.vdi D5A26F0970F474BE2ECB3318282F21D0
+if [ $? -eq 1 ]; then echo "************* MD5 CHECK MISMATCH *************"; fi
+echo .
+echo .
+java -jar compTest.jar COPY 3lvm.vdi out.vdi
+java -jar compTest.jar MD5VDI out.vdi 009D8EF0F43CF3342ED1E6785DFEFFE2
+if [ $? -eq 1 ]; then echo "************* MD5 CHECK MISMATCH *************"; fi
+rm out.vdi
+rm 3lvm.vdi
+
 echo .
 echo .
