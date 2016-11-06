@@ -259,11 +259,14 @@ class ListItem {
 				case DiskImageProgress.COPY:
 					File copy = null;
 					try (RandomAccessFile check = new RandomAccessFile(file, "r")) { // still exists?
-						// Source is open in write mode to allow for an exclusive file lock
-						try (DiskImage image = DiskImages.open(view.imageType, file, "rw")) {
+						// If writable, source is open in write mode for an exclusive file lock
+						String mode = file.canWrite()? "rw": "r";
+						try (DiskImage image = DiskImages.open(view.imageType, file, mode)) {
 							try (DiskImage clone = DiskImages.create(outputType, outputFile, image.getDiskSize())) {
 								copy = outputFile; // copy open by DiskImage
-								FileLock source = image.tryLock();
+								FileLock source = null;
+								if (mode.equals("rw"))
+									source = image.tryLock();
 								image.addObserver(this, false);
 								image.optimize(lastViewOptions);
 								image.removeObserver(this);
@@ -276,7 +279,8 @@ class ListItem {
 									clone.removeObserver(this);
 									fileLock.release();
 								}
-								source.release();
+								if (source != null)
+									source.release();
 							}
 						}
 					}
