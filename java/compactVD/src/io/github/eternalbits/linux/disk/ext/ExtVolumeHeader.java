@@ -346,13 +346,13 @@ class ExtVolumeHeader {
 			int eeBlock 	= bb.getInt();			// First file block number that this extent covers
 			int eeCount 	= bb.getShort();		// Number of blocks covered by this extent
 			int eeStartHi	= bb.getShort();		// This is expected to be zero, in this 32 bits world
-			int eeStartLo 	= bb.getInt();			// Disk block number to which this extent points
+			int eeStartLo 	= bb.getInt();			// Logical block number to which this extent points
 			if (eeBlock != 0 || eeCount < 1 && eeCount != -32768 
 					|| eeStartHi != 0 || eeStartLo < 0)
 				return false;
 			journalBlockNumber = eeStartLo;
 		} else {
-			journalBlockNumber = bb.getInt();		// First file block number
+			journalBlockNumber = bb.getInt();		// First logical block number
 		}
 		
 		ByteBuffer in = fileSystem.readImage(journalBlockNumber * (long)blockSize, 12+12+12);
