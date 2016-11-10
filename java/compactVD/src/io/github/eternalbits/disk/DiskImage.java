@@ -50,7 +50,7 @@ public abstract class DiskImage implements AutoCloseable {
 	
 	/* Statistical data to be used by viewers
 	 */
-	Integer blocksNotInUse = null;
+	Integer blocksUnused = null;
 	Integer blocksZeroed = null;
 	TreeMap<DiskFileSystem, FileSysData> blockView 
 	= new TreeMap<DiskFileSystem, FileSysData>(new Comparator<DiskFileSystem>() {
@@ -63,7 +63,7 @@ public abstract class DiskImage implements AutoCloseable {
 		int blockStart = 0;
 		int blockEnd = 0;
 		int blocksMapped = 0;
-		int blocksNotInUse = 0;
+		int blocksUnused = 0;
 		int blocksZeroed = 0;
 	}
 	
@@ -285,8 +285,30 @@ public abstract class DiskImage implements AutoCloseable {
 		return ByteBuffer.wrap(buffer, 0, read < 0? 0: read);
 	}
 	
+	/**
+	 * Writes {@code length} bytes from array {@code out} to the disk image data.
+	 *  The data is mapped into the image blocks and each resulting slice is written
+	 *  individually.
+	 * <p>
+	 * If the mapped block already exists in the image an update is made. If the
+	 *  block does not exist and the slice is not completely zero a new block is
+	 *  created in the image to accommodate the slice, and the remaining bytes
+	 *  are filled with zeros.
+	 *  
+	 * @param out		the data.
+	 * @param start		the start offset in the data.
+	 * @param length	the number of bytes to write.
+	 * @throws IOException if some I/O error occurs.
+	 */
 	public abstract void write(byte[] out, int start, int length) throws IOException;
 	
+	/**
+	 * This method calls {@link DiskImage#write(byte[],int,int)} with {@code start}
+	 *  equal to zero and {@code length} equal to {@code out.length}.
+	 * 
+	 * @param out	the data to write.
+	 * @throws IOException if some I/O error occurs.
+	 */
 	public void write(byte[] out) throws IOException {
 		write(out, 0, out.length);
 	}
@@ -318,14 +340,31 @@ public abstract class DiskImage implements AutoCloseable {
 	 */
 	public abstract boolean hasData(long offset, int length);
 	
+	/** Option for {@link #optimize(int)} method -- to detect blocks filled with zeros. */
 	public static final int FREE_BLOCKS_ZEROED = 1;
-	public static final int FREE_BLOCKS_NOT_IN_USE = 2;
+	/** Option for {@link #optimize(int)} method -- to detect blocks not in use. */
+	public static final int FREE_BLOCKS_UNUSED = 2;
+	/** Alias of {@link #FREE_BLOCKS_UNUSED}. */
+	@Deprecated
+	public static final int FREE_BLOCKS_NOT_IN_USE = FREE_BLOCKS_UNUSED;
 	
+	/**
+	 * Scans the disk image to detect blocks of data that are filled with zeros or are
+	 *  not in use by file systems, depending on the {@code options} bit set. Blocks
+	 *  detected are marked as if they were never used.
+	 * <p>
+	 * The allowable values for {@code options} are:<ul>
+	 *  <li>{@link #FREE_BLOCKS_ZEROED}</li>
+	 *  <li>{@link #FREE_BLOCKS_UNUSED}</li>
+	 * </ul>
+	 * @param options	above values combined with the bitwise operator {@code OR}.
+	 * @throws IOException if some I/O error occurs.
+	 */
 	public synchronized void optimize(int options) throws IOException {
 		if (imageTable == null)
 			return;
 		
-		final boolean freeBlocksNotInUse = (options & FREE_BLOCKS_NOT_IN_USE) != 0 && layout != null;
+		final boolean freeBlocksUnused = (options & FREE_BLOCKS_UNUSED) != 0 && layout != null;
 		final boolean freeBlocksZeroed = (options & FREE_BLOCKS_ZEROED) != 0;
 		
 		/* Initializes a global Progress for the selected options. Finding zeroed blocks is
@@ -335,13 +374,13 @@ public abstract class DiskImage implements AutoCloseable {
 		final long ZW = freeBlocksZeroed? 256: 0;
 		long maxValue = ZW * getImageBlocksMapped();
 		for (FileSysData fsd: blockView.values())
-			maxValue += freeBlocksNotInUse? fsd.blocksMapped: 0;
+			maxValue += freeBlocksUnused? fsd.blocksMapped: 0;
 		Progress progress = new Progress(DiskImageProgress.OPTIMIZE, maxValue);
 		Thread thisThread = Thread.currentThread();
 		
-		if (freeBlocksNotInUse == true) {
-			if (blocksNotInUse == null)
-				blocksNotInUse = 0;
+		if (freeBlocksUnused == true) {
+			if (blocksUnused == null)
+				blocksUnused = 0;
 			
 			// Calls DiskFileSystem.isAllocated for each data block completely included in
 			//	each file system, and frees the block if not in use by the file system
@@ -356,10 +395,10 @@ public abstract class DiskImage implements AutoCloseable {
 						progress.step(1);
 						if (!fs.isAllocated(i * length - offset, length)) {
 							imageTable.free(i);
-							blocksNotInUse++;
+							blocksUnused++;
 							dirty = true;
 							fsd.blocksMapped--;
-							fsd.blocksNotInUse++;
+							fsd.blocksUnused++;
 							progress.step(ZW);
 							progress.view();
 						}
@@ -406,8 +445,23 @@ public abstract class DiskImage implements AutoCloseable {
 		progress.end();
 	}
 	
+	/**
+	 * Compacts {@code this} disk image moving blocks from the end of the image to space
+	 *  that was marked as not in use by a previous call to the {@link #optimize(int)}
+	 *  method.
+	 * 
+	 * @throws IOException if some I/O error occurs.
+	 */
 	public abstract void compact() throws IOException;
 
+	/**
+	 * The copy method resets this disk image allocation table and copies all blocks
+	 *  that are allocated in the {@code source} disk image. Blocks that are found
+	 *  to be completely filled with zeros in {@code this} image are discarded.
+	 * 
+	 * @param source	the Disk Image to copy from.
+	 * @throws IOException if some I/O error occurs.
+	 */
 	public abstract void copy(DiskImage source) throws IOException;
 	
 	/**
@@ -515,7 +569,7 @@ public abstract class DiskImage implements AutoCloseable {
 	 */
 	public void addObserver(DiskImageObserver observer, boolean view) {
 		if (observer == null)
-			throw new NullPointerException();
+			return;
 		synchronized (obsProgress) {
 			if (!obsProgress.contains(observer))
 				obsProgress.add(observer);
@@ -550,7 +604,7 @@ public abstract class DiskImage implements AutoCloseable {
 		private final long maximum;	// Maximum value
 		private final long start;	// Start time in milliseconds
 
-		private final int notInUse;
+		private final int unused;
 		private final int zeroed;
 		
 		private long lastChange;	// Last time observers were notified of a change in view
@@ -561,7 +615,7 @@ public abstract class DiskImage implements AutoCloseable {
 			this.task 	= task;
 			maximum 	= max;
 			start 		= System.currentTimeMillis();
-			notInUse 	= blocksNotInUse == null? 0: blocksNotInUse;
+			unused 		= blocksUnused == null? 0: blocksUnused;
 			zeroed 		= blocksZeroed == null? 0: blocksZeroed;
 		}
 		
@@ -581,15 +635,15 @@ public abstract class DiskImage implements AutoCloseable {
 		}
 		
 		private void fakeCompactView(float pct) { // Could this be real?
-			int n = blocksNotInUse == null? 0: blocksNotInUse - Math.round(notInUse * pct);
+			int n = blocksUnused == null? 0: blocksUnused - Math.round(unused * pct);
 			int z = blocksZeroed == null? 0: blocksZeroed - Math.round(zeroed * pct);
 			if (n != 0 || z != 0) {
-				if (blocksNotInUse != null) blocksNotInUse -= n;
+				if (blocksUnused != null) blocksUnused -= n;
 				if (blocksZeroed != null) blocksZeroed -= z;
 				for (FileSysData fsd: blockView.values()) {
-					int dn = Math.min(fsd.blocksNotInUse, n);
+					int dn = Math.min(fsd.blocksUnused, n);
 					int dz = Math.min(fsd.blocksZeroed, z);
-					fsd.blocksNotInUse -= dn; n -= dn;
+					fsd.blocksUnused -= dn; n -= dn;
 					fsd.blocksZeroed -= dz; z -= dz;
 					if (n == 0 && z == 0)
 						break;
