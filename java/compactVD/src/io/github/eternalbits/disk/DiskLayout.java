@@ -20,8 +20,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import io.github.eternalbits.compactvd.Static;
-
 public abstract class DiskLayout {
 
 	protected DiskImage image = null;
@@ -43,11 +41,6 @@ public abstract class DiskLayout {
 
 	public List<DiskFileSystem> getFileSystems() {
 		return fileSystems;
-	}
-	
-	public static boolean isValidBlockSize(int blockSize) {
-		return blockSize >= 512 && blockSize <= 8192
-				&& Static.isPower2(blockSize);
 	}
 
 }

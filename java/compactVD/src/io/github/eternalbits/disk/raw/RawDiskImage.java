@@ -23,9 +23,10 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import java.io.RandomAccessFile;
+
+import io.github.eternalbits.compactvd.Static;
 import io.github.eternalbits.disk.DiskImage;
 import io.github.eternalbits.disk.DiskImageProgress;
-import io.github.eternalbits.disk.DiskLayout;
 import io.github.eternalbits.disk.WrongHeaderException;
 import io.github.eternalbits.disks.DiskLayouts;
 
@@ -49,7 +50,7 @@ public class RawDiskImage extends DiskImage {
 	final RawVirtualBlockTable clusterTable;
 	
 	public RawDiskImage(File file, long diskSize, int blockSize) throws IOException {
-		if (!DiskLayout.isValidBlockSize(blockSize))
+		if (!isValidBlockSize(blockSize))
 			throw new IllegalArgumentException(String.format("Block size: %d", blockSize));
 		if (diskSize < 0 || diskSize % blockSize != 0)
 			throw new IllegalArgumentException(String.format("Disk size: %d must be multiple of block size %d", diskSize, blockSize));
@@ -75,7 +76,7 @@ public class RawDiskImage extends DiskImage {
 	}
 	
 	public RawDiskImage(File file, String mode, int blockSize) throws IOException, WrongHeaderException {
-		if (!DiskLayout.isValidBlockSize(blockSize))
+		if (!isValidBlockSize(blockSize))
 			throw new IllegalArgumentException(String.format("Block size: %d", blockSize));
 
 		media = new RandomAccessFile(file, mode);
@@ -100,6 +101,11 @@ public class RawDiskImage extends DiskImage {
 			media.close();
 			throw e;
 		}
+	}
+	
+	private static boolean isValidBlockSize(int blockSize) {
+		return blockSize >= 512 && blockSize <= 8192
+				&& Static.isPower2(blockSize);
 	}
 
 	private boolean canBeADiskImage(ByteBuffer in) {
