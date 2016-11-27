@@ -25,6 +25,7 @@ import io.github.eternalbits.disk.InitializationException;
 import io.github.eternalbits.disk.NullFileSystem;
 import io.github.eternalbits.disk.WrongHeaderException;
 import io.github.eternalbits.linux.disk.ext.ExtFileSystem;
+import io.github.eternalbits.windos.disk.ntfs.NtfsFileSystem;
 
 public class DiskFileSystems {
 
@@ -41,6 +42,10 @@ public class DiskFileSystems {
 	 * @throws IOException 	if some I/O error occurs.
 	 */
 	public static DiskFileSystem open(DiskLayout layout, long offset, long length) throws IOException {
+		
+		try {
+			return new NtfsFileSystem(layout, offset, length);
+		} catch (WrongHeaderException e) {}
 		
 		try {
 			return new HfsFileSystem(layout, offset, length);
@@ -71,6 +76,12 @@ public class DiskFileSystems {
 	 * @throws IOException 	if some I/O error occurs.
 	 */
 	public static DiskFileSystem map(DiskLayout layout, long offset, long length, String description) throws IOException {
+		
+		try {
+			return new NtfsFileSystem(layout, offset, length);
+		} catch (InitializationException e) {
+			return new NullFileSystem(layout, offset, length, "NTFS", e);
+		} catch (WrongHeaderException e) {}
 		
 		try {
 			return new HfsFileSystem(layout, offset, length);
