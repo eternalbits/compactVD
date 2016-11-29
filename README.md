@@ -11,9 +11,9 @@ CompactVD is a utility to optimize the size of dynamic disk images, based on
  allocation, they should not be very different.
 
 Currently supported file systems are:
-* New Technology File System (NTFS), for Windows computers
-* Hierarchical File System (HFS), used in masOS computers
-* Extended File System (EXT), used in most linux desktops
+* Windows: New Technology File System (NTFS)
+* macOS: Hierarchical File System (HFS)
+* Linux: Extended File System (EXT)
 
 ### Compact Disk Image In Place
 
