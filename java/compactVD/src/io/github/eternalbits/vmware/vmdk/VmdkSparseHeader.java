@@ -141,7 +141,6 @@ class VmdkSparseHeader {
 					&& endLineChars == END_LINE_CHECK
 					&& compressAlgorithm == COMPRESSION_NONE
 					&& (int)grainSize == grainSize
-					&& (int)capacity == capacity
 					&& (int)overHead == overHead
 					&& capacity % grainSize == 0
 					&& overHead % grainSize == 0
