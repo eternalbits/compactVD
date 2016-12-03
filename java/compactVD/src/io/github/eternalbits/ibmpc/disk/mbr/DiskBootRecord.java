@@ -61,18 +61,19 @@ public class DiskBootRecord {
 	}
 
 	private class BootPart {
+		private static final long TO_LONG = 0xFFFFFFFFL;
 		
 		int	statusChsFS;	// packed CHS first sector with status
 		int typeChsLS;		// packed CHS last sector with partition type
-		int	firstSector;	// Logical block address of first sector
-		int	sectorCount;	// Number of sectors in partition
+		long firstSector;	// Logical block address of first sector
+		long sectorCount;	// Number of sectors in partition
 		
 		BootPart(ByteBuffer in) throws InitializationException, WrongHeaderException {
 			
 			statusChsFS = in.getInt();
 			typeChsLS 	= in.getInt();
-			firstSector	= in.getInt();
-			sectorCount	= in.getInt();
+			firstSector	= in.getInt() & TO_LONG;
+			sectorCount	= in.getInt() & TO_LONG;
 			if (isPartEmpty())
 				return;
 			
@@ -102,11 +103,11 @@ public class DiskBootRecord {
 		return bootTable[i].isPartEmpty();
 	}
 
-	public int getFirstSector(int i) {
+	public long getFirstSector(int i) {
 		return bootTable[i].firstSector;
 	}
 
-	public int getSectorCount(int i) {
+	public long getSectorCount(int i) {
 		return bootTable[i].sectorCount;
 	}
 }

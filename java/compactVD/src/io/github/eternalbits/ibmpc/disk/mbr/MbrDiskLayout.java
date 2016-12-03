@@ -98,17 +98,17 @@ public class MbrDiskLayout extends DiskLayout { // https://en.wikipedia.org/wiki
 		this.image 		= img;
 		this.blockSize 	= img.getLogicalBlockSize();
 		
-		extendMbr(readBootRecord(0), 0, (int) (img.getDiskSize() / img.getLogicalBlockSize()));
+		extendMbr(readBootRecord(0), 0, img.getDiskSize() / img.getLogicalBlockSize());
 
 	}
 
-	private DiskBootRecord readBootRecord(int start) throws IOException, WrongHeaderException {
+	private DiskBootRecord readBootRecord(long start) throws IOException, WrongHeaderException {
 		byte[] buffer = new byte[DiskBootRecord.BOOT_SIZE];
 		int read = image.readAll(start * blockSize, buffer, 0, buffer.length);
 		return new DiskBootRecord(this, ByteBuffer.wrap(buffer, 0, read));
 	}
 	
-	private void extendMbr(DiskBootRecord dbr, int start, int size) throws IOException, WrongHeaderException {
+	private void extendMbr(DiskBootRecord dbr, long start, long size) throws IOException, WrongHeaderException {
 		for (int i =0; i < 4; i++) if (!dbr.isPartEmpty(i)) {
 			
 			if (dbr.getFirstSector(i) + dbr.getSectorCount(i) > size)
@@ -122,7 +122,7 @@ public class MbrDiskLayout extends DiskLayout { // https://en.wikipedia.org/wiki
 			case EXTENDED_LINUX:
 			case EXTENDED_LBA:
 			case EXTENDED_DOS:
-				int ext = start + dbr.getFirstSector(i);
+				long ext = start + dbr.getFirstSector(i);
 				extendMbr(readBootRecord(ext), ext, dbr.getSectorCount(i));
 				break;
 			case LINUX_SWAP:
