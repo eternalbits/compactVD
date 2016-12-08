@@ -152,8 +152,8 @@ class VmdkSparseHeader {
 				gdeCount			= (int)Static.ceilDiv(gteCount, numGTEsPerGT);
 				long tabSize		= Static.ceilDiv(gteCount, SECTOR_SIZE/4);
 				long dirSize		= Static.ceilDiv(gdeCount, SECTOR_SIZE/4);
-				rgtOffset			= rgdOffset + dirSize;
-				gtOffset			= gdOffset + dirSize;
+				rgtOffset			= getTableOffset(rgdOffset);
+				gtOffset			= getTableOffset(gdOffset);
 				grainSectors		= (int)grainSize;
 				firstSector			= (int)overHead;
 				nextSector			= (int)(length / SECTOR_LONG);
@@ -162,8 +162,10 @@ class VmdkSparseHeader {
 						&& gteCount == capacity / grainSize 
 						&& nextSector == length / SECTOR_LONG 
 						&& nextSector % grainSize == 0
-						&& gdOffset >= rgdOffset + dirSize + tabSize 
-						&& overHead >= gdOffset + dirSize + tabSize
+						&& rgtOffset >= rgdOffset + dirSize
+						&& gdOffset >= rgtOffset + tabSize
+						&& gtOffset >= gdOffset + dirSize
+						&& overHead >= gtOffset + tabSize
 						&& nextSector >= overHead) {
 					return;
 				}
@@ -171,6 +173,10 @@ class VmdkSparseHeader {
 		}
 		
 		throw new WrongHeaderException(getClass(), image.toString());
+	}
+	
+	private long getTableOffset(long dirOffset) throws IOException {
+		return image.readMetadata(dirOffset, 4).order(VmdkDiskImage.BYTE_ORDER).getInt();
 	}
 	
 	long getUpdateOffset() {
