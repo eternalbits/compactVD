@@ -251,8 +251,8 @@ public class VdiDiskImage extends DiskImage {
 
 	@Override
 	public long getOptimizedLength() {
-		return header.offsetData + (long)blockTable.getDataBlocksCount() 
-			* VdiHeaderDescriptor.VDI_IMAGE_BLOCK_SIZE;
+		return header.offsetData + (long)header.blockSize 
+				* blockTable.getDataBlocksCount();
 	}
 
 	@Override
