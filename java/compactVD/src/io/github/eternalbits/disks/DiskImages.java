@@ -25,6 +25,7 @@ import io.github.eternalbits.disk.WrongHeaderException;
 import io.github.eternalbits.disk.raw.RawDiskImage;
 import io.github.eternalbits.vbox.vdi.VdiDiskImage;
 import io.github.eternalbits.vmware.vmdk.VmdkDiskImage;
+import io.github.eternalbits.windos.vhd.VhdDiskImage;
 
 public class DiskImages {
 	private static String UNKNOWN_TYPE = "Unknown disk image type";
@@ -41,6 +42,10 @@ public class DiskImages {
 		
 		try {
 			return new VmdkDiskImage(file, mode);
+		} catch (WrongHeaderException e) {}
+		
+		try {
+			return new VhdDiskImage(file, mode);
 		} catch (WrongHeaderException e) {}
 		
 		try {
@@ -64,6 +69,10 @@ public class DiskImages {
 			return new VmdkDiskImage(file, mode);
 		}
 		
+		if (type.equalsIgnoreCase("vhd")) {
+			return new VhdDiskImage(file, mode);
+		}
+		
 		if (type.equalsIgnoreCase("img") || type.equalsIgnoreCase("raw")) {
 			return new RawDiskImage(file, mode, 512);
 		}
@@ -83,6 +92,10 @@ public class DiskImages {
 		
 		if (type.equalsIgnoreCase("vmdk")) {
 			return new VmdkDiskImage(file, diskSize);
+		}
+		
+		if (type.equalsIgnoreCase("vhd")) {
+			return new VhdDiskImage(file, diskSize);
 		}
 		
 		if (type.equalsIgnoreCase("img") || type.equalsIgnoreCase("raw")) {

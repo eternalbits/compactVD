@@ -41,11 +41,16 @@ public class CompactTestUnit {
 			return;
 		
 		if ("MD5VDI".equals(args[0])) {
-			System.exit(md5Check(args[1], args[2], 392, 32));
+			System.exit(md5Check(args[1], args[2], new long[]{392}, new int[]{32}));
 		}
 		
 		if ("MD5VMDK".equals(args[0])) {
-			System.exit(md5Check(args[1], args[2], 512, 2048));
+			System.exit(md5Check(args[1], args[2], new long[]{512}, new int[]{2048}));
+		}
+		
+		if ("MD5VHD".equals(args[0])) {
+			long df = (new File(args[1]).length() - 1) / 512 * 512;
+			System.exit(md5Check(args[1], args[2], new long[]{24,24+df}, new int[]{60,60}));
 		}
 		
 		if ("COPY".equals(args[0])) {
@@ -97,15 +102,17 @@ public class CompactTestUnit {
 		System.exit(0);
 	}
 	
-	static int md5Check(String path, String sum, long ignore, int length) throws Exception {
+	static int md5Check(String path, String sum, long[] ignore, int[] length) throws Exception {
 		try (RandomAccessFile in = new RandomAccessFile(new File(path), "r")) {
 			MessageDigest md = MessageDigest.getInstance("MD5");
 			byte[] buffer = new byte[1048576];
-			int count = (int)(ignore / buffer.length);
-			int start = (int)(ignore % buffer.length);
 			for (int read, c = 0; (read = in.read(buffer)) != -1; c++) {
-				if (c == count)
-					Arrays.fill(buffer, start, start + length, (byte)0);
+				for (int i = 0; i < ignore.length; i++) {
+					int count = (int)(ignore[i] / buffer.length);
+					int start = (int)(ignore[i] % buffer.length);
+					if (c == count)
+						Arrays.fill(buffer, start, start + length[i], (byte)0);
+				}
 				md.update(buffer, 0, read);
 			}
 			String out = DatatypeConverter.printHexBinary(md.digest());
@@ -141,7 +148,7 @@ class Copy implements Runnable, DiskImageObserver {
 		try (DiskImage source = DiskImages.open(new File(args_1_), "rw")) {
 			try (DiskImage clone = DiskImages.create(source.getType(), new File(args_2_), source.getDiskSize())) {
 				System.out.println(source.toString());
-				source.optimize(DiskImage.FREE_BLOCKS_NOT_IN_USE);
+				source.optimize(DiskImage.FREE_BLOCKS_UNUSED);
 				clone.addObserver(this, false);
 				clone.copy(source);
 				clone.removeObserver(this);
@@ -183,7 +190,7 @@ class Inline implements Runnable, DiskImageObserver {
 	}
 	static int options(String arg) {
 		int opt = 0;
-		if (arg.indexOf('N') != -1) opt |= DiskImage.FREE_BLOCKS_NOT_IN_USE;
+		if (arg.indexOf('N') != -1) opt |= DiskImage.FREE_BLOCKS_UNUSED;
 		if (arg.indexOf('Z') != -1) opt |= DiskImage.FREE_BLOCKS_ZEROED;
 		return opt;
 	}

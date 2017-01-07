@@ -177,7 +177,7 @@ public class CompactVD implements DiskImageObserver {
 		}
 	}
 
-	private static final String version = "1.3";
+	private static final String version = "1.4";
 	private static final String jar = new java.io.File(CompactVD.class.getProtectionDomain()
 			.getCodeSource().getLocation().getPath()).getName();
 
@@ -226,7 +226,7 @@ public class CompactVD implements DiskImageObserver {
 				.addOption(Option.builder("Z").longOpt("keep-zeroed").desc("keep space filled with zeros").build())
 			);
 		options.addOption(Option.builder("w").longOpt("write").desc("set <out> as destination file for copy").hasArgs().argName("out").build());
-		options.addOption(Option.builder("f").longOpt("format").desc("copy output format: VDI, VMDK or IMG|RAW").hasArgs().argName("fmt").build());
+		options.addOption(Option.builder("f").longOpt("format").desc("copy output format: VDI, VMDK, VHD or IMG|RAW").hasArgs().argName("fmt").build());
 		options.addOption(Option.builder("o").longOpt("overwrite").desc("overwrite existing file on copy").build());
 		options.addOption(Option.builder("v").longOpt("verbose").desc("explain what is being done").build());
 		return options;

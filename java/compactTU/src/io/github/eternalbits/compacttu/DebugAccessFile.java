@@ -80,26 +80,23 @@ public class DebugAccessFile extends RandomAccessFile {
 			else
 			if (hb.getInt(0) == 0x4B444D56) { //VMDK
 				hb.order(ByteOrder.LITTLE_ENDIAN);
-				long tab = hb.getLong(56);
-				long cap = hb.getLong(12);
-				long gs = hb.getLong(20);
-				int gpg = hb.getInt(44);
-				long tec = cap / gs;
-				long dec = (tec + gpg -1) / gpg;
-				tab = tab * 512 + dec * 4;
+				long gdo = hb.getLong(56);
+				seek(gdo * 512); readFully(h); seek(pos);
+				long tab = (hb.getInt(0) & 0xFFFFFFFFL) * 512;
 				if (crash.equals("header") && pos == 0 || crash.equals("table") && pos == tab) {
 					System.out.println("CRASH "+crash.toUpperCase());
 					crash(b);
 					return;
 				}
 			}
-			else // TODO check VHD stuff when implemented
+			else
 			if (hb.getLong(16) <= 0x1000L) {
-				long dyn = hb.getLong(16); 
+				long dyn = hb.getLong(16);
 				seek(dyn); readFully(h); seek(pos);
 				if (hb.getLong(0) == 0x6378737061727365L) { //VHD
+					long hdr = (length()-1) / 512 * 512;
 					long tab = hb.getLong(16);
-					if (crash.equals("header") && pos == dyn || crash.equals("table") && pos == tab) {
+					if (crash.equals("header") && pos == hdr || crash.equals("table") && pos == tab) {
 						System.out.println("CRASH "+crash.toUpperCase());
 						crash(b);
 						return;
