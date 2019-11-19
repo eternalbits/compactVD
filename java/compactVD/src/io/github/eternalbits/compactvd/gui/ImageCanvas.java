@@ -215,7 +215,7 @@ class ImageCanvas extends JPanel {
 		if (view.blocksCount > 0) {
 			float c = view.blocksCount;
 			float m = view.blocksMapped * width / c;
-			float n = view.blocksNotInUse * width / c;
+			float n = view.blocksUnused * width / c;
 			float z = view.blocksZeroed * width / c;
 			g2.setColor(view.isFileSystem? MAPPED_COLOR: NOT_FS_COLOR);
 			g2.fill(new Rectangle2D.Float(x, y, m, height));
@@ -256,14 +256,14 @@ class ImageCanvas extends JPanel {
 		g2.setColor(BLACK_TEXT);
 		int b = (24 + g2.getFontMetrics().getAscent()) / 2;
 		int m = intPercent(view.blocksMapped, view.blocksCount);
-		int n = intPercent(view.blocksNotInUse, view.blocksCount);
+		int n = intPercent(view.blocksUnused, view.blocksCount);
 		int z = intPercent(view.blocksZeroed, view.blocksCount);
 		int t = 100 - m - n - z;
 		drawStatStrings(g2, "Current file size", s0, humanSize(view.imageLength), d0, y0 + b);
 		drawStatStrings(g2, "Optimized file size", s1, humanSize(view.optimizedLength), d1, y0 + b);
 		drawStatStrings(g2, "System and Files", s0, stringPercent(m, m), d0, y1 + b);
 		drawStatStrings(g2, "Not allocated", s1, stringPercent(t, t), d1, y1 + b);
-		drawStatStrings(g2, "Not in use by S&F", s0, stringPercent(view.blocksNotInUse, n), d0, y2 + b);
+		drawStatStrings(g2, "Not in use by S&F", s0, stringPercent(view.blocksUnused, n), d0, y2 + b);
 		drawStatStrings(g2, "Zero filled", s1, stringPercent(view.blocksZeroed, z), d1, y2 + b);
 	}
 	

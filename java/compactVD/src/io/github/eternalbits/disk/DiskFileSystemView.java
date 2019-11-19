@@ -32,9 +32,6 @@ public class DiskFileSystemView {
 	public final int blocksCount;
 	public final int blocksMapped;
 	public final int blocksUnused;
-	/** Replaced by {@code blocksUnused} */
-	@Deprecated
-	public final int blocksNotInUse;
 	public final int blocksZeroed;
 	
 	public DiskFileSystemView(DiskFileSystem fileSys, FileSysData cc) {
@@ -46,7 +43,6 @@ public class DiskFileSystemView {
 		blocksCount 	= cc.blockEnd - cc.blockStart;
 		blocksMapped 	= cc.blocksMapped;
 		blocksUnused 	= cc.blocksUnused;
-		blocksNotInUse 	= cc.blocksUnused;
 		blocksZeroed 	= cc.blocksZeroed;
 	}
 

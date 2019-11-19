@@ -158,8 +158,7 @@ public class FrontEnd extends JFrame {
 		setMinimumSize(new Dimension(580, 420));
 		setExtendedState(settings.windowState);
 		
-		main.setMinimumSize(new Dimension(420, 420));
-		list.setMinimumSize(new Dimension(0, 420));
+		main.setMinimumSize(new Dimension(420, 0));
 		split.setDividerLocation(settings.splitLocation);
 		getContentPane().add(split, BorderLayout.CENTER);
 		
@@ -354,13 +353,13 @@ public class FrontEnd extends JFrame {
 	int getOptimizeOptions(int task) {
 		switch (task) {
 		case DiskImageProgress.OPTIMIZE:
-			return (settings.findBlocksNotInUse? DiskImage.FREE_BLOCKS_NOT_IN_USE: 0) |
+			return (settings.findBlocksNotInUse? DiskImage.FREE_BLOCKS_UNUSED: 0) |
 					(settings.findBlocksZeroed? DiskImage.FREE_BLOCKS_ZEROED: 0);
 		case DiskImageProgress.COMPACT:
-			return (settings.compactBlocksNotInUse? DiskImage.FREE_BLOCKS_NOT_IN_USE: 0) |
+			return (settings.compactBlocksNotInUse? DiskImage.FREE_BLOCKS_UNUSED: 0) |
 					(settings.compactBlocksZeroed? DiskImage.FREE_BLOCKS_ZEROED: 0);
 		case DiskImageProgress.COPY:
-			return (settings.ignoreBlocksNotInUse? DiskImage.FREE_BLOCKS_NOT_IN_USE: 0);
+			return (settings.ignoreBlocksNotInUse? DiskImage.FREE_BLOCKS_UNUSED: 0);
 		default:
 			return 0;
 		}

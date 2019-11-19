@@ -36,9 +36,6 @@ public class DiskImageView {
 	public final int blocksInFile;
 	public final int blocksMapped;
 	public final Integer blocksUnused;
-	/** Replaced by {@code blocksUnused} */
-	@Deprecated
-	public final Integer blocksNotInUse;
 	public final Integer blocksZeroed;
 	public final String diskLayout;
 	
@@ -55,7 +52,6 @@ public class DiskImageView {
 		blocksInFile	= image.getImageBlocksInFile();
 		blocksMapped	= image.getImageBlocksMapped();
 		blocksUnused 	= image.blocksUnused;
-		blocksNotInUse 	= image.blocksUnused;
 		blocksZeroed 	= image.blocksZeroed;
 		
 		diskLayout		= image.getLayout() == null? null: image.getLayout().getType();
