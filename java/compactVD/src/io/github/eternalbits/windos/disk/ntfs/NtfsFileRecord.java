@@ -103,7 +103,7 @@ class NtfsFileRecord {
 						
 						if (d == 0) { // resident data
 							
-							break getAttributes; // Not expected for $Bitmap and $LogFile
+							break; // Expected residents for $Bitmap and $LogFile
 							
 						} else { // non resident data
 							
