@@ -177,7 +177,7 @@ public class CompactVD implements DiskImageObserver {
 		}
 	}
 
-	private static final String version = "1.4";
+	private static final String version = "1.5";
 	private static final String jar = new java.io.File(CompactVD.class.getProtectionDomain()
 			.getCodeSource().getLocation().getPath()).getName();
 
@@ -301,7 +301,7 @@ public class CompactVD implements DiskImageObserver {
 	}
 
 	private static void printAbout() {
-		System.out.println("CompactVD version " + version + " copyright 2016 Rui Baptista");
+		System.out.println("CompactVD version " + version + " copyright 2016-2020 Rui Baptista");
 		System.out.println("Licensed under the Apache License, Version 2.0.");
 	}
 	
