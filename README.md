@@ -41,7 +41,7 @@ The format of the new disk image can be select in the Copy Disk Image dialog wit
 * VDI, Virtual Disk Image for Oracle VirtualBox
 * VMDK, Virtual Machine Disk for VMware products
 * VHD, Virtual Hard Disk for Microsoft products
-* RAW or ISO, for a complete disk image
+* RAW or IGM, for a complete disk image
 
 ### Copyright Notices
 
