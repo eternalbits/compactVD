@@ -310,8 +310,8 @@ class ExtVolumeHeader {
 	}
 	
 	// Use some more bytes than ehMagic to switch journal inode type 
-	private static long INODE_TYPE_EXTENTS 	= 0x000000040007F30AL;
-	private static long INODE_TYPE_MASK 	= 0x0000000000070000L;
+	private static long INODE_TYPE_EXTENTS 	= 0x000100040007F30AL;
+	private static long INODE_TYPE_MASK 	= 0x0001000000070000L;
 	
 	/**
 	 * Checks if the journal has transactions. Implementations accessing a journaled volume
@@ -337,20 +337,29 @@ class ExtVolumeHeader {
 			short ehMagic 	= bb.getShort();		// 0xF30A
 			short ehEntries = bb.getShort();		// One entry must be present
 			short ehMax 	= bb.getShort();		// There is room  for 4 entries
-			short ehDepth 	= bb.getShort();		// Only leaf nodes are expected
+			short ehDepth 	= bb.getShort();		// Leaf nodes or other nodes are expected
 			bb.position(bb.position() + 4);
-			if (ehMagic != (short)0xF30A || ehMax !=4 || ehDepth != 0 
+			if (ehMagic != (short)0xF30A || ehMax !=4 || ehDepth < 0 || ehDepth > 1 
 					|| ehEntries < 1 || ehEntries > ehMax)
 				return false;
 			// Now read the first extent
-			int eeBlock 	= bb.getInt();			// First file block number that this extent covers
-			int eeCount 	= bb.getShort();		// Number of blocks covered by this extent
-			int eeStartHi	= bb.getShort();		// This is expected to be zero, in this 32 bits world
-			int eeStartLo 	= bb.getInt();			// Logical block number to which this extent points
-			if (eeBlock != 0 || eeCount < 1 && eeCount != -32768 
-					|| eeStartHi != 0 || eeStartLo < 0)
-				return false;
-			journalBlockNumber = eeStartLo;
+			if (ehDepth == 0) {
+				int eeBlock 	= bb.getInt();		// First file block number that this extent covers
+				int eeCount 	= bb.getShort();	// Number of blocks covered by this extent
+				int eeStartHi	= bb.getShort();	// This is expected to be zero, in this 32 bits world
+				int eeStartLo 	= bb.getInt();		// Logical block number to which this extent points
+				if (eeBlock != 0 || eeCount < 1 && eeCount != -32768 
+						|| eeStartHi != 0 || eeStartLo < 0)
+					return false;
+				journalBlockNumber = eeStartLo;
+			} else {
+				int eiBlock 	= bb.getInt();		// This index node covers file blocks from 'block' onward
+				int eiLeafLo 	= bb.getInt();		// Logical block number that is the next level lower in the tree
+				int eiLeafHi 	= bb.getShort();	// This is expected to be zero, in this 32 bits world
+				if (eiBlock != 0 || eiLeafHi != 0 || eiLeafLo < 0)
+					return false;
+				journalBlockNumber = eiLeafLo + 1;	// I'm not sure of anything, as long as it works...
+			}
 		} else {
 			journalBlockNumber = bb.getInt();		// First logical block number
 		}
@@ -363,6 +372,6 @@ class ExtVolumeHeader {
 		
 		// The journal superblock's s_start field is zero if, and only if,
 		//	the journal was cleanly unmounted.
-		return in.getInt(12+12+4) == 0;
+		return in.getInt(12+12+8) == 0;
 	}
 }

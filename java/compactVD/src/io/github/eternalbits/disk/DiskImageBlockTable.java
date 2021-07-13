@@ -24,8 +24,6 @@ package io.github.eternalbits.disk;
  *  recorded in a table that is part of the disk image metadata.
  */
 public abstract class DiskImageBlockTable {
-	
-	
 
 	/**
 	 * Returns the absolute offset, in bytes, of the image data cluster that is
