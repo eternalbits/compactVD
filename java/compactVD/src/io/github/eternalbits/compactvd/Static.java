@@ -27,6 +27,13 @@ import java.util.regex.Pattern;
  */
 public class Static {
 
+	public static long[] getLongs(ByteBuffer in, int length) {
+		long[] buffer = new long[length];
+		for (int i = 0; i < buffer.length; i++)
+			buffer[i] = in.getLong();
+		return buffer;
+	}
+
 	public static int[] getInts(ByteBuffer in, int length) {
 		int[] buffer = new int[length];
 		for (int i = 0; i < buffer.length; i++)

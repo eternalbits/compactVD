@@ -18,6 +18,7 @@ package io.github.eternalbits.disks;
 
 import java.io.IOException;
 
+import io.github.eternalbits.apple.disk.apfs.ApfsFileSystem;
 import io.github.eternalbits.darwin.disk.hfs.HfsFileSystem;
 import io.github.eternalbits.disk.DiskFileSystem;
 import io.github.eternalbits.disk.DiskLayout;
@@ -45,6 +46,10 @@ public class DiskFileSystems {
 		
 		try {
 			return new NtfsFileSystem(layout, offset, length);
+		} catch (WrongHeaderException e) {}
+		
+		try {
+			return new ApfsFileSystem(layout, offset, length);
 		} catch (WrongHeaderException e) {}
 		
 		try {
@@ -81,6 +86,12 @@ public class DiskFileSystems {
 			return new NtfsFileSystem(layout, offset, length);
 		} catch (InitializationException e) {
 			return new NullFileSystem(layout, offset, length, "NTFS", e);
+		} catch (WrongHeaderException e) {}
+		
+		try {
+			return new ApfsFileSystem(layout, offset, length);
+		} catch (InitializationException e) {
+			return new NullFileSystem(layout, offset, length, "APFS", e);
 		} catch (WrongHeaderException e) {}
 		
 		try {

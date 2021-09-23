@@ -258,11 +258,10 @@ class ImageCanvas extends JPanel {
 		int m = intPercent(view.blocksMapped, view.blocksCount);
 		int n = intPercent(view.blocksUnused, view.blocksCount);
 		int z = intPercent(view.blocksZeroed, view.blocksCount);
-		int t = 100 - m - n - z;
 		drawStatStrings(g2, "Current file size", s0, humanSize(view.imageLength), d0, y0 + b);
 		drawStatStrings(g2, "Optimized file size", s1, humanSize(view.optimizedLength), d1, y0 + b);
 		drawStatStrings(g2, "System and Files", s0, stringPercent(m, m), d0, y1 + b);
-		drawStatStrings(g2, "Not allocated", s1, stringPercent(t, t), d1, y1 + b);
+		drawStatStrings(g2, "Full disk size", s1, humanSize(view.diskLength), d1, y1 + b);
 		drawStatStrings(g2, "Not in use by S&F", s0, stringPercent(view.blocksUnused, n), d0, y2 + b);
 		drawStatStrings(g2, "Zero filled", s1, stringPercent(view.blocksZeroed, z), d1, y2 + b);
 	}
