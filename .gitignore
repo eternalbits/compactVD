@@ -10,8 +10,6 @@ Thumbs.db
 .recommenders/
 .dictionaries/
 .metadata/
-.settings/*
-!.settings/org.eclipse.core.resources.prefs
 
 # Java clases
 bin/
