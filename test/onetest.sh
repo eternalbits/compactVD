@@ -1,7 +1,7 @@
 #!/bin/sh
 
 if [ $# -ne 4 ]; then
- echo "usage: ./$(basename $0) image_name VDI/VMDK compressed_md5 copied_md5"
+ echo "usage: ./$(basename $0) image_name VDI/VMDK/VHD compressed_md5 copied_md5"
  exit
 fi
 echo "Expanding $1..."

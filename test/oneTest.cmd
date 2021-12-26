@@ -1,11 +1,11 @@
 @echo off
 
 if "%4" == "" (
- echo usage: %~nx0 image_name VDI/VMDK compressed_md5 copied_md5
+ echo usage: %~nx0 image_name VDI/VMDK/VHD compressed_md5 copied_md5
  exit /b
 )
 echo Expanding %1...
-7z x -y %1.xz > nul
+"%az%\7z" x -y %1.xz > nul
 echo .
 echo .
 java -jar compTest.jar COPY %1 out.%2
