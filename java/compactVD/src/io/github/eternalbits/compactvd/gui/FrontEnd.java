@@ -559,17 +559,23 @@ public class FrontEnd extends JFrame {
 			fileDialog.setMultipleMode(false);
 			fileDialog.setVisible(true);
 			for (File file: fileDialog.getFiles()) {
-				if (Static.getExtension(file.getName()).length() == 0)
-					file = new File(file.getPath()+"."+Static.getExtension(source));
-				String type = Static.getExtension(file.getName()).toUpperCase();
-				if (!ListItem.IMAGE_TYPE.contains(type)) {
+				if (file.compareTo(listData.get(s).getFile()) == 0) {
 					JOptionPane.showMessageDialog(this, 
-							String.format("Unknown image type: %s", type), 
-							"Error", JOptionPane.ERROR_MESSAGE);
-					return;
+							String.format("The %s image is the same as the old image", 
+							file.getName()), "Error", JOptionPane.ERROR_MESSAGE);
+				} else {
+					if (Static.getExtension(file.getName()).length() == 0)
+						file = new File(file.getPath()+"."+Static.getExtension(source));
+					String type = Static.getExtension(file.getName()).toUpperCase();
+					if (!ListItem.IMAGE_TYPE.contains(type)) {
+						JOptionPane.showMessageDialog(this, 
+								String.format("Unknown image type: %s", type), 
+								"Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					listData.get(s).copyTo(file, type);
+					break;
 				}
-				listData.get(s).copyTo(file, type);
-				break;
 			}
 		}
 	}
