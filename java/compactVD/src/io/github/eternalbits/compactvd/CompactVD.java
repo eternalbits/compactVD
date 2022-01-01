@@ -28,6 +28,7 @@ import java.util.List;
 
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -177,7 +178,7 @@ public class CompactVD implements DiskImageObserver {
 		}
 	}
 
-	private static final String version = "1.7";
+	private static final String version = "1.8";
 	private static final String jar = new java.io.File(CompactVD.class.getProtectionDomain()
 			.getCodeSource().getLocation().getPath()).getName();
 
@@ -301,7 +302,7 @@ public class CompactVD implements DiskImageObserver {
 	}
 
 	private static void printAbout() {
-		System.out.println("CompactVD version " + version + " copyright 2016-2021 Rui Baptista");
+		System.out.println("CompactVD version " + version + " copyright 2016-2022 Rui Baptista");
 		System.out.println("Licensed under the Apache License, Version 2.0.");
 	}
 	
@@ -310,7 +311,7 @@ public class CompactVD implements DiskImageObserver {
 		formatter.setSyntaxPrefix("Usage: ");
 		final String prefix = "--";
 		String header = "\nTo reduce the size of dynamic disk images. Version "+version+"\n\n";
-		String footer = ("\nOne of ^inline, ^copy or ^dump is required. For ^inline and ^dump"
+		String footer = ("\nOne of ^inplace, ^copy or ^dump is required. For ^inplace and ^dump"
 				+ " the default options are ^drop-unused ^keep-zeroed. For ^copy the default"
 				+ " is ^drop-unused and ^drop-zeroed is implied. Not applicable arguments"
 				+ " are ignored.\n").replace("^", prefix);

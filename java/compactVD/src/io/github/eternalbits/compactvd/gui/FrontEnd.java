@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
+
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
@@ -304,6 +305,11 @@ public class FrontEnd extends JFrame {
 			
 			for (int i = 0, s = listData.getSize(); i < s; i++) {
 				if (listData.get(i).getFile().equals(file)) {
+					if (listData.get(i).stopRun("refresh the image from the list")) {
+						try (DiskImage image = DiskImages.open(file, "r")) {						
+							listData.set(i, new ListItem(this, file, image.getView()));
+						} catch (IOException e) {}
+					}
 					list.setSelectedIndex(i);
 					updateDiskImage();
 					return;
