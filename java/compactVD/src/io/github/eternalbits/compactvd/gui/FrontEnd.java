@@ -52,8 +52,10 @@ import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -152,6 +154,7 @@ public class FrontEnd extends JFrame {
 		
 		split.setLeftComponent(setupFileList());
 		split.setRightComponent(main);
+		setComponentPopupMenu(main);
 		
 		adjustBounds();
 		setLocation(settings.windowRect.getLocation());
@@ -239,23 +242,6 @@ public class FrontEnd extends JFrame {
 			}
 		});
 		
-		list.addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyPressed(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_DELETE && list.getSelectedIndex() != -1) {
-					int index = list.getSelectedIndex();
-					if (listData.get(index).stopRun("remove the image from the list")) {
-						listData.remove(index);
-						if (listData.size() > 0) {
-							if (index == listData.size())
-								index--;
-							list.setSelectedIndex(index);
-						}
-					}
-				}
-			}
-		});
-		
 		JScrollPane jsp = new JScrollPane(list);
 		jsp.setMinimumSize(new Dimension(0, 0));
 		return jsp;
@@ -299,19 +285,16 @@ public class FrontEnd extends JFrame {
 			}
 		});
 	}
-
+	
+	/**
+	 * The open file to make a translation
+	 */
 	private void addToList(File file) {
 		if (file.isFile()) {
 			
 			for (int i = 0, s = listData.getSize(); i < s; i++) {
 				if (listData.get(i).getFile().equals(file)) {
-					if (listData.get(i).stopRun("refresh the image from the list")) {
-						try (DiskImage image = DiskImages.open(file, "r")) {						
-							listData.set(i, new ListItem(this, file, image.getView()));
-						} catch (IOException e) {}
-					}
-					list.setSelectedIndex(i);
-					updateDiskImage();
+					refresh(i);
 					return;
 				}
 			}
@@ -327,6 +310,66 @@ public class FrontEnd extends JFrame {
 						"Error", JOptionPane.ERROR_MESSAGE);
 			}
 		}
+	}
+	
+	/**
+	 * The refresh results on a file
+	 */
+	private void refresh(int i) {
+		if (listData.get(i).stopRun("refresh the image from the list")) {
+			File file = listData.get(i).getFile();
+			
+			try (DiskImage image = DiskImages.open(file, "r")) {						
+				listData.set(i, new ListItem(this, file, image.getView()));
+				list.setSelectedIndex(i);
+				updateDiskImage();
+				
+			} catch (IOException e) {
+				JOptionPane.showMessageDialog(this, 
+						Static.wordWrap(Static.simpleString(e)), 
+						"Error", JOptionPane.ERROR_MESSAGE);
+			}
+		}
+	}
+	
+	/**
+	 * Place the PopupMenu with its dependencies under the JComponent source
+	 */
+	private void setComponentPopupMenu(JComponent source) {
+		final JMenuItem refresh = new JMenuItem("Refresh");
+		final JMenuItem close = new JMenuItem("Close");
+		final JPopupMenu popup = new JPopupMenu();
+		popup.add(refresh);
+		popup.add(close);
+		
+		source.setComponentPopupMenu(popup);
+
+		refresh.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (list.getSelectedIndex() != -1) {
+					refresh(list.getSelectedIndex());
+				}
+			}
+		});
+		
+		close.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (list.getSelectedIndex() != -1) {
+					int index = list.getSelectedIndex();
+					if (listData.get(index).stopRun("close the image from the list")) {
+						listData.remove(index);
+						if (listData.size() > 0) {
+							if (index == listData.size())
+								index--;
+							list.setSelectedIndex(index);
+						}
+					}
+				}
+			}
+		});
+
 	}
 	
 	/**
@@ -561,7 +604,7 @@ public class FrontEnd extends JFrame {
 			for (File file: fileDialog.getFiles()) {
 				if (file.compareTo(listData.get(s).getFile()) == 0) {
 					JOptionPane.showMessageDialog(this, 
-							String.format("The %s image is the same as the old image", 
+							String.format("The %s image is the same as the old image!", 
 							file.getName()), "Error", JOptionPane.ERROR_MESSAGE);
 				} else {
 					if (Static.getExtension(file.getName()).length() == 0)
