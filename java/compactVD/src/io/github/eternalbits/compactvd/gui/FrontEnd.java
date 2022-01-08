@@ -242,6 +242,15 @@ public class FrontEnd extends JFrame {
 			}
 		});
 		
+		list.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_DELETE && list.getSelectedIndex() != -1) {
+					close(list.getSelectedIndex());
+				}
+			}
+		});
+		
 		JScrollPane jsp = new JScrollPane(list);
 		jsp.setMinimumSize(new Dimension(0, 0));
 		return jsp;
@@ -333,6 +342,20 @@ public class FrontEnd extends JFrame {
 	}
 	
 	/**
+	 * The close results on a file
+	 */
+	private void close(int i) {
+		if (listData.get(i).stopRun("close the image from the list")) {
+			listData.remove(i);
+			if (listData.size() > 0) {
+				if (i == listData.size())
+					i--;
+				list.setSelectedIndex(i);
+			}
+		}
+	}
+	
+	/**
 	 * Place the PopupMenu with its dependencies under the JComponent source
 	 */
 	private void setComponentPopupMenu(JComponent source) {
@@ -357,15 +380,7 @@ public class FrontEnd extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (list.getSelectedIndex() != -1) {
-					int index = list.getSelectedIndex();
-					if (listData.get(index).stopRun("close the image from the list")) {
-						listData.remove(index);
-						if (listData.size() > 0) {
-							if (index == listData.size())
-								index--;
-							list.setSelectedIndex(index);
-						}
-					}
+					close(list.getSelectedIndex());
 				}
 			}
 		});
