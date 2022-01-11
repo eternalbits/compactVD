@@ -67,8 +67,7 @@ class SettingsDialog extends JDialog {
 		Box copy = Box.createVerticalBox();
 		copy.setBorder(new TitledBorder(boxBorder, "Copy"));
 		copy.add(ignoreBlocksNotInUse = new JCheckBox("Ignore blocks not in use by System and Files", app.settings.ignoreBlocksNotInUse));
-		copy.add(ignoreBlocksZeroed   = new JCheckBox("Ignore blocks completely filled with zeros", true));
-		ignoreBlocksZeroed.setEnabled(false);
+		copy.add(ignoreBlocksZeroed   = new JCheckBox("Ignore blocks completely filled with zeros", app.settings.ignoreBlocksZeroed));
 		
 		Box cmd = Box.createHorizontalBox();
 		JButton apply = new JButton("Apply");

@@ -19,12 +19,12 @@ package io.github.eternalbits.vbox.vdi;
 import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.UUID;
 
-import java.io.RandomAccessFile;
 import io.github.eternalbits.compactvd.Static;
 import io.github.eternalbits.disk.DiskImage;
 import io.github.eternalbits.disk.DiskImageJournal;
@@ -205,7 +205,7 @@ public class VdiDiskImage extends DiskImage {
 				blockTable.update(blockNumber, blockOffset, out, start, max);
 				touched = true;
 			}
-			else if (!isZero(out, start, max)) {
+			else {
 				blockTable.create(blockNumber, blockOffset, out, start, max);
 				touched = true;
 				dirty = true;

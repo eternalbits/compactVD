@@ -244,7 +244,7 @@ public class VhdDiskImage extends DiskImage {
 				blockTable.update(blockNumber, blockOffset, out, start, max);
 				touched = true;
 			}
-			else if (!isZero(out, start, max)) {
+			else {
 				blockTable.create(blockNumber, blockOffset, out, start, max);
 				touched = true;
 				dirty = true;

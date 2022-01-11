@@ -423,7 +423,8 @@ public class FrontEnd extends JFrame {
 			return (settings.compactBlocksNotInUse? DiskImage.FREE_BLOCKS_UNUSED: 0) |
 					(settings.compactBlocksZeroed? DiskImage.FREE_BLOCKS_ZEROED: 0);
 		case DiskImageProgress.COPY:
-			return (settings.ignoreBlocksNotInUse? DiskImage.FREE_BLOCKS_UNUSED: 0);
+			return (settings.ignoreBlocksNotInUse? DiskImage.FREE_BLOCKS_UNUSED: 0) |
+					(settings.ignoreBlocksZeroed? DiskImage.FREE_BLOCKS_ZEROED: 0);
 		default:
 			return 0;
 		}

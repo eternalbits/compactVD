@@ -19,13 +19,13 @@ package io.github.eternalbits.vmware.vmdk;
 import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.UUID;
 
-import java.io.RandomAccessFile;
 import io.github.eternalbits.compactvd.Static;
 import io.github.eternalbits.disk.DiskImage;
 import io.github.eternalbits.disk.DiskImageJournal;
@@ -246,7 +246,7 @@ public class VmdkDiskImage extends DiskImage {
 				grainTable.update(blockNumber, blockOffset, out, start, max);
 				touched = true;
 			}
-			else if (!isZero(out, start, max)) {
+			else {
 				grainTable.create(blockNumber, blockOffset, out, start, max);
 				touched = true;
 				dirty = true;
@@ -362,7 +362,7 @@ public class VmdkDiskImage extends DiskImage {
 	}
 	
 	@Override
-	public void copy(DiskImage source) throws IOException {
+	public synchronized void copy(DiskImage source) throws IOException {
 		if (getDiskSize() != source.getDiskSize())
 			throw new IOException(MUST_HAVE_SAME_SIZE);
 		if (readOnly)

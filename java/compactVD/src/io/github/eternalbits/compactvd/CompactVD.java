@@ -284,6 +284,7 @@ public class CompactVD implements DiskImageObserver {
 			if (cmd.hasOption("c")) {
 				if (!cmd.hasOption("w"))
 					throw new MissingOptionException(Arrays.asList(new String[]{"w"}));
+				opt |= DiskImage.FREE_BLOCKS_ZEROED; // drop-zeroed is implied
 
 				File from = new File(cmd.getOptionValue("c"));
 				File to = new File(cmd.getOptionValue("w"));
