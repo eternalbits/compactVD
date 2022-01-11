@@ -8,6 +8,7 @@ Furthermore the vmdk version was partially compacted, leaving the image with
  size greater than the nominal size of the disk. The current versions of
  the reference VMs do handle such images.
 
+sudo fdisk /dev/sdb
 ----------------------------------------------------------
 Disk /dev/sdb: 8589 MB, 8589934592 bytes, 16777216 sectors
 Units = sectors of 1 * 512 = 512 bytes
@@ -21,8 +22,8 @@ Disk identifier: 0xef5d23b3
 /dev/sdb2         5595136    11187541     2796203   83  Linux
 /dev/sdb3        11188224    16777215     2794496   83  Linux
 
----------------------------------------
-mkfs -t ext4 -b 1024 -L part1 /dev/sdb1
+--------------------------------------------
+sudo mkfs -t ext4 -b 1024 -L part1 /dev/sdb1
 mke2fs 1.42.9 (28-Dec-2013)
 Filesystem label=part1
 OS type: Linux
@@ -45,8 +46,8 @@ Writing inode tables: done
 Creating journal (32768 blocks): done
 Writing superblocks and filesystem accounting information: done   
 
---------------------------------------------------------------------------
-mkfs -t ext3 -b 1024 -L part2 -I 128 -O flex_bg,extents,bigalloc /dev/sdb2
+-------------------------------------------------------------------------------
+sudo mkfs -t ext3 -b 1024 -L part2 -I 128 -O flex_bg,extents,bigalloc /dev/sdb2
 mke2fs 1.42.9 (28-Dec-2013)
 
 Warning: the bigalloc feature is still under development
@@ -74,8 +75,8 @@ Writing inode tables: done
 Creating journal (32768 blocks): done
 Writing superblocks and filesystem accounting information: done 
 
-----------------------------------------------
-mkfs -t ext2 -b 4096 -L part3 -I 128 /dev/sdb3
+---------------------------------------------------
+sudo mkfs -t ext2 -b 4096 -L part3 -I 128 /dev/sdb3
 mke2fs 1.42.9 (28-Dec-2013)
 Filesystem label=part3
 OS type: Linux

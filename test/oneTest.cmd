@@ -5,7 +5,7 @@ if "%4" == "" (
  exit /b
 )
 echo Expanding %1...
-"%az%\7z" x -y %1.xz > nul
+tar -xkf %1.bz2 > nul
 echo .
 echo .
 java -jar compTest.jar COPY %1 out.%2

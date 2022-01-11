@@ -5,7 +5,7 @@ if [ $# -ne 4 ]; then
  exit
 fi
 echo "Expanding $1..."
-xz -dfk $1.xz
+tar -xkf $1.bz2
 echo .
 echo .
 java -jar compTest.jar COPY $1 out.$2
