@@ -182,6 +182,7 @@ public class CompactVD implements DiskImageObserver {
 	private static final String jar = new java.io.File(CompactVD.class.getProtectionDomain()
 			.getCodeSource().getLocation().getPath()).getName();
 
+	private static final String FILES_ARE_DUPLICATED = "File \"%s\" is the same as the old image!";
 	private static final String FILE_ALREADY_EXISTS = "File \"%s\" already exists";
 	
 	public static void main(String[] args) throws Exception {
@@ -283,13 +284,18 @@ public class CompactVD implements DiskImageObserver {
 			if (cmd.hasOption("c")) {
 				if (!cmd.hasOption("w"))
 					throw new MissingOptionException(Arrays.asList(new String[]{"w"}));
+
+				File from = new File(cmd.getOptionValue("c"));
 				File to = new File(cmd.getOptionValue("w"));
 				
 				if (!cmd.hasOption("o") && to.exists())
 					throw new IOException(String.format(FILE_ALREADY_EXISTS, to));
 				
+				if (from.equals(to))
+					throw new IOException(String.format(FILES_ARE_DUPLICATED, to));
+				
 				String f = cmd.hasOption("f")? cmd.getOptionValue("f"): null;
-				copy(new File(cmd.getOptionValue("c")), opt, to, f);
+				copy(from, opt, to, f);
 				return;
 			}
 			

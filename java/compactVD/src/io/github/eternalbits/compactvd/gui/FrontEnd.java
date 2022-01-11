@@ -619,7 +619,7 @@ public class FrontEnd extends JFrame {
 			for (File file: fileDialog.getFiles()) {
 				if (file.compareTo(listData.get(s).getFile()) == 0) {
 					JOptionPane.showMessageDialog(this, 
-							String.format("The %s image is the same as the old image!", 
+							String.format("File %s is the same as the old image!", 
 							file.getName()), "Error", JOptionPane.ERROR_MESSAGE);
 				} else {
 					if (Static.getExtension(file.getName()).length() == 0)
