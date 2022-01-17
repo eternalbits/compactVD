@@ -34,6 +34,7 @@ class SettingsDialog extends JDialog {
 	private static final long serialVersionUID = -6334838729023774629L;
 
 	private final JCheckBox filterImageFiles;
+	private final JCheckBox visibleCompactCopy;	
 	private final JCheckBox findBlocksNotInUse;
 	private final JCheckBox findBlocksZeroed;
 	
@@ -56,6 +57,7 @@ class SettingsDialog extends JDialog {
 		Box open = Box.createVerticalBox();
 		open.setBorder(new TitledBorder(boxBorder, "Open"));
 		open.add(filterImageFiles 	= new JCheckBox("Filter image files in open dialog", app.settings.filterImageFiles));
+		open.add(visibleCompactCopy = new JCheckBox("Compact and Copy settings are the same as Open", app.settings.visibleCompactCopy));
 		open.add(findBlocksNotInUse = new JCheckBox("Search blocks not in use by System and Files", app.settings.findBlocksNotInUse));
 		open.add(findBlocksZeroed 	= new JCheckBox("Search blocks completely filled with zeros", app.settings.findBlocksZeroed));
 		
@@ -76,16 +78,34 @@ class SettingsDialog extends JDialog {
 		cmd.add(apply);
 		cmd.add(cancel);
 
+		visibleCompactCopy.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				compact.setVisible(!visibleCompactCopy.isSelected());
+				copy.setVisible(!visibleCompactCopy.isSelected());
+				pack();
+				setLocationRelativeTo(app);
+			}
+		});
+		
 		apply.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				app.settings.filterImageFiles 		= filterImageFiles.isSelected();
+				app.settings.visibleCompactCopy 	= visibleCompactCopy.isSelected();
 				app.settings.findBlocksNotInUse 	= findBlocksNotInUse.isSelected();
 				app.settings.findBlocksZeroed 		= findBlocksZeroed.isSelected();
-				app.settings.compactBlocksNotInUse 	= compactBlocksNotInUse.isSelected();
-				app.settings.compactBlocksZeroed 	= compactBlocksZeroed.isSelected();
-				app.settings.ignoreBlocksNotInUse 	= ignoreBlocksNotInUse.isSelected();
-				app.settings.ignoreBlocksZeroed 	= ignoreBlocksZeroed.isSelected();
+				if (visibleCompactCopy.isSelected()) {
+					app.settings.compactBlocksNotInUse 	= findBlocksNotInUse.isSelected();
+					app.settings.compactBlocksZeroed 	= findBlocksZeroed.isSelected();
+					app.settings.ignoreBlocksNotInUse 	= findBlocksNotInUse.isSelected();
+					app.settings.ignoreBlocksZeroed 	= findBlocksZeroed.isSelected();
+				} else {
+					app.settings.compactBlocksNotInUse 	= compactBlocksNotInUse.isSelected();
+					app.settings.compactBlocksZeroed 	= compactBlocksZeroed.isSelected();
+					app.settings.ignoreBlocksNotInUse 	= ignoreBlocksNotInUse.isSelected();
+					app.settings.ignoreBlocksZeroed 	= ignoreBlocksZeroed.isSelected();
+				}
 				dispose();
 			}
 		});
@@ -105,8 +125,11 @@ class SettingsDialog extends JDialog {
 		getContentPane().add(copy, gbc);
 		getContentPane().add(cmd, gbc);
 		
+		compact.setVisible(!visibleCompactCopy.isSelected());
+		copy.setVisible(!visibleCompactCopy.isSelected());
 		pack();
 		setLocationRelativeTo(app);
+		
 		setResizable(false);
 		setVisible(true);
 	}

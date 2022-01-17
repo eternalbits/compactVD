@@ -46,6 +46,7 @@ class Settings implements Serializable {
 	boolean filterImageFiles = true;
 	
 	// Open options
+	boolean visibleCompactCopy = false;
 	boolean findBlocksNotInUse = true;
 	boolean findBlocksZeroed = false;
 	
