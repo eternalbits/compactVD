@@ -21,6 +21,7 @@ import java.io.RandomAccessFile;
 import java.nio.channels.FileLock;
 import java.util.Arrays;
 import java.util.List;
+
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
@@ -278,6 +279,8 @@ class ListItem {
 									clone.copy(image);
 									clone.removeObserver(this);
 									fileLock.release();
+									if (!isCancelled())
+										app.addToList(outputFile);
 								}
 								if (source != null)
 									source.release();
@@ -300,6 +303,9 @@ class ListItem {
 				activeTask = DiskImageProgress.NO_TASK;
 				progressString = "";
 			}
+			if (task == DiskImageProgress.COMPACT 
+					&& lastViewOptions != app.getOptimizeOptions(DiskImageProgress.OPTIMIZE))
+				app.addToList(file);
 			app.updateToolbar();
 			return null;
 		}

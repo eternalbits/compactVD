@@ -298,7 +298,7 @@ public class FrontEnd extends JFrame {
 	/**
 	 * The open file to make a translation
 	 */
-	private void addToList(File file) {
+	void addToList(File file) {
 		if (file.isFile()) {
 			
 			for (int i = 0, s = listData.getSize(); i < s; i++) {
