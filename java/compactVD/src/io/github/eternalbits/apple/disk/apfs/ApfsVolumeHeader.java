@@ -135,7 +135,6 @@ public class ApfsVolumeHeader {
 				if (nx_type == CONTAINER && nx_subtype == 0 
 						&& nx_magic == SUPERBLOCK_MAGIC && Static.isPower2(nx_block_size) 
 						&& nx_block_count * nx_block_size == fileSystem.getLength()
-						&& nx_xp_desc_blocks == nx_xp_data_base - nx_xp_desc_base
 						&& nx_xp_desc_blocks > 32 && nx_xp_desc_blocks < 512) {
 					return;
 				}
