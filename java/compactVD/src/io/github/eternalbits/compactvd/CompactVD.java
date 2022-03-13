@@ -178,7 +178,7 @@ public class CompactVD implements DiskImageObserver {
 		}
 	}
 
-	private static final String version = "1.8";
+	private static final String version = "1.9";
 	private static final String jar = new java.io.File(CompactVD.class.getProtectionDomain()
 			.getCodeSource().getLocation().getPath()).getName();
 
