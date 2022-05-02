@@ -371,7 +371,7 @@ class ExtVolumeHeader {
 			return false;
 		
 		// The journal superblock's s_start field is zero if, and only if,
-		//	the journal was cleanly unmounted.
-		return in.getInt(12+12+4) == 0;
+		//	the journal was cleanly unmounted and s_errno are both zero.
+		return in.getLong(12+12+4) == 0;
 	}
 }
