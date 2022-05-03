@@ -237,15 +237,18 @@ public class CompactVD implements DiskImageObserver {
 	private void commandLine(String[] args) {
 		mainThread = Thread.currentThread();
 		
-		Runtime.getRuntime().addShutdownHook(new Thread() { // Ctrl+C
-			@Override
-			public void run() {
-				try {
-					mainThread.interrupt();
-					mainThread.join();
-				} catch (InterruptedException e) {}
-			}
-		});
+		if (args.length == 0) {
+			Runtime.getRuntime().addShutdownHook(new Thread() { // Ctrl+C
+				@Override
+				public void run() {
+					try {
+						mainThread.interrupt();
+						mainThread.join();
+					} catch (InterruptedException e) {}
+				}
+			});
+			return;
+		}
 		
 		Options options = buildOptions();
 		Options helpers = buildHelpers();
