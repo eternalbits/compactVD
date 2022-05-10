@@ -32,7 +32,6 @@ import javax.swing.UIManager;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.MissingOptionException;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
@@ -72,6 +71,18 @@ public class CompactVD implements DiskImageObserver {
 		if (verbose) System.out.println(verb);
 	}
 	
+	private void getRuntime() {
+		Runtime.getRuntime().addShutdownHook(new Thread() { // Ctrl+C
+			@Override
+			public void run() {
+				try {
+					mainThread.interrupt();
+					mainThread.join();
+				} catch (InterruptedException e) {}
+			}
+		});
+	}
+	
 	private void showView(File file, int options) throws IOException {
 		task = DiskImageProgress.OPTIMIZE;
 		try (DiskImage image = DiskImages.open(file, "r")) {
@@ -87,6 +98,7 @@ public class CompactVD implements DiskImageObserver {
 	private void compact(File file, int options) throws IOException {
 		long mtime = file.lastModified();
 		task = DiskImageProgress.COMPACT;
+		getRuntime();
 		try (RandomAccessFile check = new RandomAccessFile(file, "r")) { // is file?
 			try (DiskImage image = DiskImages.open(file, "rw")) {
 				FileLock fileLock = image.tryLock();
@@ -110,9 +122,9 @@ public class CompactVD implements DiskImageObserver {
 	}
 	
 	private void copy(File from, int options, File to, String type) throws IOException {
-		long mtime = to.lastModified();
 		task = DiskImageProgress.COPY;
 		File copy = null;
+		getRuntime();
 		try (RandomAccessFile check = new RandomAccessFile(from, "r")) { // is file?
 			// If writable, source is open in write mode for an exclusive file lock
 			String mode = from.canWrite()? "rw": "r";
@@ -135,17 +147,17 @@ public class CompactVD implements DiskImageObserver {
 						clone.removeObserver(this);
 						fileLock.release();
 					}
-					if (source != null) source.release();
-					if (!isCancelled()) {
+					if (source != null) 
+						source.release();
+					if (!isCancelled()) 
 						copy = null;
-					}
 				}
 			}
 		}
 		finally {
 			if (copy != null && copy.isFile()) 
 				copy.delete();
-			System.out.println(mtime != to.lastModified()? String.format(IMAGE_CREATED, 
+			System.out.println(to != null && to.isFile()? String.format(IMAGE_CREATED, 
 					to.getName(), to.getAbsoluteFile().getParent()): IMAGE_NOT_CREATED);
 		}
 	}
@@ -177,14 +189,23 @@ public class CompactVD implements DiskImageObserver {
 			}
 		}
 	}
-
+	
+	private final static String[] DEFAULT_FILE_FILTER = {null, "vdi", "vmdk", "vhd", "img", "raw"};
+	private final static String FILES_ARE_DUPLICATED = "File \"%s\" is the same as the old image!";
+	private final static String FILE_ALREADY_EXISTS = "File \"%s\" already exists";
+	private final static String INCORRECT_COMMAND = "The syntax of the command is incorrect.";	
+	private final static String TOO_MANY_OPTIONS = "There are too many options: %s.";	
+	
+	private File getOptionValues(CommandLine cmd, String opt) throws ParseException {
+		if (cmd.getOptionValues(opt).length != 1)
+			throw new ParseException(String.format(TOO_MANY_OPTIONS, opt));
+		return new File(cmd.getOptionValue(opt));
+	}
+	
 	private static final String version = "1.9";
 	private static final String jar = new java.io.File(CompactVD.class.getProtectionDomain()
 			.getCodeSource().getLocation().getPath()).getName();
 
-	private static final String FILES_ARE_DUPLICATED = "File \"%s\" is the same as the old image!";
-	private static final String FILE_ALREADY_EXISTS = "File \"%s\" already exists";
-	
 	public static void main(String[] args) throws Exception {
 		
 		DiskImageJournal.scanDirectory(Static.getWorkingDirectory());
@@ -237,16 +258,6 @@ public class CompactVD implements DiskImageObserver {
 	private void commandLine(String[] args) {
 		mainThread = Thread.currentThread();
 		
-		Runtime.getRuntime().addShutdownHook(new Thread() { // Ctrl+C
-			@Override
-			public void run() {
-				try {
-					mainThread.interrupt();
-					mainThread.join();
-				} catch (InterruptedException e) {}
-			}
-		});
-		
 		Options options = buildOptions();
 		Options helpers = buildHelpers();
 		for (Option opt: helpers.getOptions()) {
@@ -271,32 +282,41 @@ public class CompactVD implements DiskImageObserver {
 			
 			verbose = cmd.hasOption("v");
 			
-			if (cmd.hasOption("d")) {
-				showView(new File(cmd.getOptionValue("d")), opt);
-				return;
-			}
-			
-			if (cmd.hasOption("i")) {
-				compact(new File(cmd.getOptionValue("i")), opt);
-				return;
-			}
-			
 			if (cmd.hasOption("c")) {
-				if (!cmd.hasOption("w"))
-					throw new MissingOptionException(Arrays.asList(new String[]{"w"}));
 				opt |= DiskImage.FREE_BLOCKS_ZEROED; // drop-zeroed is implied
-
-				File from = new File(cmd.getOptionValue("c"));
-				File to = new File(cmd.getOptionValue("w"));
+				
+				if (!cmd.hasOption("w"))
+					throw new ParseException(INCORRECT_COMMAND);
+				
+				File from = getOptionValues(cmd, "c");
+				File to = getOptionValues(cmd, "w");
 				
 				if (!cmd.hasOption("o") && to.exists())
-					throw new IOException(String.format(FILE_ALREADY_EXISTS, to));
+					throw new ParseException(String.format(FILE_ALREADY_EXISTS, to));
 				
 				if (from.equals(to))
-					throw new IOException(String.format(FILES_ARE_DUPLICATED, to));
+					throw new ParseException(String.format(FILES_ARE_DUPLICATED, to));
 				
-				String f = cmd.hasOption("f")? cmd.getOptionValue("f"): null;
+				String f = cmd.hasOption("f")? cmd.getOptionValue("f").toLowerCase(): null;
+				if (cmd.hasOption("f") && cmd.getOptionValues("f").length != 1)
+					throw new ParseException(String.format(TOO_MANY_OPTIONS, "f"));
+				if (!Arrays.asList(DEFAULT_FILE_FILTER).contains(f))
+					throw new ParseException(INCORRECT_COMMAND);
+				
 				copy(from, opt, to, f);
+				return;
+			}
+			
+			if (cmd.hasOption("w") || cmd.hasOption("o") || cmd.hasOption("f"))
+				throw new ParseException(INCORRECT_COMMAND);
+			
+			if (cmd.hasOption("i")) {
+				compact(getOptionValues(cmd, "i"), opt);
+				return;
+			}
+			
+			if (cmd.hasOption("d")) {
+				showView(getOptionValues(cmd, "d"), opt);
 				return;
 			}
 			
@@ -320,8 +340,7 @@ public class CompactVD implements DiskImageObserver {
 		String header = "\nTo reduce the size of dynamic disk images. Version "+version+"\n\n";
 		String footer = ("\nOne of ^inplace, ^copy or ^dump is required. For ^inplace and ^dump"
 				+ " the default options are ^drop-unused ^keep-zeroed. For ^copy the default"
-				+ " is ^drop-unused and ^drop-zeroed is implied. Not applicable arguments"
-				+ " are ignored.\n").replace("^", prefix);
+				+ " is ^drop-unused and ^drop-zeroed is implied.\n").replace("^", prefix);
 		formatter.setLongOptPrefix(" "+prefix);
 		formatter.printHelp("java -jar "+jar, header, options, footer, true);
 	}
