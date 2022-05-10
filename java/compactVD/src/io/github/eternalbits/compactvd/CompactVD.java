@@ -190,7 +190,7 @@ public class CompactVD implements DiskImageObserver {
 		}
 	}
 	
-	private final static String[] DEFAULT_FILE_FILTER = {null, "vdi", "vmdk", "vhd", "img", "raw"};
+	private final static String[] DEFAULT_FILE_FILTER = {null, "vdi", "vmdk", "vhd", "raw"};
 	private final static String FILES_ARE_DUPLICATED = "File \"%s\" is the same as the old image!";
 	private final static String FILE_ALREADY_EXISTS = "File \"%s\" already exists";
 	private final static String INCORRECT_COMMAND = "The syntax of the command is incorrect.";	
@@ -249,7 +249,7 @@ public class CompactVD implements DiskImageObserver {
 				.addOption(Option.builder("Z").longOpt("keep-zeroed").desc("keep space filled with zeros").build())
 			);
 		options.addOption(Option.builder("w").longOpt("write").desc("set <out> as destination file for copy").hasArgs().argName("out").build());
-		options.addOption(Option.builder("f").longOpt("format").desc("copy output format: VDI, VMDK, VHD or IMG|RAW").hasArgs().argName("fmt").build());
+		options.addOption(Option.builder("f").longOpt("format").desc("copy output format: VDI, VMDK, VHD or RAW").hasArgs().argName("fmt").build());
 		options.addOption(Option.builder("o").longOpt("overwrite").desc("overwrite existing file on copy").build());
 		options.addOption(Option.builder("v").longOpt("verbose").desc("explain what is being done").build());
 		return options;

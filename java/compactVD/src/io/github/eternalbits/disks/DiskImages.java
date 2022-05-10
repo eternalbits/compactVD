@@ -73,7 +73,7 @@ public class DiskImages {
 			return new VhdDiskImage(file, mode);
 		}
 		
-		if (type.equalsIgnoreCase("img") || type.equalsIgnoreCase("raw")) {
+		if (type.equalsIgnoreCase("raw")) {
 			return new RawDiskImage(file, mode, 512);
 		}
 		
@@ -98,7 +98,7 @@ public class DiskImages {
 			return new VhdDiskImage(file, diskSize);
 		}
 		
-		if (type.equalsIgnoreCase("img") || type.equalsIgnoreCase("raw")) {
+		if (type.equalsIgnoreCase("raw")) {
 			return new RawDiskImage(file, diskSize, 512);
 		}
 		

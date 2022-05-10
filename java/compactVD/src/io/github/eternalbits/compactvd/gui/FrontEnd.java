@@ -84,8 +84,8 @@ public class FrontEnd extends JFrame {
 	private static final long serialVersionUID = 4457476192315737735L;
 	
 	private static final String title = "Virtual Disk Compact and Copy";
-	private static final String DEFAULT_FILE_FILTER = ".+\\.(?i:vdi|vmdk|vhd|img|raw)";
-	private static final String WINDOWS_FILE_FILTER = "*.vdi;*.vmdk;*.vhd;*.img;*.raw";
+	private static final String DEFAULT_FILE_FILTER = ".+\\.(?i:vdi|vmdk|vhd|raw)";
+	private static final String WINDOWS_FILE_FILTER = "*.vdi;*.vmdk;*.vhd;*.raw";
 	
 	/* The window: a tool bar with command buttons, a list with known images,
 	 *  and a main area with the selected image or a help/about dialog. 

@@ -11,9 +11,9 @@ CompactVD is a utility to optimize the size of dynamic disk images, based on
  allocation, they should not be very different.
 
 Currently supported file systems are:
-* Windows: New Technology File System (NTFS)
-* macOS: Hierarchical File System (HFS)
-* Linux: Extended File System (EXT)
+* New Technology File System (NTFS), for Windows computers
+* Hierarchical or Apple File System (HFS or APFS), for macOS
+* Extended File System (EXT), used in most linux desktops
 
 ### Compact Disk Image In Place
 
@@ -41,7 +41,7 @@ The format of the new disk image can be select in the Copy Disk Image dialog wit
 * VDI, Virtual Disk Image for Oracle VirtualBox
 * VMDK, Virtual Machine Disk for VMware products
 * VHD, Virtual Hard Disk for Microsoft products
-* RAW or IGM, for a complete disk image
+* RAW, for a complete disk image
 
 ### Copyright Notices
 

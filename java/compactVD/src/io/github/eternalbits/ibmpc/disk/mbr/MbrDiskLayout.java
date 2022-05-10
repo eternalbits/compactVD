@@ -94,11 +94,11 @@ public class MbrDiskLayout extends DiskLayout { // https://en.wikipedia.org/wiki
 	
 	private final long blockSize;
 	
-	public MbrDiskLayout(DiskImage img) throws IOException, WrongHeaderException {
-		this.image 		= img;
-		this.blockSize 	= img.getLogicalBlockSize();
+	public MbrDiskLayout(DiskImage raw) throws IOException, WrongHeaderException {
+		this.image 		= raw;
+		this.blockSize 	= raw.getLogicalBlockSize();
 		
-		extendMbr(readBootRecord(0), 0, img.getDiskSize() / img.getLogicalBlockSize());
+		extendMbr(readBootRecord(0), 0, raw.getDiskSize() / raw.getLogicalBlockSize());
 
 	}
 

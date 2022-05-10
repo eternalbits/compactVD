@@ -19,6 +19,7 @@ package io.github.eternalbits.linux.disk.lvm;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+
 import io.github.eternalbits.disk.DiskImage;
 import io.github.eternalbits.disk.DiskLayout;
 import io.github.eternalbits.disk.InitializationException;
@@ -45,27 +46,27 @@ public class LvmSimpleDiskLayout extends DiskLayout {
      * Initializes a {@code LvmSimpleDiskLayout} from a block device inside
      *  a whole disk image.
 	 * 
-	 * @param img	The disk image.
+	 * @param raw	The disk image.
 	 * @throws WrongHeaderException if the block device is not a LVM physical volume.
 	 * @throws IOException if some I/O error occurs.
      */
-	public LvmSimpleDiskLayout(DiskImage img) throws IOException, WrongHeaderException {
-		this(img, 0, img.getDiskSize());
+	public LvmSimpleDiskLayout(DiskImage raw) throws IOException, WrongHeaderException {
+		this(raw, 0, raw.getDiskSize());
 	}
 
 	/**
      * Initializes a {@code LvmSimpleDiskLayout} from a block device inside
      *  a disk image partition.
 	 * 
-	 * @param img		The disk image.
+	 * @param raw		The disk image.
 	 * @param offset	The partition offset, in bytes.
 	 * @param length	The partition length, in bytes.
 	 * @throws WrongHeaderException if the block device is not a LVM physical volume.
 	 * @throws IOException if some I/O error occurs.
 	 */
-	public LvmSimpleDiskLayout(DiskImage img, long offset, long length) throws IOException, WrongHeaderException {
-		this.image 		= img;
-		blockSize 		= img.getLogicalBlockSize();
+	public LvmSimpleDiskLayout(DiskImage raw, long offset, long length) throws IOException, WrongHeaderException {
+		this.image 		= raw;
+		blockSize 		= raw.getLogicalBlockSize();
 		
 		long position 	= offset;
 		byte[] buffer = new byte[4 * LvmPhysicalVolumeLabel.LABEL_SIZE];

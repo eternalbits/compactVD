@@ -19,10 +19,9 @@ package io.github.eternalbits.disk.raw;
 import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-
-import java.io.RandomAccessFile;
 
 import io.github.eternalbits.compactvd.Static;
 import io.github.eternalbits.disk.DiskImage;
@@ -32,9 +31,9 @@ import io.github.eternalbits.disks.DiskLayouts;
 
 /**
  * Implements a {@link DiskImage} from a raw
- *  <a href="https://en.wikipedia.org/wiki/IMG_(file_format)">dump of a hard drive </a> (IMG).
+ *  <a href="https://en.wikipedia.org/wiki/Rawdisk">dump of a hard drive </a> (RAW).
  * <p>
- * Since IMG files hold no additional data beyond the disk contents, these files can
+ * Since RAW files hold no additional data beyond the disk contents, these files can
  *  only be automatically handled by programs that can detect their file systems.
  *  For instance, a typical raw disk image of a floppy disk begins with a FAT boot
  *  sector, which can be used to identify its file system.
@@ -129,7 +128,7 @@ public class RawDiskImage extends DiskImage {
 
 	@Override
 	public String getType() {
-		return "IMG";
+		return "RAW";
 	}
 
 	@Override

@@ -28,21 +28,21 @@ import io.github.eternalbits.uefi.disk.gpt.GptDiskLayout;
 
 public class DiskLayouts {
 
-	public static DiskLayout open(DiskImage img) throws IOException {
+	public static DiskLayout open(DiskImage raw) throws IOException {
 		
 		try {
-			return new GptDiskLayout(img);
+			return new GptDiskLayout(raw);
 		} catch (WrongHeaderException e) {}
 		
 		try {
-			return new MbrDiskLayout(img);
+			return new MbrDiskLayout(raw);
 		} catch (WrongHeaderException e) {}
 		
 		try {
-			return new LvmSimpleDiskLayout(img);
+			return new LvmSimpleDiskLayout(raw);
 		} catch (WrongHeaderException e) {}
 		
-		throw new InitializationException(DiskLayout.class, img.toString());
+		throw new InitializationException(DiskLayout.class, raw.toString());
 	}
 
 }

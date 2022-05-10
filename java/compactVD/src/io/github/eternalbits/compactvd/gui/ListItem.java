@@ -35,7 +35,7 @@ import io.github.eternalbits.disk.DiskImageView;
 import io.github.eternalbits.disks.DiskImages;
 
 class ListItem {
-	static final List<String> IMAGE_TYPE = Arrays.asList(new String[] {"VDI", "VMDK", "VHD", "IMG", "RAW"});
+	static final List<String> IMAGE_TYPE = Arrays.asList(new String[] {"VDI", "VMDK", "VHD", "RAW"});
 	
 	private final static String CONFIRM_COMPACT = 
 			"This operation may change the disk image, do you want to proceed?";

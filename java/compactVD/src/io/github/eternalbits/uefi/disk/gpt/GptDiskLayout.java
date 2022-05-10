@@ -35,9 +35,9 @@ public class GptDiskLayout extends DiskLayout { // http://www.uefi.org/sites/def
 	final GuidPartitionHeader header;
 	final GuidPartitionTable table;
 
-	public GptDiskLayout(DiskImage img) throws IOException, WrongHeaderException {
-		this.image 		= img;
-		blockSize 		= img.getLogicalBlockSize();
+	public GptDiskLayout(DiskImage raw) throws IOException, WrongHeaderException {
+		this.image 		= raw;
+		blockSize 		= raw.getLogicalBlockSize();
 
 		byte[] buffer = new byte[DiskBootRecord.bufferSize()];
 		int read = image.readAll(0L, buffer, 0, buffer.length);
