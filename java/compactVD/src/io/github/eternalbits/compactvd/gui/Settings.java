@@ -56,7 +56,7 @@ class Settings implements Serializable {
 	
 	// Copy options
 	boolean ignoreBlocksNotInUse = true;
-	boolean ignoreBlocksZeroed = false;
+	boolean ignoreBlocksZeroed = true;
 	
 	/**
 	 * Writes the FrontEnd geometry and current settings.
