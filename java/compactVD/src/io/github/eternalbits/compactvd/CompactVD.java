@@ -264,6 +264,15 @@ public class CompactVD implements DiskImageObserver {
 			options.addOption(opt);
 		}
 		try {
+			int opt = DiskImage.FREE_BLOCKS_UNUSED;
+			if (args.length == 1) {
+				File file = new File(args[0]);
+				if (file.exists() && file.isFile()) {
+					showView(file, opt);
+					return;
+				}
+			}
+			
 			CommandLine cmd = new DefaultParser().parse(helpers, args, true);
 			if (cmd.hasOption("version")) {
 				printAbout();
@@ -276,7 +285,6 @@ public class CompactVD implements DiskImageObserver {
 			
 			cmd = new DefaultParser().parse(options, args);
 			
-			int opt = DiskImage.FREE_BLOCKS_UNUSED;
 			if (cmd.hasOption("U")) opt &= ~DiskImage.FREE_BLOCKS_UNUSED;
 			if (cmd.hasOption("z")) opt |= DiskImage.FREE_BLOCKS_ZEROED;
 			
