@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -67,8 +68,7 @@ class VmdkEmbeddedDescriptor {
 		descriptor = sb.toString().getBytes(StandardCharsets.UTF_8);
 	}
 	
-	private static Pattern EXTENT_PAT = Pattern.compile("\n\\s*RW\\s+(\\d+)\\s+SPARSE\\s+");
-	private static Pattern PARENT_PAT = Pattern.compile("\n\\s*parentCID\\s*=\\s*([0-9A-Fa-f]+)");
+	private static Pattern EXTENT_PAT = Pattern.compile("\n\\s*RW\\s+(\\d+)\\s+SPARSE\\s+\"(.+)\"");
 	private static Pattern CREATE_PAT = Pattern.compile("\n\\s*createType\\s*=\\s*\"(\\w+)\"");
 	
 	VmdkEmbeddedDescriptor(VmdkDiskImage vmdk, ByteBuffer in) throws InitializationException {
@@ -79,16 +79,45 @@ class VmdkEmbeddedDescriptor {
 		String desc = new String(descriptor, StandardCharsets.UTF_8);
 		
 		Matcher m = EXTENT_PAT.matcher(desc);
-		Matcher p = PARENT_PAT.matcher(desc);
 		Matcher c = CREATE_PAT.matcher(desc);
-		if (!m.find() || !p.find() || !c.find())
+		if (!m.find() || !c.find() || !c.group(1).equals("monolithicSparse"))
 			throw new InitializationException(getClass(), vmdk.toString());
 		
-		if (!c.group(1).equals("monolithicSparse") || !p.group(1).equalsIgnoreCase("ffffffff"))
-			throw new InitializationException(String.format("%s: Not a dynamic base image file.", vmdk.toString()));
+		header.diskSize = Long.valueOf(m.group(1)) * VmdkSparseHeader.SECTOR_SIZE;
+		header.fileName = m.group(2);
 		
-		long sectorCount = Long.valueOf(m.group(1));
-		header.diskSize = sectorCount * VmdkSparseHeader.SECTOR_SIZE;
+		header.imageCID					= fromInteger(desc, "CID");
+		header.parentCID				= fromInteger(desc, "parentCID");
+		header.parentFileName			= fromString(desc, "parentFileNameHint");
+		
+		header.uuidImage 				= fromUUID(desc, "image");
+		header.uuidModification 		= fromUUID(desc, "modification");
+		header.uuidParent 				= fromUUID(desc, "parent");
+		header.uuidParentModification 	= fromUUID(desc, "parentmodification");
+		
+		if (header.getFileType() != 0)
+			throw new InitializationException(String.format("%s: Not a dynamic base image file.", vmdk.toString()));
+	}
+
+	private static UUID fromUUID(String desc, String header) {
+		Pattern UUID_PAT = Pattern.compile("\n\\s*ddb.uuid."+header+"\\s*=\\s*\"([0-9A-Fa-f-]{36})\"");
+		Matcher m = UUID_PAT.matcher(desc);
+		if (!m.find()) return null;
+		return UUID.fromString(m.group(1));
+	}
+
+	private static Integer fromInteger(String desc, String header) {
+		Pattern INTEGER_PAT = Pattern.compile("\n\\s*"+header+"\\s*=\\s*([0-9A-Fa-f]+)");
+		Matcher m = INTEGER_PAT.matcher(desc);
+		if (!m.find()) return null;
+		return (int)Long.parseLong(m.group(1), 16);
+	}
+
+	private static String fromString(String desc, String header) {
+		Pattern STRING_PAT = Pattern.compile("\n\\s*"+header+"\\s*=\\s*(.+)");
+		Matcher m = STRING_PAT.matcher(desc);
+		if (!m.find()) return null;
+		return m.group(1);
 	}
 
 	void update() throws IOException {

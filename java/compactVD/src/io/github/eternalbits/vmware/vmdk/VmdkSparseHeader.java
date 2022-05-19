@@ -18,6 +18,7 @@ package io.github.eternalbits.vmware.vmdk;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.UUID;
 
 import io.github.eternalbits.compactvd.Static;
 import io.github.eternalbits.disk.WrongHeaderException;
@@ -70,6 +71,17 @@ class VmdkSparseHeader {
 	int 	nextSector; 				// Sector number where the next block of data will be written.
 	int		firstSector;				// First sector for data blocks = overHead as integer.
 	int		grainSectors;				// Grain size in sectors = grainSize as integer.
+	int 	fileType;					// 1 = VirtualBox, 2 = VMware.
+//	VirtualBox
+	UUID	uuidImage;					// UUID of image.
+	UUID	uuidModification;			// UUID of image's last modification.
+	UUID	uuidParent;					// UUID of previous parent, only for secondary images.
+	UUID	uuidParentModification;		// UUID of previous parent's last modification.
+//	VMware	
+	Integer	imageCID;					// It is a random 32-bit value.
+	Integer	parentCID;					// A link trough the image CID of the parent link.
+	String	fileName;					// The file name, as specified.
+	String	parentFileName;				// The file name of the previous parent.
 	
 	VmdkSparseHeader(VmdkDiskImage vmdk, long diskSize) {
 		if (diskSize < 0 || diskSize % SECTOR_SIZE != 0)
@@ -177,6 +189,16 @@ class VmdkSparseHeader {
 	
 	private long getTableOffset(long dirOffset) throws IOException {
 		return image.readMetadata(dirOffset, 4).order(VmdkDiskImage.BYTE_ORDER).getInt();
+	}
+	
+	int getFileType() {
+		fileType = 0;
+		final UUID zeroUUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
+		if (uuidImage != null && uuidParent != null && uuidModification != null && uuidParentModification != null)
+			fileType |= uuidParent.equals(zeroUUID) && uuidParentModification.equals(zeroUUID) ? 0 : 1;
+		if (imageCID != null && parentCID != null && fileName != null && parentFileName != null)
+			fileType |= parentCID == -1 ? 0 : 2;
+		return fileType;
 	}
 	
 	long getUpdateOffset() {
