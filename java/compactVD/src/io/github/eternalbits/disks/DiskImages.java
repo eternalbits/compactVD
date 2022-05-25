@@ -18,6 +18,7 @@ package io.github.eternalbits.disks;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 
 import io.github.eternalbits.disk.DiskImage;
 import io.github.eternalbits.disk.InitializationException;
@@ -35,6 +36,17 @@ public class DiskImages {
 	}
 
 	public static DiskImage open(File file, String mode) throws IOException {
+		
+		try (RandomAccessFile media = new RandomAccessFile(file, "r")) {
+			switch (media.readInt()) {
+			case 0x3C3C3C20:								// '<<< ' for VDI
+				return new VdiDiskImage(file, mode);
+			case 0x4B444D56:								// 'KDMV' for VMDK
+				return new VmdkDiskImage(file, mode);
+			case 0x636F6E65:								// 'cone' for VHD
+				return new VhdDiskImage(file, mode);
+			}
+		} catch (WrongHeaderException e) {}
 		
 		try {
 			return new VdiDiskImage(file, mode);

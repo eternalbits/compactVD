@@ -33,8 +33,8 @@ class VhdBlockAllocationTable extends DiskImageBlockTable {
 	private final int[] blockMap;
 	private int dataBlocksCount;
 
-	VhdBlockAllocationTable(VhdDiskImage vdi) {
-		image 	= vdi;
+	VhdBlockAllocationTable(VhdDiskImage vhd) {
+		image 	= vhd;
 		header 	= image.header;
 		
 		blockMap = new int[header.maxTableEntries];
@@ -42,8 +42,8 @@ class VhdBlockAllocationTable extends DiskImageBlockTable {
 		dataBlocksCount = 0;
 	}
 	
-	VhdBlockAllocationTable(VhdDiskImage vdi, ByteBuffer in) throws IOException {
-		image 	= vdi;
+	VhdBlockAllocationTable(VhdDiskImage vhd, ByteBuffer in) throws IOException {
+		image 	= vhd;
 		header 	= image.header;
 		
 		if (in.remaining() >= header.maxTableEntries * 4) {
