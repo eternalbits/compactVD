@@ -328,22 +328,33 @@ class ExtVolumeHeader {
 		if (journalBackupType != 1) // No journalBlocks
 			return false;
 		
-		ByteBuffer bb = ByteBuffer.wrap(journalBlocks);
+		ByteBuffer bb = ByteBuffer.wrap(journalBlocks.clone());
 		bb.order(ExtFileSystem.BYTE_ORDER);
-		int journalBlockNumber;
 		
-		if ((bb.getLong(0) | INODE_TYPE_MASK) == INODE_TYPE_EXTENTS) {
-			// This is the extents header
+		// This is the extents header
+		if ((bb.getLong(0) | INODE_TYPE_MASK) != INODE_TYPE_EXTENTS)
+			return false;
+		
+		for (int nTimes = 0; nTimes < 5; nTimes++) {// 5 times
 			short ehMagic 	= bb.getShort();		// 0xF30A
 			short ehEntries = bb.getShort();		// One entry must be present
-			short ehMax 	= bb.getShort();		// There is room  for 4 entries
+			short ehMax 	= bb.getShort();		// There is room for 340 entries
 			short ehDepth 	= bb.getShort();		// Leaf nodes or other nodes are expected
 			bb.position(bb.position() + 4);
-			if (ehMagic != (short)0xF30A || ehMax !=4 || ehDepth < 0 || ehDepth > 1 
-					|| ehEntries < 1 || ehEntries > ehMax)
+			if (ehMagic != (short)0xF30A || ehMax < 1 || ehMax > 340 || ehDepth < 0 
+					|| ehDepth > 1 || ehEntries < 1 || ehEntries > ehMax)
 				return false;
+			
 			// Now read the first extent
-			if (ehDepth == 0) {
+			if (ehDepth != 0) {
+				int eiBlock 	= bb.getInt();		// This index node covers file blocks from 'block' onward
+				int eiLeafLo 	= bb.getInt();		// Logical block number that is the next level lower in the tree
+				int eiLeafHi 	= bb.getShort();	// This is expected to be zero, in this 32 bits world
+				if (eiBlock != 0 || eiLeafHi != 0 || eiLeafLo < 0)
+					return false;
+				bb = fileSystem.readImage(eiLeafLo * (long)blockSize, bb.capacity());
+				
+			} else {
 				int eeBlock 	= bb.getInt();		// First file block number that this extent covers
 				int eeCount 	= bb.getShort();	// Number of blocks covered by this extent
 				int eeStartHi	= bb.getShort();	// This is expected to be zero, in this 32 bits world
@@ -351,27 +362,18 @@ class ExtVolumeHeader {
 				if (eeBlock != 0 || eeCount < 1 && eeCount != -32768 
 						|| eeStartHi != 0 || eeStartLo < 0)
 					return false;
-				journalBlockNumber = eeStartLo;
-			} else {
-				int eiBlock 	= bb.getInt();		// This index node covers file blocks from 'block' onward
-				int eiLeafLo 	= bb.getInt();		// Logical block number that is the next level lower in the tree
-				int eiLeafHi 	= bb.getShort();	// This is expected to be zero, in this 32 bits world
-				if (eiBlock != 0 || eiLeafHi != 0 || eiLeafLo < 0)
+				
+				ByteBuffer in = fileSystem.readImage(eeStartLo * (long)blockSize, 12+12+12);
+				in.order(ByteOrder.BIG_ENDIAN);
+				int magic = in.getInt();
+				if (magic != 0xC03B3998) // The header is invalid
 					return false;
-				journalBlockNumber = eiLeafLo + 1;	// I'm not sure of anything, as long as it works...
+				
+				// The journal superblock's s_start field is zero if, and only if,
+				//	the journal was cleanly unmounted and s_errno are both zero.
+				return in.getLong(12+12+4) == 0;
 			}
-		} else {
-			journalBlockNumber = bb.getInt();		// First logical block number
 		}
-		
-		ByteBuffer in = fileSystem.readImage(journalBlockNumber * (long)blockSize, 12+12+12);
-		in.order(ByteOrder.BIG_ENDIAN);
-		int magic = in.getInt();
-		if (magic != 0xC03B3998) // The header is invalid
-			return false;
-		
-		// The journal superblock's s_start field is zero if, and only if,
-		//	the journal was cleanly unmounted and s_errno are both zero.
-		return in.getLong(12+12+4) == 0;
+		return false;
 	}
 }
