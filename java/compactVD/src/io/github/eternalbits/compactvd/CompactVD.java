@@ -193,8 +193,8 @@ public class CompactVD implements DiskImageObserver {
 	private final static String[] DEFAULT_FILE_FILTER = {null, "vdi", "vmdk", "vhd", "raw"};
 	private final static String FILES_ARE_DUPLICATED = "File \"%s\" is the same as the old image!";
 	private final static String FILE_ALREADY_EXISTS = "File \"%s\" already exists";
-	private final static String INCORRECT_COMMAND = "The syntax of the command is incorrect.";	
-	private final static String TOO_MANY_OPTIONS = "There are too many options: %s.";	
+	private final static String INCORRECT_COMMAND = "The syntax of the command is incorrect.";
+	private final static String TOO_MANY_OPTIONS = "There are too many options: %s.";
 	
 	private File getOptionValues(CommandLine cmd, String opt) throws ParseException {
 		if (cmd.getOptionValues(opt).length != 1)

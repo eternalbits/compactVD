@@ -16,12 +16,13 @@
 
 package io.github.eternalbits.compactvd.gui;
 
-import com.apple.eawt.AboutHandler;
-import com.apple.eawt.Application;
-import com.apple.eawt.PreferencesHandler;
-import com.apple.eawt.QuitStrategy;
-import com.apple.eawt.AppEvent.AboutEvent;
-import com.apple.eawt.AppEvent.PreferencesEvent;
+import java.awt.Desktop;
+import java.awt.Taskbar;
+import java.awt.desktop.AboutEvent;
+import java.awt.desktop.AboutHandler;
+import java.awt.desktop.PreferencesEvent;
+import java.awt.desktop.PreferencesHandler;
+import java.awt.desktop.QuitStrategy;
 
 /**
  * A minimal adapter to delegate the default Mac Menu requests to
@@ -38,9 +39,9 @@ class MacAdapter {
 	MacAdapter(FrontEnd frontEnd) {
 		mainFrame = frontEnd;
 		
-		Application macApp = Application.getApplication();
+		Desktop macApp = Desktop.getDesktop();
 		
-		macApp.setDockIconImage(mainFrame.getIconImage());
+		Taskbar.getTaskbar().setIconImage(mainFrame.getIconImage());
 		macApp.setQuitStrategy(QuitStrategy.CLOSE_ALL_WINDOWS);
 		
 		macApp.setAboutHandler(new AboutHandler() {
