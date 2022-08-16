@@ -7,7 +7,7 @@ This application requires a Java Runtime Environment equal to or greater than 9.
 
 From the [`Releases`](https://github.com/eternalbits/compactVD/releases/) page download `compactVD-x.y-bin.zip`. You have 3 options:
 * Copy to `C:\Program Files`. You have to give permission to `Continue`.
-* Copy to another folder. You have to change the link in at least one place.
+* Copy to another folder. You have to change the link in at least in one place.
 * Go to [`Launch4j`](http://launch4j.sourceforge.net/) and bring the file. Run as administrator. Open `CompactVD.xml`. Build wrapper.
 
 ### Install on Apple macOS
