@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=CompactVD
+Comment=Virtual Disk Compact and Copy
+Exec=java -jar /opt/CompactVD/CompactVD.jar
+Icon=/opt/CompactVD/CompactVD.png
+Categories=Utility;
