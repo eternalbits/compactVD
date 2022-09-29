@@ -98,7 +98,7 @@ public class MbrDiskLayout extends DiskLayout { // https://en.wikipedia.org/wiki
 		this.image 		= raw;
 		this.blockSize 	= raw.getLogicalBlockSize();
 		
-		extendMbr(readBootRecord(0), 0, raw.getDiskSize() / raw.getLogicalBlockSize());
+		extendMbr(readBootRecord(0), 0, raw.getDiskSize() / raw.getLogicalBlockSize(), 0);
 
 	}
 
@@ -108,22 +108,25 @@ public class MbrDiskLayout extends DiskLayout { // https://en.wikipedia.org/wiki
 		return new DiskBootRecord(this, ByteBuffer.wrap(buffer, 0, read));
 	}
 	
-	private void extendMbr(DiskBootRecord dbr, long start, long size) throws IOException, WrongHeaderException {
+	private void extendMbr(DiskBootRecord dbr, long start, long size, long extend) throws IOException, WrongHeaderException {
 		for (int i =0; i < 4; i++) if (!dbr.isPartEmpty(i)) {
-			
-			if (dbr.getFirstSector(i) + dbr.getSectorCount(i) > size)
-				throw new InitializationException(getClass(), this.toString());
 			
 			long offset = (start + dbr.getFirstSector(i)) * blockSize;
 			long length = dbr.getSectorCount(i) * blockSize;
 			int type = dbr.getType(i);
 			
+			if (dbr.getFirstSector(i) + dbr.getSectorCount(i) > size)
+				if (type != EXTENDED_LINUX && type != EXTENDED_LBA && type != EXTENDED_DOS)
+					throw new InitializationException(getClass(), this.toString());
+		
 			switch (type) {
 			case EXTENDED_LINUX:
 			case EXTENDED_LBA:
 			case EXTENDED_DOS:
-				long ext = start + dbr.getFirstSector(i);
-				extendMbr(readBootRecord(ext), ext, dbr.getSectorCount(i));
+				long ext = extend + dbr.getFirstSector(i);
+				if (extend == 0) 
+					extend = dbr.getFirstSector(i);
+				extendMbr(readBootRecord(ext), ext, dbr.getSectorCount(i), extend);
 				break;
 			case LINUX_SWAP:
 				getFileSystems().add(new NullFileSystem(this, offset, length, "SWAP", partDesc[type]));
