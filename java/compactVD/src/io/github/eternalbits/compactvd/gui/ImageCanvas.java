@@ -30,6 +30,7 @@ import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
@@ -81,8 +82,8 @@ class ImageCanvas extends JPanel {
 				new ImageIcon(FrontEnd.getResource(type.toLowerCase()+".png")).getImage());
 	}
 	
-	private static final String[] LABELS = new String[] {"System", "No system", "Not in use", "Zeros", "Free"};
 	private static final Color[] COLORS = new Color[] {MAPPED_COLOR, NOT_FS_COLOR, NO_USE_COLOR, ZEROED_COLOR, WHITE_COLOR};
+	private static String[] LABELS;
 	
 	private final FrontEnd app;
 	
@@ -98,6 +99,9 @@ class ImageCanvas extends JPanel {
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		if (app.list.getSelectedIndex() != -1) {
+			LABELS = new String[] {app.res.getString("color_system"), app.res.getString("color_no_system"), 
+					app.res.getString("color_not_in_use"), app.res.getString("color_zeros"), 
+					app.res.getString("color_free")};
 			Graphics2D g2 = (Graphics2D) g;
 			g2.addRenderingHints(TEXT_ANTIALIAS_ON);
 			g2.addRenderingHints(ANTIALIAS_OFF);
@@ -258,12 +262,12 @@ class ImageCanvas extends JPanel {
 		int m = intPercent(view.blocksMapped, view.blocksCount);
 		int n = intPercent(view.blocksUnused, view.blocksCount);
 		int z = intPercent(view.blocksZeroed, view.blocksCount);
-		drawStatStrings(g2, "Current file size", s0, humanSize(view.imageLength), d0, y0 + b);
-		drawStatStrings(g2, "Optimized file size", s1, humanSize(view.optimizedLength), d1, y0 + b);
-		drawStatStrings(g2, "System and Files", s0, stringPercent(m, m), d0, y1 + b);
-		drawStatStrings(g2, "Full disk size", s1, humanSize(view.diskLength), d1, y1 + b);
-		drawStatStrings(g2, "Not in use by S&F", s0, stringPercent(view.blocksUnused, n), d0, y2 + b);
-		drawStatStrings(g2, "Zero filled", s1, stringPercent(view.blocksZeroed, z), d1, y2 + b);
+		drawStatStrings(g2, app.res.getString("show_current"), s0, humanSize(view.imageLength), d0, y0 + b);
+		drawStatStrings(g2, app.res.getString("show_optimized"), s1, humanSize(view.optimizedLength), d1, y0 + b);
+		drawStatStrings(g2, app.res.getString("show_system"), s0, stringPercent(m, m), d0, y1 + b);
+		drawStatStrings(g2, app.res.getString("show_full_disk"), s1, humanSize(view.diskLength), d1, y1 + b);
+		drawStatStrings(g2, app.res.getString("show_unused"), s0, stringPercent(view.blocksUnused, n), d0, y2 + b);
+		drawStatStrings(g2, app.res.getString("show_zeroed"), s1, stringPercent(view.blocksZeroed, z), d1, y2 + b);
 	}
 	
 	private int intPercent(Integer part, Integer all) {

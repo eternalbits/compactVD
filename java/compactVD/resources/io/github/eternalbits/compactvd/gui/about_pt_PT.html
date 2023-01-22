@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Sobre a Compactação e Cópia do Disco Virtual</title>
+<style>/* only a limited subset of CSS1: http://docs.oracle.com/javase/8/docs/api/javax/swing/text/html/CSS.html */
+body {
+ font-family: Verdana, Arial, sans-serif;
+ font-size: 11pt;
+ margin: 0 6px;
+}
+h4, div.p { /* margins don't collapse */
+ margin-bottom: 12px;
+ margin-top: 0;
+}
+ul {
+ margin-bottom: 0;
+}
+li {
+ margin-bottom: 4px;
+}
+ul.d {
+ margin-left: 24px;
+}
+ul.d li {
+ margin-bottom: 2px;
+}
+a { /* isolated names have body */
+ text-decoration: none;
+}
+</style>
+</head>
+<body>
+
+
+<a name="top"><h3>Sobre a Compactação e Cópia do Disco Virtual</h3></a>
+
+<table style="margin-bottom:8px"><tr>
+<td><img src="drive.png" width="64" height="64" style="margin-right:12px" alt=""/></td>
+<td style="vertical-align:top">Para reduzir o tamanho das imagens de disco virtual<br>
+<small>Versão 2.4<br><br>
+Lançado sob a licença Apache 2.0
+</small></td>
+</tr></table>
+
+<div class="p">Para mais informações consulte os seguintes tópicos:<ul>
+<li><a href="#whatis">O que é CompactVD?</a></li>
+<li><a href="#compact">Imagem de disco compacto no local</a></li>
+<li><a href="#copy">Copiar para nova imagem de disco</a></li>
+<li><a href="#note">Avisos de direitos autorais</a></li>
+</ul></div>
+
+
+
+<hr/><a name="whatis"></a>
+<h4>O que é CompactVD?
+<a href="#top">▲</a></h4>
+
+<div class="p">CompactVD é um utilitário para otimizar o tamanho de imagens de disco dinâmicas, com base nas tabelas de alocação de bitmap de sistemas de ficheiros conhecidos.
+</div>
+<div class="p">Você pode verificar se há espaço desperdiçado em uma imagem de disco dinâmica comparando o tamanho do ficheiro de imagem de disco com o espaço usado pelos sistemas de ficheiros dentro da imagem. Para uma alocação ótima de recursos, eles não devem ser muito diferentes. Ou apenas arraste uma imagem de disco para esta janela:
+</div>
+<div class="p" style="margin-left: 16px"><img src="about_files/reduce_pt_PT.png" width="379" alt=""/></div>
+
+<div class="p">Os sistemas de ficheiros atualmente suportados são:<ul class="d">
+<li>New Technology File System (NTFS), para computadores Windows</li>
+<li>Hierarchical ou Apple File System (HFS ou APFS), para macOS</li>
+<li>Extended File System (EXT), usado na maioria dos desktops Linux</li>
+</ul></div>
+
+
+
+<hr/><a name="compact"></a>
+<h4>Imagem de Disco Compacto no Local
+<a href="#top">▲</a></h4>
+
+<div class="p">A operação para <code>compactar</code> extrai blocos de dados do final da imagem do disco para o espaço que foi detectado como não sendo usado pelos sistemas de ficheiros.
+</div>
+<div class="p">Para iniciar é feita uma varredura para detectar blocos de dados que não estão em uso pelos sistemas de ficheiros, e a estrutura da imagem do disco é atualizada marcando esses blocos como se nunca tivessem sido usados.
+</div>
+<div class="p">Em seguida, os blocos com dados efetivos são movidos do final da imagem do disco para o espaço que foi recuperado pela operação anterior.
+</div>
+<div class="p">Por fim, a estrutura da imagem é atualizada para refletir a nova posição dos blocos movidos e o tamanho do ficheiro de imagem é reduzido. As atualizações na estrutura da imagem são salvas temporariamente na mídia do host e serão gravadas na imagem na próxima execução do programa, no caso de uma falha de hardware recuperável.
+</div>
+
+
+
+<hr/><a name="copy"></a>
+<h4>Copiar para Nova Imagem de Disco
+<a href="#top">▲</a></h4>
+
+<div class="p">A operação de <code>cópia</code> começa com uma varredura para detectar blocos de dados que não estão em uso pelos sistemas de ficheiros. A nova imagem é criada ignorando esses blocos e blocos que de outra forma seriam completamente preenchidos com zeros.
+</div>
+<div class="p">O formato da nova imagem de disco pode ser selecionado na caixa de diálogo <code>Copiar imagem de disco</code> com uma destas extensões de ficheiro:<ul class="d">
+<li>VDI, Virtual Disk Image para Oracle VirtualBox</li>
+<li>VMDK, Virtual Machine Disk para produtos VMware</li>
+<li>VHD, Virtual Hard Disk para produtos Microsoft</li>
+<li>RAW, para uma imagem de disco completa</li>
+</ul></div>
+
+
+
+<hr/><a name="note"></a>
+<h4>Avisos de Direitos Autorais
+<a href="#top">▲</a></h4>
+
+
+<div class="p"><div style="margin-bottom: 4px">Copyright © 2016-2023 Rui Baptista</div>
+Licenciado sob a Licença Apache, Versão 2.0. Você pode obter uma cópia da Licença <a href="http://www.apache.org/licenses/LICENSE-2.0">lançada sob a Licença Apache 2.0</a>. O software distribuído sob a Licença é distribuído "COMO ESTÁ", SEM GARANTIAS OU CONDIÇÕES DE QUALQUER TIPO, expressas ou implícitas.
+</div>
+
+<div class="p">Este produto inclui o software <a href="https://commons.apache.org/proper/commons-cli/">Apache Commons CLI</a> Copyright 2001-2020 The Apache Software Foundation.
+</div>
+
+<div class="p">O ícone do aplicativo é um trabalho derivado do original feito por <a href="http://web.archive.org/web/20090718204515/http://www.mcdodesign.com/downloads/?paged=3">Susumu Yoshida</a> (Copyright © 2009 McDo DESIGN.com).
+</div>
+
+<div class="p">Os outros ícones que identificam os discos de imagem no painel de visualização são ícones de formatos de ficheiro protegidos por direitos autorais. O autor acredita que a exibição de ícones para identificar os formatos de ficheiro em questão se qualifica como uso justo.
+</div>
+
+
+
+</body>
+</html>

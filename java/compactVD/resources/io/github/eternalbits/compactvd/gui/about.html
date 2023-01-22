@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>About Virtual Disk Compact and Copy</title>
-<style>/* only a limited subset of CSS1: http://docs.oracle.com/javase/7/docs/api/javax/swing/text/html/CSS.html */
+<style>/* only a limited subset of CSS1: http://docs.oracle.com/javase/8/docs/api/javax/swing/text/html/CSS.html */
 body {
  font-family: Verdana, Arial, sans-serif;
  font-size: 11pt;
@@ -38,7 +38,7 @@ a { /* isolated names have body */
 <table style="margin-bottom:8px"><tr>
 <td><img src="drive.png" width="64" height="64" style="margin-right:12px" alt=""/></td>
 <td style="vertical-align:top">To reduce the size of virtual disk images<br>
-<small>Version 2.3<br><br>
+<small>Version 2.4<br><br>
 Released under the Apache License 2.0
 </small></td>
 </tr></table>
@@ -53,17 +53,14 @@ Released under the Apache License 2.0
 
 
 <hr/><a name="whatis"></a>
-<h4>What is CompactVD?<a href="#top">▲</a></h4>
+<h4>What is CompactVD?
+<a href="#top">▲</a></h4>
 
-<div class="p">CompactVD is a utility to optimize the size of dynamic disk images, 
-based on the bitmap allocation tables of known file systems.
+<div class="p">CompactVD is a utility to optimize the size of dynamic disk images, based on the bitmap allocation tables of known file systems.
 </div>
-<div class="p">You can check if there is wasted space in a dynamic disk image comparing
-the size of the disk image file with the space used by file systems inside the image.
-For a optimal resource allocation, they should not be very different.
-Or just drag a disk image into this window:
+<div class="p">You can check if there is wasted space in a dynamic disk image comparing the size of the disk image file with the space used by file systems inside the image. For a optimal resource allocation, they should not be very different. Or just drag a disk image into this window:
 </div>
-<div class="p" style="margin-left: 16px"><img src="about_files/reduce.png" width="361" alt=""/></div>
+<div class="p" style="margin-left: 16px"><img src="about_files/reduce.png" width="379" alt=""/></div>
 
 <div class="p">Currently supported file systems are:<ul class="d">
 <li>New Technology File System (NTFS), for Windows computers</li>
@@ -77,18 +74,13 @@ Or just drag a disk image into this window:
 <h4>Compact Disk Image In Place
 <a href="#top">▲</a></h4>
 
-<div class="p">The <code>compact</code> operation pulls blocks of data from the end of the disk image
-to space that was detected to be not in use by file systems.
+<div class="p">The <code>compact</code> operation pulls blocks of data from the end of the disk image to space that was detected to be not in use by file systems.
 </div>
-<div class="p">To begin a scan is made to detect blocks of data that are not in use by file systems,
-and the disk image structure is updated marking those blocks as if they were never used.
+<div class="p">To begin a scan is made to detect blocks of data that are not in use by file systems, and the disk image structure is updated marking those blocks as if they were never used.
 </div>
-<div class="p">Then blocks with effective data are moved from the end of the disk image to the space
-that was recovered by the previous operation. 
+<div class="p">Then blocks with effective data are moved from the end of the disk image to the space that was recovered by the previous operation.
 </div>
-<div class="p">Finally the image structure is updated to reflect the new position of the moved blocks,
-and the image file size is trimmed. Updates to the image structure are temporarily saved on the host media
-and will be written to the image at next program execution, in case of a recoverable hardware failure.
+<div class="p">Finally the image structure is updated to reflect the new position of the moved blocks, and the image file size is trimmed. Updates to the image structure are temporarily saved on the host media and will be written to the image at next program execution, in case of a recoverable hardware failure.
 </div>
 
 
@@ -97,11 +89,9 @@ and will be written to the image at next program execution, in case of a recover
 <h4>Copy to New Disk Image
 <a href="#top">▲</a></h4>
 
-<div class="p">The <code>copy</code> operation begins with a scan to detect blocks of data that are not in use by file systems.
-The new image is created ignoring those blocks, and blocks that would otherwise be completely filled with zeros.
+<div class="p">The <code>copy</code> operation begins with a scan to detect blocks of data that are not in use by file systems. The new image is created ignoring those blocks, and blocks that would otherwise be completely filled with zeros.
 </div>
-<div class="p">The format of the new disk image can be select in the <code>Copy Disk Image</code> dialog
-with one these file extensions:<ul class="d">
+<div class="p">The format of the new disk image can be select in the <code>Copy Disk Image</code> dialog with one these file extensions:<ul class="d">
 <li>VDI, Virtual Disk Image for Oracle VirtualBox</li>
 <li>VMDK, Virtual Machine Disk for VMware products</li>
 <li>VHD, Virtual Hard Disk for Microsoft products</li>
@@ -115,24 +105,17 @@ with one these file extensions:<ul class="d">
 <a href="#top">▲</a></h4>
 
 
-<div class="p"><div style="margin-bottom: 4px">Copyright © 2016-2022 Rui Baptista</div>
-Licensed under the Apache License, Version 2.0. You may obtain a copy of the License at
-<a href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a>.
-Software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
-either express or implied.
+<div class="p"><div style="margin-bottom: 4px">Copyright © 2016-2023 Rui Baptista</div>
+Licensed under the Apache License, Version 2.0. You may obtain a copy of the License <a href="http://www.apache.org/licenses/LICENSE-2.0">released under the Apache License 2.0</a>. Software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 </div>
 
-<div class="p">This product includes <a href="https://commons.apache.org/proper/commons-cli/">Apache
-Commons CLI</a> software Copyright 2001-2015 The Apache Software Foundation.
+<div class="p">This product includes <a href="https://commons.apache.org/proper/commons-cli/">Apache Commons CLI</a> software Copyright 2001-2020 The Apache Software Foundation.
 </div>
 
-<div class="p">The application icon is a derivative work of original made by 
-<a href="http://web.archive.org/web/20090718204515/http://www.mcdodesign.com/downloads/?paged=3">Susumu Yoshida</a>
-(Copyright © 2009 McDo DESIGN.com).
+<div class="p">The application icon is a derivative work of original made by <a href="http://web.archive.org/web/20090718204515/http://www.mcdodesign.com/downloads/?paged=3">Susumu Yoshida</a> (Copyright © 2009 McDo DESIGN.com).
 </div>
 
-<div class="p">The other icons that identify image disks in the view panel are copyright-protected computer icons of file formats.
-The author believes that the exhibition of icons to identify the file formats in question qualifies as fair use.
+<div class="p">The other icons that identify image disks in the view panel are copyright-protected computer icons of file formats. The author believes that the exhibition of icons to identify the file formats in question qualifies as fair use.
 </div>
 
 

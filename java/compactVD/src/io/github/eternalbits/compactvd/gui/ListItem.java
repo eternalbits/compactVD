@@ -37,27 +37,6 @@ import io.github.eternalbits.disks.DiskImages;
 class ListItem {
 	static final List<String> IMAGE_TYPE = Arrays.asList(new String[] {"VDI", "VMDK", "VHD", "RAW"});
 	
-	private final static String CONFIRM_COMPACT = 
-			"This operation may change the disk image, do you want to proceed?";
-	private final static String CANCEL_COMPACT = 
-			"The requested action will interrupt a compact operation in progress.\n\n"
-			+ "If you %s now, the image beeing compacted may be in an intermediate state "
-			+ "that doesn't allow it to be mounted in a virtual machine. You must "
-			+ "complete the task as soon as you can.\n\n"
-			+ "Do you want to interrupt the compact operation?\n\n";
-	private final static String CANCEL_COPY = 
-			"The requested action will interrupt a copy operation in progress.\n\n"
-			+ "If you %s now, the image beeing created is not complete and will be deleted.\n\n"
-			+ "Do you want to interrupt the copy operation?\n\n";
-	
-	private final static String TASK_ABNORMAL = "The operation ended abnormally.";
-	private final static String TASK_CANCELED = "The operation was canceled.";
-	private final static String TASK_COMPLETE = "The operation is complete.";
-	private final static String IMAGE_CHANGED = "The disk image '%s' was changed.";
-	private final static String IMAGE_CREATED = "The disk image '%s' was created in '%s' directory.";
-	private final static String IMAGE_NOT_CHANGED = "The disk image '%s' was NOT changed.";
-	private final static String IMAGE_NOT_CREATED = "No disk image was created.";
-	
 	/** Synchronizer to ensure that only one task is running for this item,
 	 *  and to wait for the task to end on cancel. */
 	private final Object serializer = new Object();
@@ -123,12 +102,12 @@ class ListItem {
 			cancelWorker();
 			break;
 		case DiskImageProgress.COMPACT:
-			if (!confirm(String.format(CANCEL_COMPACT, action), "Abort compact?"))
+			if (!confirm(String.format(app.res.getString("cancel_compact"), action), app.res.getString("abort_compact")))
 				return false;
 			cancelWorker();
 			break;
 		case DiskImageProgress.COPY:
-			if (!confirm(String.format(CANCEL_COPY, action), "Abort copy?"))
+			if (!confirm(String.format(app.res.getString("cancel_copy"), action), app.res.getString("abort_copy")))
 				return false;
 			cancelWorker();
 			break;
@@ -165,7 +144,8 @@ class ListItem {
 
 	void compact() {
 		if (JOptionPane.showConfirmDialog(app, 
-				Static.wordWrap(CONFIRM_COMPACT), "Compact", 
+				Static.wordWrap(app.res.getString("confirm_compact")), 
+				app.res.getString("compact"), 
 				JOptionPane.YES_NO_OPTION, 
 				JOptionPane.QUESTION_MESSAGE) 
 				!= JOptionPane.YES_OPTION)
@@ -200,12 +180,13 @@ class ListItem {
 		private File outputFile;
 
 		private int activeTask;
-		private String progressString = "Searching space not in use or zero filled";
+		private String progressString;
 		private String exceptionCause = null;
 
 		DiskImageWorker(int task) {
 			this.task = task;
 			activeTask = task;
+			progressString = app.res.getString("progress");
 			// Set last view control to avoid false updateViews
 			lastViewOptions = app.getOptimizeOptions(task);
 			lastViewModifiedTime = file.lastModified();
@@ -231,7 +212,7 @@ class ListItem {
 						update(image.getView());
 						CompactVD.dump(view);
 					}
-					catch (Exception e) { setExceptionCause(e); showFinalDialog(null, "Error"); }				
+					catch (Exception e) { setExceptionCause(e); showFinalDialog(null, app.res.getString("error")); }				
 					break;
 					
 				case DiskImageProgress.COMPACT:
@@ -242,7 +223,7 @@ class ListItem {
 							image.optimize(lastViewOptions);
 							image.removeObserver(this);
 							if (!isCancelled()) {
-								progressString = "Compacting "+file.getName();
+								progressString = String.format(app.res.getString("compacting"), file.getName());
 								image.addObserver(this, true);
 								image.compact();
 								image.removeObserver(this);
@@ -254,7 +235,8 @@ class ListItem {
 					catch (Exception e) { setExceptionCause(e); }
 					
 					showFinalDialog(String.format(file.lastModified() != lastViewModifiedTime? 
-							IMAGE_CHANGED: IMAGE_NOT_CHANGED, file.getName()), "Compact");
+							app.res.getString("image_changed"): app.res.getString("image_not_changed"), file.getName()), 
+							app.res.getString("compact"));
 					break;
 					
 				case DiskImageProgress.COPY:
@@ -273,7 +255,7 @@ class ListItem {
 								image.removeObserver(this);
 								update(image.getView());
 								if (!isCancelled()) {
-									progressString = "Copying "+file.getName()+" to "+outputFile.getName();
+									progressString = String.format(app.res.getString("copying"), file.getName(), outputFile.getName());
 									FileLock fileLock = clone.tryLock();
 									clone.addObserver(this, false);
 									clone.copy(image);
@@ -291,8 +273,9 @@ class ListItem {
 					if (isCancelled() && copy != null && copy.isFile())
 						copy.delete();
 					
-					showFinalDialog(copy != null && copy.isFile()? String.format(IMAGE_CREATED, 
-							copy.getName(), copy.getParent()): IMAGE_NOT_CREATED, "Copy");
+					showFinalDialog(copy != null && copy.isFile()? String.format(app.res.getString("image_created"), 
+							copy.getName(), copy.getParent()): app.res.getString("image_not_created"), 
+							app.res.getString("copy"));
 					break;
 					
 				}
@@ -317,7 +300,8 @@ class ListItem {
 		}
 
 		private void showFinalDialog(final String result, final String title) {
-			String how = exceptionCause != null? TASK_ABNORMAL: isCancelled()? TASK_CANCELED: TASK_COMPLETE;
+			final String how = exceptionCause != null? app.res.getString("task_abnormal"): 
+				isCancelled()? app.res.getString("task_canceled"): app.res.getString("task_complete");
 			final int type = exceptionCause != null? JOptionPane.ERROR_MESSAGE: JOptionPane.INFORMATION_MESSAGE;
 			final String message = result == null? exceptionCause: how + " " + result + 
 					(exceptionCause == null? "": "\n\n" + exceptionCause);

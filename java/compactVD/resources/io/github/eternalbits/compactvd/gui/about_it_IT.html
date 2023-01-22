@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Informazioni su Compatta e Copia su disco virtuale</title>
+<style>/* only a limited subset of CSS1: http://docs.oracle.com/javase/8/docs/api/javax/swing/text/html/CSS.html */
+body {
+ font-family: Verdana, Arial, sans-serif;
+ font-size: 11pt;
+ margin: 0 6px;
+}
+h4, div.p { /* margins don't collapse */
+ margin-bottom: 12px;
+ margin-top: 0;
+}
+ul {
+ margin-bottom: 0;
+}
+li {
+ margin-bottom: 4px;
+}
+ul.d {
+ margin-left: 24px;
+}
+ul.d li {
+ margin-bottom: 2px;
+}
+a { /* isolated names have body */
+ text-decoration: none;
+}
+</style>
+</head>
+<body>
+
+
+<a name="top"><h3>Informazioni su Compatta e Copia su disco virtuale</h3></a>
+
+<table style="margin-bottom:8px"><tr>
+<td><img src="drive.png" width="64" height="64" style="margin-right:12px" alt=""/></td>
+<td style="vertical-align:top">Per ridurre le dimensioni delle immagini del disco virtuale<br>
+<small>Versione 2.4<br><br>
+Rilasciato sotto licenza Apache 2.0
+</small></td>
+</tr></table>
+
+<div class="p">Per ulteriori informazioni, vedere i seguenti argomenti:<ul>
+<li><a href="#whatis">Cos'è CompactVD?</a></li>
+<li><a href="#compact">Immagine del disco compatto al suo posto</a></li>
+<li><a href="#copy">Copia nella nuova immagine del disco</a></li>
+<li><a href="#note">Avvisi sul diritto d'autore</a></li>
+</ul></div>
+
+
+
+<hr/><a name="whatis"></a>
+<h4>Cos'è CompactVD?
+<a href="#top">▲</a></h4>
+
+<div class="p">CompactVD è un'utilità per ottimizzare la dimensione delle immagini disco dinamiche, basata sulle tabelle di allocazione bitmap dei file system conosciuti.
+</div>
+<div class="p">Puoi verificare se c'è spazio sprecato in un'immagine disco dinamica confrontando la dimensione del file immagine disco con lo spazio utilizzato dai file system all'interno dell'immagine. Per un'allocazione ottimale delle risorse, non dovrebbero essere molto diversi. Oppure trascina semplicemente un'immagine del disco in questa finestra:
+</div>
+<div class="p" style="margin-left: 16px"><img src="about_files/reduce_it_IT.png" width="379" alt=""/></div>
+
+<div class="p">I file system attualmente supportati sono:<ul class="d">
+<li>New Technology File System (NTFS), per computer Windows</li>
+<li>Gerarchico o Apple File System (HFS o APFS), per macOS</li>
+<li>File system esteso (EXT), utilizzato nella maggior parte dei desktop Linux</li>
+</ul></div>
+
+
+
+<hr/><a name="compact"></a>
+<h4>Immagine del disco compatto al suo posto
+<a href="#top">▲</a></h4>
+
+<div class="p">L'operazione <code>compatta</code> estrae blocchi di dati dalla fine dell'immagine del disco allo spazio che è stato rilevato come non utilizzato dai file system.
+</div>
+<div class="p">Per iniziare viene eseguita una scansione per rilevare i blocchi di dati che non sono utilizzati dai file system e la struttura dell'immagine del disco viene aggiornata contrassegnando tali blocchi come se non fossero mai stati utilizzati.
+</div>
+<div class="p">Quindi i blocchi con i dati effettivi vengono spostati dalla fine dell'immagine del disco allo spazio che è stato recuperato dall'operazione precedente.
+</div>
+<div class="p">Infine la struttura dell'immagine viene aggiornata per riflettere la nuova posizione dei blocchi spostati e la dimensione del file immagine viene tagliata. Gli aggiornamenti alla struttura dell'immagine vengono temporaneamente salvati sul supporto host e verranno scritti sull'immagine alla successiva esecuzione del programma, in caso di guasto hardware recuperabile.
+</div>
+
+
+
+<hr/><a name="copy"></a>
+<h4>Copia in una nuova immagine del disco
+<a href="#top">▲</a></h4>
+
+<div class="p">L'operazione di <code>copia</code> inizia con una scansione per rilevare i blocchi di dati che non sono utilizzati dai file system. La nuova immagine viene creata ignorando quei blocchi e blocchi che altrimenti sarebbero completamente riempiti di zeri.
+</div>
+<div class="p">Il formato della nuova immagine disco può essere selezionato nella finestra di dialogo <code>Copia immagine disco</code> con una di queste estensioni di file:<ul class="d">
+<li>VDI, Virtual Disk Image per Oracle VirtualBox</li>
+<li>VMDK, Virtual Machine Disk per i prodotti VMware</li>
+<li>VHD, Virtual Hard Disk per i prodotti Microsoft</li>
+<li>RAW, per un'immagine disco completa</li>
+</ul></div>
+
+
+
+<hr/><a name="note"></a>
+<h4>Avvisi sul copyright
+<a href="#top">▲</a></h4>
+
+
+<div class="p"><div style="margin-bottom: 4px">Copyright © 2016-2023 Rui Baptista</div>
+Concesso in licenza con licenza Apache, versione 2.0. È possibile ottenere una copia della Licenza <a href="http://www.apache.org/licenses/LICENSE-2.0">rilasciata ai sensi della Licenza Apache 2.0</a>. Il software distribuito in base alla Licenza è distribuito "COSÌ COM'È", SENZA GARANZIE O CONDIZIONI DI ALCUN TIPO, espresse o implicite.
+</div>
+
+<div class="p">Questo prodotto include il software <a href="https://commons.apache.org/proper/commons-cli/">Apache Commons CLI</a> Copyright 2001-2020 The Apache Software Foundation.
+</div>
+
+<div class="p">L'icona dell'applicazione è un'opera derivata dell'originale realizzata da <a href="http://web.archive.org/web/20090718204515/http://www.mcdodesign.com/downloads/?paged=3">Susumu Yoshida</a> (Copyright © 2009 McDo DESIGN.com).
+</div>
+
+<div class="p">Le altre icone che identificano i dischi immagine nel pannello di visualizzazione sono icone di computer dei formati di file protette da copyright. L'autore ritiene che l'esposizione di icone per identificare i formati di file in questione si qualifichi come fair use.
+</div>
+
+
+
+</body>
+</html>

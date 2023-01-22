@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>仮想ディスクの圧縮とコピーについて</title>
+<style>/* only a limited subset of CSS1: http://docs.oracle.com/javase/8/docs/api/javax/swing/text/html/CSS.html */
+body {
+ font-family: Verdana, Arial, sans-serif;
+ font-size: 11pt;
+ margin: 0 6px;
+}
+h4, div.p { /* margins don't collapse */
+ margin-bottom: 12px;
+ margin-top: 0;
+}
+ul {
+ margin-bottom: 0;
+}
+li {
+ margin-bottom: 4px;
+}
+ul.d {
+ margin-left: 24px;
+}
+ul.d li {
+ margin-bottom: 2px;
+}
+a { /* isolated names have body */
+ text-decoration: none;
+}
+</style>
+</head>
+<body>
+
+
+<a name="top"><h3>仮想ディスクの圧縮とコピーについて</h3></a>
+
+<table style="margin-bottom:8px"><tr>
+<td><img src="drive.png" width="64" height="64" style="margin-right:12px" alt=""/></td>
+<td style="vertical-align:top">仮想ディスク イメージのサイズを縮小するには<br>
+<small>バージョン 2.4<br><br>
+Apache License 2.0 の下でリリース
+</small></td>
+</tr></table>
+
+<div class="p">詳細については、次のトピックを参照してください。<ul>
+<li><a href="#whatis">CompactVD とは何ですか?</a></li>
+<li><a href="#compact">コンパクト ディスク イメージの配置</a></li>
+<li><a href="#copy">新しいディスク イメージにコピー</a></li>
+<li><a href="#note">著作権表示</a></li>
+</ul></div>
+
+
+
+<hr/><a name="whatis"></a>
+<h4>CompactVD とは何ですか?
+<a href="#top">▲</a></h4>
+
+<div class="p">CompactVD は、既知のファイル システムのビットマップ アロケーション テーブルに基づいて、ダイナミック ディスク イメージのサイズを最適化するユーティリティです。
+</div>
+<div class="p">ディスク イメージ ファイルのサイズと、イメージ内のファイル システムで使用されるスペースを比較すると、ダイナミック ディスク イメージに無駄なスペースがあるかどうかを確認できます。 最適なリソース割り当てのために、それらは大きく異なるべきではありません。 または、ディスク イメージをこのウィンドウにドラッグするだけです。
+</div>
+<div class="p" style="margin-left: 16px"><img src="about_files/reduce_ja_JP.png" width="379" alt=""/></div>
+
+<div class="p">現在サポートされているファイル システムは次のとおりです。<ul class="d">
+<li>Windows コンピュータ用の New Technology File System (NTFS)</li>
+<li>macOS 用の階層型または Apple ファイル システム (HFS または APFS)</li>
+<li>ほとんどの Linux デスクトップで使用される拡張ファイル システム (EXT)</li>
+</ul></div>
+
+
+
+<hr/><a name="compact"></a>
+<h4>コンパクト ディスク イメージ インプレース
+<a href="#top">▲</a></h4>
+
+<div class="p">圧縮操作は、ディスク イメージの最後から、ファイル システムで使用されていないことが検出された領域にデータ ブロックをプルします。
+</div>
+<div class="p">スキャンを開始して、ファイル システムで使用されていないデータ ブロックを検出し、ディスク イメージ構造を更新して、それらのブロックが使用されていないかのようにマークします。
+</div>
+<div class="p">次に、有効なデータを含むブロックが、ディスク イメージの末尾から、前の操作で回復されたスペースに移動されます。
+</div>
+<div class="p">最後に、移動したブロックの新しい位置を反映するように画像構造が更新され、画像ファイルのサイズがトリミングされます。 イメージ構造の更新は一時的にホスト メディアに保存され、回復可能なハードウェア障害が発生した場合に、次のプログラム実行時にイメージに書き込まれます。
+</div>
+
+
+
+<hr/><a name="copy"></a>
+<h4>新しいディスク イメージにコピー
+<a href="#top">▲</a></h4>
+
+<div class="p">コピー操作は、ファイル システムで使用されていないデータ ブロックを検出するためのスキャンから始まります。 新しいイメージは、それらのブロックを無視して作成され、そうでなければ完全にゼロで埋められるブロックが作成されます。
+</div>
+<div class="p">新しいディスク イメージのフォーマットは、<code>ディスク イメージのコピー</code> ダイアログで次のいずれかのファイル拡張子で選択できます。<ul class="d">
+<li>VDI、Oracle VirtualBox の仮想ディスク イメージ</li>
+<li>VMDK、VMware 製品の仮想マシン ディスク</li>
+<li>VHD、Microsoft 製品の仮想ハードディスク</li>
+<li>RAW、完全なディスク イメージ用</li>
+</ul></div>
+
+
+
+<hr/><a name="note"></a>
+<h4>著作権表示
+<a href="#top">▲</a></h4>
+
+
+<div class="p"><div style="margin-bottom: 4px">Copyright © 2016-2023 Rui Baptista</div>
+Apache ライセンス、バージョン 2.0 の下でライセンス供与されています。<a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a> に基づいてリリースされたライセンスのコピーを取得できます。 ライセンスに基づいて配布されるソフトウェアは、明示または黙示を問わず、いかなる種類の保証または条件もなく、「現状のまま」で配布されます。
+</div>
+
+<div class="p">この製品には、<a href="https://commons.apache.org/proper/commons-cli/">Apache Commons CLI</a> ソフトウェアが含まれています。Copyright 2001-2020 The Apache Software Foundation.
+</div>
+
+<div class="p">アプリのアイコンは、<a href="http://web.archive.org/web/20090718204515/http://www.mcdodesign.com/downloads/?paged=3">吉田晋</a>（Copyright © 2009 McDo DESIGN.com）が作成したオリジナルの派生作品です。
+</div>
+
+<div class="p">ビュー パネルでイメージ ディスクを識別するその他のアイコンは、著作権で保護されたファイル形式のコンピュータ アイコンです。 著者は、問題のファイル形式を識別するためのアイコンの表示がフェアユースに該当すると考えています。
+</div>
+
+
+
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>关于虚拟磁盘压缩和复制</title>
+<style>/* only a limited subset of CSS1: http://docs.oracle.com/javase/8/docs/api/javax/swing/text/html/CSS.html */
+body {
+ font-family: Verdana, Arial, sans-serif;
+ font-size: 11pt;
+ margin: 0 6px;
+}
+h4, div.p { /* margins don't collapse */
+ margin-bottom: 12px;
+ margin-top: 0;
+}
+ul {
+ margin-bottom: 0;
+}
+li {
+ margin-bottom: 4px;
+}
+ul.d {
+ margin-left: 24px;
+}
+ul.d li {
+ margin-bottom: 2px;
+}
+a { /* isolated names have body */
+ text-decoration: none;
+}
+</style>
+</head>
+<body>
+
+
+<a name="top"><h3>关于虚拟磁盘压缩和复制</h3></a>
+
+<table style="margin-bottom:8px"><tr>
+<td><img src="drive.png" width="64" height="64" style="margin-right:12px" alt=""/></td>
+<td style="vertical-align:top">减小虚拟磁盘映像的大小<br>
+<small>版本 2.4<br><br>
+在 Apache License 2.0 下发布
+</small></td>
+</tr></table>
+
+<div class="p">有关详细信息，请参阅以下主题：<ul>
+<li><a href="#whatis">什么是 CompactVD？</a></li>
+<li><a href="#compact">光盘映像到位</a></li>
+<li><a href="#copy">复制到新的磁盘映像</a></li>
+<li><a href="#note">版权声明</a></li>
+</ul></div>
+
+
+
+<hr/><a name="whatis"></a>
+<h4>什么是 CompactVD？
+<a href="#top">▲</a></h4>
+
+<div class="p">CompactVD 是一种基于已知文件系统的位图分配表来优化动态磁盘映像大小的实用程序。
+</div>
+<div class="p">您可以检查动态磁盘映像中是否存在浪费的空间，比较磁盘映像文件的大小与映像内文件系统使用的空间。 为了优化资源分配，它们不应该有很大的不同。 或者只是将磁盘映像拖到此窗口中：
+</div>
+<div class="p" style="margin-left: 16px"><img src="about_files/reduce_zh_CN.png" width="379" alt=""/></div>
+
+<div class="p">目前支持的文件系统有：<ul class="d">
+<li>新技术文件系统 (NTFS)，适用于 Windows 计算机</li>
+<li>分层或 Apple 文件系统（HFS 或 APFS），适用于 macOS</li>
+<li>扩展文件系统 (EXT)，用于大多数 Linux 桌面</li>
+</ul></div>
+
+
+
+<hr/><a name="compact"></a>
+<h4>光盘映像就位
+<a href="#top">▲</a></h4>
+
+<div class="p">压缩操作将数据块从磁盘映像的末尾拉到检测到未被文件系统使用的空间。
+</div>
+<div class="p">开始扫描以检测文件系统未使用的数据块，并更新磁盘映像结构，将这些块标记为从未使用过。
+</div>
+<div class="p">然后将具有有效数据的块从磁盘映像的末尾移动到之前操作回收的空间。
+</div>
+<div class="p">最后更新图像结构以反映移动块的新位置，并修剪图像文件大小。 图像结构的更新临时保存在主机介质上，并在下一次程序执行时写入图像，以防出现可恢复的硬件故障。
+</div>
+
+
+
+<hr/><a name="copy"></a>
+<h4>复制到新磁盘映像
+<a href="#top">▲</a></h4>
+
+<div class="p">复制操作从扫描开始，以检测文件系统未使用的数据块。 创建新图像时会忽略那些块，否则这些块将完全被零填充。
+</div>
+<div class="p">可以在“复制磁盘映像”对话框中使用以下文件扩展名选择新磁盘映像的格式：<ul class="d">
+<li>VDI，Oracle VirtualBox 的虚拟磁盘映像</li>
+<li>VMDK，VMware 产品的虚拟机磁盘</li>
+<li>VHD，Microsoft 产品的虚拟硬盘</li>
+<li>RAW，用于完整的磁盘映像</li>
+</ul></div>
+
+
+
+<hr/><a name="note"></a>
+<h4>版权声明
+<a href="#top">▲</a></h4>
+
+
+<div class="p"><div style="margin-bottom: 4px">Copyright © 2016-2023 Rui Baptista</div>
+根据 Apache 许可证 2.0 版获得许可。 您可以获得一份<a href="http://www.apache.org/licenses/LICENSE-2.0">根据 Apache 许可证 2.0</a> 发布的许可证副本。 根据许可证分发的软件按“原样”分发，不附带任何明示或暗示的保证或条件。
+</div>
+
+<div class="p">本产品包括 <a href="https://commons.apache.org/proper/commons-cli/">Apache Commons CLI</a> 软件版权所有 2001-2020 The Apache Software Foundation。
+</div>
+
+<div class="p">应用程序图标是 <a href="http://web.archive.org/web/20090718204515/http://www.mcdodesign.com/downloads/?paged=3">Susumu Yoshida</a> 原创作品的衍生作品（版权所有 © 2009 McDo DESIGN.com）。
+</div>
+
+<div class="p">查看面板中标识图像磁盘的其他图标是受版权保护的文件格式计算机图标。 作者认为展示图标以识别有问题的文件格式符合合理使用的条件。
+</div>
+
+
+
+</body>
+</html>

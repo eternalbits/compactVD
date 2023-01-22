@@ -51,8 +51,6 @@ import io.github.eternalbits.disks.DiskImages;
  */
 public class CompactVD implements DiskImageObserver {
 	
-	// TODO: move this stuff to DiskImage[s] and merge with ListItem methods
-	
 	private Thread mainThread = null;
 	private int task = DiskImageProgress.NO_TASK;
 	
@@ -202,7 +200,7 @@ public class CompactVD implements DiskImageObserver {
 		return new File(cmd.getOptionValue(opt));
 	}
 	
-	private static final String version = "2.3";
+	private static final String version = "2.4";
 	private static final String jar = new java.io.File(CompactVD.class.getProtectionDomain()
 			.getCodeSource().getLocation().getPath()).getName();
 

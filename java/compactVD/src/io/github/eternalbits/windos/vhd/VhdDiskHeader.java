@@ -26,8 +26,8 @@ import io.github.eternalbits.disk.InitializationException;
 import io.github.eternalbits.disk.WrongHeaderException;
 
 class VhdDiskHeader {
-	static final int HEADER_SIZE = 1024;
-
+	static final int HEADER_SIZE = 1024;						// Dynamically growing base image file
+	
 	private static final long CXSPARSE = 0x6378737061727365L;	// "cxsparse"
 	private static final int CURRENT_VERSION = 0x10000;			// Version 1.0
 	private static final int DEFAULT_BLOCK_SIZE = 0x200000;		// 2 MB

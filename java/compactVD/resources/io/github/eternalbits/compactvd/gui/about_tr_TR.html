@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Sanal Diski Sıkıştırma ve Kopyalama Hakkında</title>
+<style>/* only a limited subset of CSS1: http://docs.oracle.com/javase/8/docs/api/javax/swing/text/html/CSS.html */
+body {
+ font-family: Verdana, Arial, sans-serif;
+ font-size: 11pt;
+ margin: 0 6px;
+}
+h4, div.p { /* margins don't collapse */
+ margin-bottom: 12px;
+ margin-top: 0;
+}
+ul {
+ margin-bottom: 0;
+}
+li {
+ margin-bottom: 4px;
+}
+ul.d {
+ margin-left: 24px;
+}
+ul.d li {
+ margin-bottom: 2px;
+}
+a { /* isolated names have body */
+ text-decoration: none;
+}
+</style>
+</head>
+<body>
+
+
+<a name="top"><h3>Sanal Diski Sıkıştırma ve Kopyalama Hakkında</h3></a>
+
+<table style="margin-bottom:8px"><tr>
+<td><img src="drive.png" width="64" height="64" style="margin-right:12px" alt=""/></td>
+<td style="vertical-align:top">Sanal disk görüntülerinin boyutunu azaltmak için<br>
+<small>Sürüm 2.4<br><br>
+Apache Lisansı 2.0 altında yayınlandı
+</small></td>
+</tr></table>
+
+<div class="p">Daha fazla bilgi için aşağıdaki konulara bakın:<ul>
+<li><a href="#whatis">CompactVD nedir?</a></li>
+<li><a href="#compact">Kompakt disk görüntüsü yerinde</a></li>
+<li><a href="#copy">Yeni disk görüntüsüne kopyala</a></li>
+<li><a href="#note">Telif hakkı bildirimleri</a></li>
+</ul></div>
+
+
+
+<hr/><a name="whatis"></a>
+<h4>CompactVD nedir?
+<a href="#top">▲</a></h4>
+
+<div class="p">CompactVD, bilinen dosya sistemlerinin bitmap ayırma tablolarına dayalı olarak dinamik disk görüntülerinin boyutunu optimize etmek için bir yardımcı programdır.
+</div>
+<div class="p">Disk görüntü dosyasının boyutunu görüntünün içindeki dosya sistemleri tarafından kullanılan alanla karşılaştırarak dinamik bir disk görüntüsünde boş alan olup olmadığını kontrol edebilirsiniz. Optimum kaynak tahsisi için çok farklı olmamalıdırlar. Veya sadece bir disk görüntüsünü bu pencereye sürükleyin:
+</div>
+<div class="p" style="margin-left: 16px"><img src="about_files/reduce_tr_TR.png" width="379" alt=""/></div>
+
+<div class="p">Şu anda desteklenen dosya sistemleri şunlardır:<ul class="d">
+<li>Windows bilgisayarlar için Yeni Teknoloji Dosya Sistemi (NTFS)</li>
+<li>macOS için Hiyerarşik veya Apple Dosya Sistemi (HFS veya APFS)</li>
+<li>Çoğu linux masaüstünde kullanılan Genişletilmiş Dosya Sistemi (EXT)</li>
+</ul></div>
+
+
+
+<hr/><a name="compact"></a>
+<h4>Yerinde Kompakt Disk Görüntüsü
+<a href="#top">▲</a></h4>
+
+<div class="p"><code>Kompakt</code> işlem, dosya sistemleri tarafından kullanılmadığı tespit edilen disk görüntüsünün sonundaki veri bloklarını boşluğa çeker.
+</div>
+<div class="p">Başlamak için, dosya sistemleri tarafından kullanılmayan veri bloklarını tespit etmek için bir tarama yapılır ve disk görüntü yapısı, bu blokları hiç kullanılmamış gibi işaretleyerek güncellenir.
+</div>
+<div class="p">Ardından, etkin veri içeren bloklar, disk görüntüsünün sonundan önceki işlem tarafından kurtarılan alana taşınır.
+</div>
+<div class="p">Son olarak, görüntü yapısı taşınan blokların yeni konumunu yansıtacak şekilde güncellenir ve görüntü dosyası boyutu kırpılır. Görüntü yapısındaki güncellemeler geçici olarak ana ortama kaydedilir ve kurtarılabilir bir donanım arızası durumunda, bir sonraki program yürütmesinde görüntüye yazılır.
+</div>
+
+
+
+<hr/><a name="copy"></a>
+<h4>Yeni Disk Görüntüsüne Kopyala
+<a href="#top">▲</a></h4>
+
+<div class="p"><code>Kopyalama</code> işlemi, dosya sistemleri tarafından kullanılmayan veri bloklarını algılamak için bir tarama ile başlar. Yeni görüntü, bu bloklar ve aksi takdirde tamamen sıfırlarla doldurulacak olan bloklar göz ardı edilerek oluşturulur.
+</div>
+<div class="p">Yeni disk görüntüsünün formatı, <code>Disk Görüntüsünü Kopyala</code> iletişim kutusunda aşağıdaki dosya uzantılarından biriyle seçilebilir:<ul class="d">
+<li>VDI, Oracle VirtualBox için Sanal Disk Görüntüsü</li>
+<li>VMDK, VMware ürünleri için Sanal Makine Diski</li>
+<li>Microsoft ürünleri için VHD, Sanal Sabit Disk</li>
+<li>Tam bir disk görüntüsü için RAW</li>
+</ul></div>
+
+
+
+<hr/><a name="note"></a>
+<h4>Telif Hakkı Bildirimleri
+<a href="#top">▲</a></h4>
+
+
+<div class="p"><div style="margin-bottom: 4px">Copyright © 2016-2023 Rui Baptista</div>
+Apache Lisansı, Sürüm 2.0 altında lisanslanmıştır. <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache Lisansı 2.0 kapsamında verilen</a> Lisansın bir kopyasını edinebilirsiniz. Lisans kapsamında dağıtılan yazılım, açık veya zımni HİÇBİR TÜR GARANTİ VEYA KOŞUL OLMAKSIZIN, "OLDUĞU GİBİ" TEMELİNDE dağıtılır.
+</div>
+
+<div class="p">Bu ürün, <a href="https://commons.apache.org/proper/commons-cli/">Apache Commons CLI</a> yazılımını içerir Telif hakkı 2001-2020 The Apache Software Foundation.
+</div>
+
+<div class="p">Uygulama simgesi, <a href="http://web.archive.org/web/20090718204515/http://www.mcdodesign.com/downloads/?paged=3">Susumu Yoshida</a> (Telif hakkı © 2009 McDo DESIGN.com) tarafından yapılan orijinalden türetilmiş bir çalışmadır.
+</div>
+
+<div class="p">Görünüm panelinde görüntü disklerini tanımlayan diğer simgeler, dosya biçimlerinin telif hakkı korumalı bilgisayar simgeleridir. Yazar, söz konusu dosya formatlarını tanımlamak için simgelerin sergilenmesinin adil kullanım olarak nitelendirildiğine inanmaktadır.
+</div>
+
+
+
+</body>
+</html>

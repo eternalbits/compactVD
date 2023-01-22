@@ -43,6 +43,8 @@ class Settings implements Serializable {
 	
 	// File dialog
 	String lastDirectory = null;
+	String selectedLanguage = "en";
+	String selectedCountry = "US";
 	boolean filterImageFiles = true;
 	
 	// Open options

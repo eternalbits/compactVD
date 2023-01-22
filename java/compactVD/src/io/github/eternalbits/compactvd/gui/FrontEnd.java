@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
+import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
@@ -62,6 +63,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 import javax.swing.TransferHandler;
+import javax.swing.UIManager;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.HyperlinkEvent;
@@ -83,7 +85,6 @@ import io.github.eternalbits.disks.DiskImages;
 public class FrontEnd extends JFrame {
 	private static final long serialVersionUID = 4457476192315737735L;
 	
-	private static final String title = "Virtual Disk Compact and Copy";
 	private static final String DEFAULT_FILE_FILTER = ".+\\.(?i:vdi|vmdk|vhd|raw)";
 	private static final String WINDOWS_FILE_FILTER = "*.vdi;*.vmdk;*.vhd;*.raw";
 	
@@ -108,7 +109,8 @@ public class FrontEnd extends JFrame {
 	private final CardLayout deck = new CardLayout();
 	private final JPanel main = new JPanel(deck);
 	private final JEditorPane about = new JEditorPane();
-	private final ImageCanvas view = new ImageCanvas(this);
+	private final JToolBar tb = new JToolBar();
+	private final ImageCanvas view;
 	
 	private final JProgressBar progress = new JProgressBar();
 	
@@ -119,25 +121,25 @@ public class FrontEnd extends JFrame {
 	private transient final boolean isMac;
 	
 	final Settings settings;
+	ResourceBundle res;
 	
 	/**
 	 * The Virtual Disk Compact and Copy graphical user interface.
 	 */
 	public FrontEnd() {
-		super(title);
-		
-		settings = Settings.read();
 		setIconImage(new ImageIcon(getResource("drive.png")).getImage());
-		
 		String osName = System.getProperty("os.name").toLowerCase();
 		isWindows = osName.indexOf("windows") >= 0;
 		isMac = osName.indexOf("mac") >= 0;
 		if (isMac) 
 			new MacAdapter(this);
 		
-		setupFrame();
+		settings = Settings.read();
+		onLocaleChange();
 		
-		getContentPane().add(setupToolBar(), BorderLayout.PAGE_START);
+		view = new ImageCanvas(this);
+		
+		setupFrame();
 		
 		JComponent about = setupAboutDialog();
 		deck.addLayoutComponent(about, "about");
@@ -154,7 +156,6 @@ public class FrontEnd extends JFrame {
 		
 		split.setLeftComponent(setupFileList());
 		split.setRightComponent(main);
-		setComponentPopupMenu(main);
 		
 		adjustBounds();
 		setLocation(settings.windowRect.getLocation());
@@ -170,6 +171,27 @@ public class FrontEnd extends JFrame {
 		pack();
 		setVisible(true);
 		onSelectListItem();
+	}
+
+	/**
+	 *  Sets the window according to the Language Interface option that appears in Settings.
+	 */
+	private void onLocaleChange() {
+		res = ResourceBundle.getBundle("res.bundle", 
+				SettingsDialog.Languages(settings.selectedLanguage, settings.selectedCountry));
+		UIManager.put("OptionPane.yesButtonText", res.getString("yes_text"));
+		UIManager.put("OptionPane.noButtonText", res.getString("no_text"));
+		UIManager.put("OptionPane.okButtonText", res.getString("ok_text"));
+		
+		setTitle(res.getString("title"));
+		getContentPane().add(setupToolBar(tb), BorderLayout.PAGE_START);
+		setComponentPopupMenu(main);
+		try {
+			about.setContentType("text/html; charset=utf-8");
+			about.setPage(getResource(res.getString("about_html")));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -316,7 +338,7 @@ public class FrontEnd extends JFrame {
 			} catch (IOException e) {
 				JOptionPane.showMessageDialog(this, 
 						Static.wordWrap(Static.simpleString(e)), 
-						"Error", JOptionPane.ERROR_MESSAGE);
+						res.getString("error"), JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}
@@ -336,7 +358,7 @@ public class FrontEnd extends JFrame {
 			} catch (IOException e) {
 				JOptionPane.showMessageDialog(this, 
 						Static.wordWrap(Static.simpleString(e)), 
-						"Error", JOptionPane.ERROR_MESSAGE);
+						res.getString("error"), JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}
@@ -359,8 +381,8 @@ public class FrontEnd extends JFrame {
 	 * Place the PopupMenu with its dependencies under the JComponent source
 	 */
 	private void setComponentPopupMenu(JComponent source) {
-		final JMenuItem refresh = new JMenuItem("Refresh");
-		final JMenuItem close = new JMenuItem("Close");
+		final JMenuItem refresh = new JMenuItem(res.getString("refresh"));
+		final JMenuItem close = new JMenuItem(res.getString("close"));
 		final JPopupMenu popup = new JPopupMenu();
 		popup.add(refresh);
 		popup.add(close);
@@ -397,7 +419,7 @@ public class FrontEnd extends JFrame {
 	 */
 	boolean canCloseNow() {
 		for (int i = 0, s = listData.getSize(); i < s; i++) {
-			if (!listData.get(i).stopRun("close the window")) {
+			if (!listData.get(i).stopRun(res.getString("close_now"))) {
 				return false;
 			}
 		}
@@ -508,11 +530,13 @@ public class FrontEnd extends JFrame {
 		}
 	}
 
-	private JToolBar setupToolBar() {
-		JToolBar tb = new JToolBar();
+	private JToolBar setupToolBar(JToolBar tb) {
+		tb.invalidate();
+		tb.removeAll();
+		pack();
 		
-		tb.add(openButton = new JToolButton("Open", "open.png", "Open Disk Image"
-				+ ": select an image to Compact or Copy"));
+		tb.add(openButton = new JToolButton(res.getString("open"), "open.png", 
+				res.getString("open_msg") + ": " + res.getString("open_txt")));
 		openButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -520,30 +544,30 @@ public class FrontEnd extends JFrame {
 			}
 		});
 		
-		tb.add(compactButton = new JToolButton("Compact", "compact.png", "Compact Disk Image"
-				+ ": compact the selected image inline"));
+		tb.add(compactButton = new JToolButton(res.getString("compact"), "compact.png", 
+				res.getString("compact_msg") + ": " + res.getString("compact_txt")));
 		compactButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (compactButton.getIcon() == compactIcon)
 					compactDiskImage();
-				else cancelTaskInProgress("stop the compact operation");
+				else cancelTaskInProgress(res.getString("compact_now"));
 			}
 		});
 		
-		tb.add(copyButton = new JToolButton("Copy", "copy.png", "Copy Disk Image"
-				+ ": create a new, optimized image from the selected image data"));
+		tb.add(copyButton = new JToolButton(res.getString("copy"), "copy.png", 
+				res.getString("copy_msg") + ": " + res.getString("copy_txt")));
 		copyButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (copyButton.getIcon() == copyIcon)
 					copyDiskImage();
-				else cancelTaskInProgress("stop the copy operation");
+				else cancelTaskInProgress(res.getString("copy_now"));
 			}
 		});
 		
-		tb.add(settingsButton = new JToolButton("Settings", "settings.png", "Edit Settings"
-				+ ": change how images are optimized"));
+		tb.add(settingsButton = new JToolButton(res.getString("settings"), "settings.png", 
+				res.getString("settings_msg") + ": " + res.getString("settings_txt")));
 		settingsButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -551,7 +575,8 @@ public class FrontEnd extends JFrame {
 			}
 		});
 		
-		tb.add(aboutButton = new JToolButton("About", "about.png", "Show About Dialog"));
+		tb.add(aboutButton = new JToolButton(res.getString("about"), "about.png", 
+				res.getString("about_msg") + "" + ""));
 		aboutButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -585,7 +610,7 @@ public class FrontEnd extends JFrame {
 
 	private void openDiskImage() {
 		fileDialog.setFile(isWindows && settings.filterImageFiles? WINDOWS_FILE_FILTER: null);
-		fileDialog.setTitle("Open Disk Image");
+		fileDialog.setTitle(res.getString("open_msg"));
 		fileDialog.setMode(FileDialog.LOAD);
 		fileDialog.setMultipleMode(true);
 		fileDialog.setVisible(true);
@@ -612,24 +637,24 @@ public class FrontEnd extends JFrame {
 		int s = list.getSelectedIndex();
 		if (s != -1) {
 			String source = listData.get(s).getFile().getName();
-			fileDialog.setFile(String.format("Copy of %s", source));
-			fileDialog.setTitle("Copy Disk Image");
+			fileDialog.setFile(String.format(res.getString("copy_dup"), source));
+			fileDialog.setTitle(res.getString("copy_msg"));
 			fileDialog.setMode(FileDialog.SAVE);
 			fileDialog.setMultipleMode(false);
 			fileDialog.setVisible(true);
 			for (File file: fileDialog.getFiles()) {
 				if (file.compareTo(listData.get(s).getFile()) == 0) {
 					JOptionPane.showMessageDialog(this, 
-							String.format("File %s is the same as the old image!", 
-							file.getName()), "Error", JOptionPane.ERROR_MESSAGE);
+							String.format(res.getString("error_old_image"), file.getName()), 
+							res.getString("error"), JOptionPane.ERROR_MESSAGE);
 				} else {
 					if (Static.getExtension(file.getName()).length() == 0)
 						file = new File(file.getPath()+"."+Static.getExtension(source));
 					String type = Static.getExtension(file.getName()).toUpperCase();
 					if (!ListItem.IMAGE_TYPE.contains(type)) {
 						JOptionPane.showMessageDialog(this, 
-								String.format("Unknown image type: %s", type), 
-								"Error", JOptionPane.ERROR_MESSAGE);
+								String.format(res.getString("error_image_type"), type), 
+								res.getString("error"), JOptionPane.ERROR_MESSAGE);
 						return;
 					}
 					listData.get(s).copyTo(file, type);
@@ -648,8 +673,12 @@ public class FrontEnd extends JFrame {
 
 	void editSettings() {
 		new SettingsDialog(this);
+		onLocaleChange();
+		
 		setupFileDialog(settings.filterImageFiles);
 		updateDiskImage();
+		
+		onSelectListItem();
 	}
 
 	void showAboutDialog() {
@@ -668,13 +697,6 @@ public class FrontEnd extends JFrame {
 		about.setBorder(BorderFactory.createEmptyBorder());
 		about.setTransferHandler(null);
 		about.setEditable(false);
-		
-		try {
-			about.setContentType("text/html; charset=utf-8");
-			about.setPage(getResource("about.html"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 		
 		about.addHyperlinkListener(new HyperlinkListener() {
 			@Override
