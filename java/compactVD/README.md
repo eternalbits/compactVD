@@ -7,4 +7,4 @@ If you use eclipse, remember the following advices:
 * [A cycle was detected in the build path of project xxx](https://stackoverflow.com/questions/1084866/a-cycle-was-detected-in-the-build-path-of-project-xxx-build-path-problem/17650402#17650402)
 * [Eclipse wrong Java properties UTF-8 encoding](https://stackoverflow.com/questions/31143923/eclipse-wrong-java-properties-utf-8-encoding/31144165#31144165)
 
-[existing translation](https://github.com/eternalbits/compactVD/files/10475754/bundle.xlsx)
+There is a translation [already in issues](https://github.com/eternalbits/compactVD/issues/1).
