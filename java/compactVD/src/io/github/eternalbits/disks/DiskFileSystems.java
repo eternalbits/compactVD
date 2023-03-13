@@ -25,7 +25,9 @@ import io.github.eternalbits.disk.DiskLayout;
 import io.github.eternalbits.disk.InitializationException;
 import io.github.eternalbits.disk.NullFileSystem;
 import io.github.eternalbits.disk.WrongHeaderException;
+import io.github.eternalbits.linux.disk.btrfs.BtrfsFileSystem;
 import io.github.eternalbits.linux.disk.ext.ExtFileSystem;
+import io.github.eternalbits.linux.disk.xfs.XfsFileSystem;
 import io.github.eternalbits.windos.disk.ntfs.NtfsFileSystem;
 
 public class DiskFileSystems {
@@ -58,6 +60,14 @@ public class DiskFileSystems {
 		
 		try {
 			return new ExtFileSystem(layout, offset, length);
+		} catch (WrongHeaderException e) {}
+		
+		try {
+			return new BtrfsFileSystem(layout, offset, length);
+		} catch (WrongHeaderException e) {}
+		
+		try {
+			return new XfsFileSystem(layout, offset, length);
 		} catch (WrongHeaderException e) {}
 		
 		throw new InitializationException(DiskLayout.class, layout.toString());
@@ -104,6 +114,18 @@ public class DiskFileSystems {
 			return new ExtFileSystem(layout, offset, length);
 		} catch (InitializationException e) {
 			return new NullFileSystem(layout, offset, length, "EXT", e);
+		} catch (WrongHeaderException e) {}
+		
+		try {
+			return new BtrfsFileSystem(layout, offset, length);
+		} catch (InitializationException e) {
+			return new NullFileSystem(layout, offset, length, "BTRFS", e);
+		} catch (WrongHeaderException e) {}
+		
+		try {
+			return new XfsFileSystem(layout, offset, length);
+		} catch (InitializationException e) {
+			return new NullFileSystem(layout, offset, length, "XFS", e);
 		} catch (WrongHeaderException e) {}
 		
 		return new NullFileSystem(layout, offset, length, null, description);

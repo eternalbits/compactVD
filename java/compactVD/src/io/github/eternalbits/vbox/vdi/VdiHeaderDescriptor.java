@@ -92,7 +92,7 @@ class VdiHeaderDescriptor {
 		blockSize			= VDI_IMAGE_BLOCK_SIZE;
 		blockExtraSize		= 0;
 		blocksCount			= (int)Static.ceilDiv(diskSize, VDI_IMAGE_BLOCK_SIZE);
-		offsetData		   += (int)Static.ceilDiv(blocksCount * 4, VDI_IMAGE_BLOCK_SIZE) * VDI_IMAGE_BLOCK_SIZE;
+		offsetData		   += (int)Static.roundUp(blocksCount * 4, VDI_IMAGE_BLOCK_SIZE);
 		blocksAllocated		= 0;
 		uuidCreate			= UUID.randomUUID();
 		uuidModify			= UUID.randomUUID();

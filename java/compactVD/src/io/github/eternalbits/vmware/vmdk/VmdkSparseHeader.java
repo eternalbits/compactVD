@@ -105,7 +105,7 @@ class VmdkSparseHeader {
 		long tabSize		= Static.ceilDiv(gteCount, SECTOR_SIZE/4);
 		long dirSize		= Static.ceilDiv(gdeCount, SECTOR_SIZE/4);
 		gdOffset			= rgdOffset + dirSize + tabSize;
-		overHead			= Static.ceilDiv(gdOffset + dirSize + tabSize, grainSize) * grainSize;
+		overHead			= Static.roundUp(gdOffset + dirSize + tabSize, grainSize);
 		rgtOffset			= rgdOffset + dirSize;
 		gtOffset			= gdOffset + dirSize;
 		grainSectors		= (int)grainSize;

@@ -88,6 +88,14 @@ public class Static {
 		return (num + div - 1) / div;
 	}
 	
+	public static long roundUp(long num, long div) {
+		return (num + div - 1) / div * div;
+	}
+	
+	public static long roundDown(long num, long div) {
+		return num / div * div;
+	}
+	
 	public static boolean isPower2(long num) {
 		return num > 0 && (num & (num - 1)) == 0;
 	}
