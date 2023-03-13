@@ -48,7 +48,7 @@ class Settings implements Serializable {
 	boolean filterImageFiles = true;
 	
 	// Open options
-	boolean visibleCompactCopy = false;
+	boolean visibleCompactCopy = true;
 	boolean findBlocksNotInUse = true;
 	boolean findBlocksZeroed = false;
 	
@@ -58,7 +58,7 @@ class Settings implements Serializable {
 	
 	// Copy options
 	boolean ignoreBlocksNotInUse = true;
-	boolean ignoreBlocksZeroed = true;
+	boolean ignoreBlocksZeroed = false;
 	
 	/**
 	 * Writes the FrontEnd geometry and current settings.

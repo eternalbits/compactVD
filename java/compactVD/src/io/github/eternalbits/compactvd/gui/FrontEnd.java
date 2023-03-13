@@ -322,6 +322,8 @@ public class FrontEnd extends JFrame {
 	 */
 	void addToList(File file) {
 		if (file.isFile()) {
+			if (isWindows)
+				file = WindowShortcut.linkFile(file);
 			
 			for (int i = 0, s = listData.getSize(); i < s; i++) {
 				if (listData.get(i).getFile().equals(file)) {

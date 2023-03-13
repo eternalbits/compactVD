@@ -109,7 +109,7 @@ public class MbrDiskLayout extends DiskLayout { // https://en.wikipedia.org/wiki
 	}
 	
 	private void extendMbr(DiskBootRecord dbr, long start, long size, long extend) throws IOException, WrongHeaderException {
-		for (int i =0; i < 4; i++) if (!dbr.isPartEmpty(i)) {
+		for (int i = 0; i < 4; i++) if (!dbr.isPartEmpty(i)) {
 			
 			long offset = (start + dbr.getFirstSector(i)) * blockSize;
 			long length = dbr.getSectorCount(i) * blockSize;
