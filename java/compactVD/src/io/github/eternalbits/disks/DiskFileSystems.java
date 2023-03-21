@@ -107,7 +107,7 @@ public class DiskFileSystems {
 		try {
 			return new HfsFileSystem(layout, offset, length);
 		} catch (InitializationException e) {
-			return new NullFileSystem(layout, offset, length, "HFS", e);
+			return new NullFileSystem(layout, offset, length, "HFS+", e);
 		} catch (WrongHeaderException e) {}
 		
 		try {

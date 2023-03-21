@@ -39,7 +39,7 @@ public class HfsFileSystem extends DiskFileSystem { // https://developer.apple.c
 
 	@Override
 	public String getType() {
-		return "HFS";
+		return "HFS+";
 	}
 
 	@Override
