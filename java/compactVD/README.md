@@ -8,3 +8,6 @@ If you use eclipse, remember the following advices:
 * [Eclipse wrong Java properties UTF-8 encoding](https://stackoverflow.com/questions/31143923/eclipse-wrong-java-properties-utf-8-encoding/31144165#31144165)
 
 There is a translation [already in issues](https://github.com/eternalbits/compactVD/issues/1).
+
+Windows users:
+If you can, install Java 20 or later. If not, go to `Start` > `Settings` > `Apps` > `Optional features` > `View features` or `Add a feature`; then install `Korean Supplemental Fonts`.

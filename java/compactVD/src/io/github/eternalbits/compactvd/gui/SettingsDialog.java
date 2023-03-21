@@ -50,12 +50,14 @@ class SettingsDialog extends JDialog {
 	private final JCheckBox ignoreBlocksZeroed;
 	
 	static private final Language[] languages = new Language[] {
-			new Language("zh", "CN", "中国人"), 
+			new Language("zh", "CN", "简体中文"), 
 			new Language("en", "US", "English"), 
 			new Language("fr", "FR", "Français"), 
 			new Language("de", "DE", "Deutsch"), 
+			new Language("id", "ID", "Indonesia"), 
 			new Language("it", "IT", "Italiano"), 
 			new Language("ja", "JP", "日本語"), 
+			new Language("ko", "KR", "한국어"), 
 			new Language("pt", "PT", "Português"), 
 			new Language("ru", "RU", "Русский"), 
 			new Language("es", "ES", "Español"), 

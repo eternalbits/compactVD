@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Tentang Virtual Disk Compact and Copy</title>
+<style>/* only a limited subset of CSS1: http://docs.oracle.com/javase/8/docs/api/javax/swing/text/html/CSS.html */
+body {
+ font-family: Verdana, Arial, sans-serif;
+ font-size: 11pt;
+ margin: 0 6px;
+}
+h4, div.p { /* margins don't collapse */
+ margin-bottom: 12px;
+ margin-top: 0;
+}
+ul {
+ margin-bottom: 0;
+}
+li {
+ margin-bottom: 4px;
+}
+ul.d {
+ margin-left: 24px;
+}
+ul.d li {
+ margin-bottom: 2px;
+}
+a { /* isolated names have body */
+ text-decoration: none;
+}
+</style>
+</head>
+<body>
+
+
+<a name="top"><h3>Tentang Virtual Disk Compact and Copy</h3></a>
+
+<table style="margin-bottom:8px"><tr>
+<td><img src="drive.png" width="64" height="64" style="margin-right:12px" alt=""/></td>
+<td style="vertical-align:top">Untuk mengurangi ukuran image disk virtual<br>
+<small>Versi 2.4<br><br>
+Dirilis di bawah Lisensi Apache 2.0
+</small></td>
+</tr></table>
+
+<div class="p">Untuk informasi selengkapnya, lihat topik berikut:<ul>
+<li><a href="#whatis">Apa itu CompactVD?</a></li>
+<li><a href="#compact">Gambar cakram padat di tempatnya</a></li>
+<li><a href="#copy">Salin ke image disk baru</a></li>
+<li><a href="#note">Pemberitahuan hak cipta</a></li>
+</ul></div>
+
+
+
+<hr/><a name="whatis"></a>
+<h4>Apa itu CompactVD?
+<a href="#top">▲</a></h4>
+
+<div class="p">CompactVD adalah utilitas untuk mengoptimalkan ukuran image disk dinamis, berdasarkan tabel alokasi bitmap dari sistem file yang dikenal.
+</div>
+<div class="p">Anda dapat memeriksa apakah ada ruang yang terbuang dalam image disk dinamis dengan membandingkan ukuran file image disk dengan ruang yang digunakan oleh sistem file di dalam image. Untuk alokasi sumber daya yang optimal, mereka seharusnya tidak jauh berbeda. Atau cukup seret gambar disk ke jendela ini:
+</div>
+<div class="p" style="margin-left: 16px"><img src="about_files/reduce_id_ID.png" width="379" alt=""/></div>
+
+<div class="p">Sistem file yang didukung saat ini adalah:<ul class="d">
+<li>Sistem File Teknologi Baru (NTFS), untuk komputer Windows</li>
+<li>Hierarchical File System Extended (HFS+), untuk macOS versi lebih lama</li>
+<li>Extended File System (EXT), digunakan di sebagian besar desktop linux</li>
+</ul></div>
+<div class="p">Juga membaca APFS (macOS) dan BTRFS atau XFS (Linux), tetapi dalam kasus ini kompresi tidak berfungsi.
+</div>
+
+
+
+<hr/><a name="compact"></a>
+<h4>Gambar Disk Padat Di Tempat
+<a href="#top">▲</a></h4>
+
+<div class="p">Operasi <code>kompak</code> menarik blok data dari ujung image disk ke ruang yang terdeteksi tidak digunakan oleh sistem file.
+</div>
+<div class="p">Untuk memulai pemindaian dilakukan untuk mendeteksi blok data yang tidak digunakan oleh sistem file, dan struktur gambar disk diperbarui menandai blok tersebut seolah-olah tidak pernah digunakan.
+</div>
+<div class="p">Kemudian blok dengan data efektif dipindahkan dari ujung gambar disk ke ruang yang telah dipulihkan oleh operasi sebelumnya.
+</div>
+<div class="p">Akhirnya struktur gambar diperbarui untuk mencerminkan posisi baru dari blok yang dipindahkan, dan ukuran file gambar dipangkas. Pembaruan struktur image disimpan sementara di media host dan akan ditulis ke image pada eksekusi program berikutnya, jika terjadi kegagalan perangkat keras yang dapat dipulihkan.
+</div>
+
+
+
+<hr/><a name="copy"></a>
+<h4>Salin ke Gambar Disk Baru
+<a href="#top">▲</a></h4>
+
+<div class="p">Operasi <code>penyalinan</code> dimulai dengan pemindaian untuk mendeteksi blok data yang tidak digunakan oleh sistem file. Gambar baru dibuat mengabaikan blok-blok itu, dan blok-blok yang seharusnya diisi penuh dengan nol.
+</div>
+<div class="p">Format gambar disk baru dapat dipilih dalam dialog <code>Salin Gambar Disk</code> dengan salah satu ekstensi file berikut:<ul class="d">
+<li>VDI, Gambar Disk Virtual untuk Oracle VirtualBox</li>
+<li>VMDK, Disk Mesin Virtual untuk produk VMware</li>
+<li>VHD, Hard Disk Virtual untuk produk Microsoft</li>
+<li>RAW, untuk image disk yang lengkap</li>
+</ul></div>
+
+
+
+<hr/><a name="note"></a>
+<h4>Pemberitahuan Hak Cipta
+<a href="#top">▲</a></h4>
+
+
+<div class="p" style="margin-bottom: 4px">Hak Cipta © 2016-2023 Rui Baptista</div>
+<div class="p">Dilisensikan di bawah Lisensi Apache, Versi 2.0. Anda dapat memperoleh salinan Lisensi <a href="http://www.apache.org/licenses/LICENSE-2.0">yang dirilis di bawah Lisensi Apache 2.0</a>. Perangkat lunak yang didistribusikan di bawah Lisensi didistribusikan atas dasar "SEBAGAIMANA ADANYA", TANPA JAMINAN ATAU KETENTUAN APA PUN, baik tersurat maupun tersirat.
+</div>
+
+<div class="p">Produk ini mencakup perangkat lunak <a href="https://commons.apache.org/proper/commons-cli/">Apache Commons CLI</a> Hak Cipta 2001-2020 The Apache Software Foundation.
+</div>
+
+<div class="p">Ikon aplikasi merupakan karya turunan asli buatan <a href="http://web.archive.org/web/20090718204515/http://www.mcdodesign.com/downloads/?paged=3">Susumu Yoshida</a> (Hak Cipta © 2009 McDo DESIGN.com).
+</div>
+
+<div class="p">Ikon lain yang mengidentifikasi disk gambar di panel tampilan adalah ikon komputer dari format file yang dilindungi hak cipta. Penulis percaya bahwa pameran ikon untuk mengidentifikasi format file yang dimaksud memenuhi syarat sebagai penggunaan wajar.
+</div>
+
+
+
+</body>
+</html>
