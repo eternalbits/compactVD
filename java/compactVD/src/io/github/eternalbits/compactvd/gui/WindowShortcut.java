@@ -48,6 +48,8 @@ class WindowShortcut {	// https://winprotocoldoc.blob.core.windows.net/productio
 					int target = link.getShort(header) + 2 + header;
 					int info   = link.getInt(target) + target;
 					int string = info;
+					/* Reads the string as long as the length plus the first 
+					 *  character of the string is greater than 65535 */
 					while (link.getInt(string) > 65535)
 						string = link.getShort(string) * 2 + 2 + string;
 					int length = string;
