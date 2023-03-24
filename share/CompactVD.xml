@@ -24,12 +24,12 @@
     <runtimeBits>64/32</runtimeBits>
   </jre>
   <versionInfo>
-    <fileVersion>2.4.0.0</fileVersion>
-    <txtFileVersion>2.4.0.0</txtFileVersion>
+    <fileVersion>2.5.0.0</fileVersion>
+    <txtFileVersion>2.5.0.0</txtFileVersion>
     <fileDescription>Virtual Disk Compact and Copy</fileDescription>
     <copyright>Copyright © 2016-2022 Rui Baptista</copyright>
-    <productVersion>2.4.0.0</productVersion>
-    <txtProductVersion>2.4.0.0</txtProductVersion>
+    <productVersion>2.5.0.0</productVersion>
+    <txtProductVersion>2.5.0.0</txtProductVersion>
     <productName>CompactVD</productName>
     <companyName></companyName>
     <internalName>Rui Baptista</internalName>
