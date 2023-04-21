@@ -18,7 +18,7 @@ package io.github.eternalbits.disks;
 
 import java.io.IOException;
 
-import io.github.eternalbits.apple.disk.apfs.ApfsFileSystem;
+import io.github.eternalbits.darwin.disk.apfs.ApfsFileSystem;
 import io.github.eternalbits.darwin.disk.hfs.HfsFileSystem;
 import io.github.eternalbits.disk.DiskFileSystem;
 import io.github.eternalbits.disk.DiskLayout;

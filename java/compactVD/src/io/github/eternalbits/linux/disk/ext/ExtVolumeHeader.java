@@ -38,7 +38,7 @@ class ExtVolumeHeader {
 	private static final short EXT_MAGIC = (short)0xEF53;
 	
 	private static final int COMPAT_HAS_JOURNAL 	= 0x4; 
-	private static final int COMPAT_UNKNOWN			= 0b11111111111111111111110000000000;
+	private static final int COMPAT_UNKNOWN			= 0b11111111111111111110110000000000;
 	private static final int INCOMPAT_JOURNAL_DEV	= 0x8;
 	private static final int INCOMPAT_META_BG		= 0x10;
 	private static final int INCOMPAT_UNKNOWN		= 0b11111111111111111000000000000000;

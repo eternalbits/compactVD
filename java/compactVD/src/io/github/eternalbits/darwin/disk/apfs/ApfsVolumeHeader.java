@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.github.eternalbits.apple.disk.apfs;
+package io.github.eternalbits.darwin.disk.apfs;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
