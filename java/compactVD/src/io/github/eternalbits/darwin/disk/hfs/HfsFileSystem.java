@@ -82,8 +82,9 @@ public class HfsFileSystem extends DiskFileSystem { // https://developer.apple.c
 		byte lastMask = leaveMask[(lastBlock + 1) % 8];						// Bits to ignore in last byte
 		
 		try {
-			int want = lastByte - firstByte + 1, from = firstByte, into = 0;
+			int want = lastByte - firstByte + 1, into = 0;
 			byte[] buffer = new byte[want];
+			int from = firstByte;
 			while (want > 0) {
 				int readNumber = header.allocationFile.getBlock(from);
 				int readOffset = from % header.blockSize;

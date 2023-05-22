@@ -87,8 +87,9 @@ public class ExtFileSystem extends DiskFileSystem {
 		 * 	with a number of block extents equal to the number of cluster groups.
 		 */
 		try {
-			int want = lastByte - firstByte + 1, from = firstByte, into = 0;
+			int want = lastByte - firstByte + 1, into = 0;
 			byte[] buffer = new byte[want];
+			int from = firstByte;
 			while (want > 0) {
 				int readNumber = header.bitmapBlockOrMaker[from / header.blockSize];
 				int readOffset = from % header.blockSize;
