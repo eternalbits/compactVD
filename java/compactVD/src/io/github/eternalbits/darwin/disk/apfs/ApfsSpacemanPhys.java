@@ -47,8 +47,8 @@ public class ApfsSpacemanPhys {
 			int		sm_subtype;								// The object's subtype. It indicates the type of data stored in a data structure such as a B-tree.
 			byte[]	sm_used;								// The spaceman_device_t, spaceman_free_queue_t and a bunch more items. (2488)
 			long	ph_xid;									// Copy of the identifier of the most recent transaction that this object was modified in.
-			long	ph_sum;									// It almost looks like an accountant, but it's not. This is not part of the data.
-			long[]	ph_count;								// Here's a list of items that spaceman are part of, and a few more things... (195)
+			long	ph_sum;									// Counter for the 2-byte set. It's usually 16, but it can be more. This is not part of the data.
+			long[]	ph_count;								// Here is the list of 2 bytes plus another one of 8 that spacemen is part of... (195)
 			
 			if (ApfsFileSystem.checkChecksum(in) == 0) {
 				sm_cksum						= in.getLong();

@@ -71,12 +71,12 @@ public class ApfsFileSystem extends DiskFileSystem { // https://developer.apple.
 	 */
     static long checkChecksum(ByteBuffer data) {
         long modValue = (2L<<31) - 1;
-        long sum1 = 0, sum2 = 0;
+        long check = 0, sum = 0;
         for (int i = 0; i < data.capacity(); i=i+4) {
-            sum1 = data.getInt(i) & modValue;
-            sum2 = (sum2 + sum1) % modValue;
+            check = data.getInt(i) & modValue;
+            sum = (sum + check) % modValue;
          }
-        return (sum2 << 32) | sum1;
+        return sum;	// The return (sum << 32) | check is wrong!
     }
     
 	private final byte[] leaveMask = new byte[] {(byte)0xFF, 0x1, 0x3, 0x7, 0x0F, 0x1F, 0x3F, 0x7F};
