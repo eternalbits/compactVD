@@ -9,7 +9,7 @@ The files `.classpath`, `.project` `build.xml` and `.settings\` are specific
 
 The compactTU project is a test unit for compactVD, to check if there are
  no obvious regressions and to do some stress tests. There is one script
- `compTest` and some test cases `*.xz` in the `../test` folder. Examples:
+ `compTest` and some test cases `*.bz2` in the `../test` folder. Examples:
 
 `java -jar -Dcrash=header compTest.jar INLINE <image> NZ`  
 writes random bytes to the image header and exits. It is expected that
