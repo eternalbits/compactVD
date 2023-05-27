@@ -1,6 +1,6 @@
 # How to install on Windows, macOS and Linux
 
-This application requires a Java Runtime Environment equal to or greater than 9.
+This application requires a Java Runtime Environment equal to or greater than 11.
  Go to [`Java`](https://www.oracle.com/java/technologies/downloads/) to get the download you want.
 
 ### Install on Microsoft Windows
