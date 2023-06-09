@@ -123,6 +123,10 @@ public class Static {
 		return new File(path).getName().replaceFirst("([^.]+)[.][^.]+$", "$1");
 	}
 	
+	public static String replaceExtension(String path, String ext) {
+		return new File(path).getPath().replaceFirst("([^.]+)[.][^.]+$", "$1."+ext);
+	}
+	
 	public static String getExtension(String path) {
 		String name = new File(path).getName();
 		String part = name.replaceFirst("([^.]+)[.][^.]+$", "$1");

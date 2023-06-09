@@ -16,10 +16,12 @@
 
 package io.github.eternalbits.disk;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileLock;
+import java.nio.file.Files;
 import java.util.Comparator;
 import java.util.TreeMap;
 import java.util.Vector;
@@ -472,6 +474,24 @@ public abstract class DiskImage implements AutoCloseable {
 		if (lock != null)
 			return lock;
 		throw new IOException(String.format("File %s is locked by other process.", path));
+	}
+	
+	/**
+	 * Try to copy the .nvram from the original file. 
+	 * 
+	 * @param	file	the Disk Image to copy from.
+	 * @return	true if copied successfully, false otherwise.
+	 * @throws	IOException if some I/O error occurs.
+	 */
+	public boolean copyNvram(DiskImage file) throws IOException {
+		File from = new File(Static.replaceExtension(file.path, "nvram"));
+		if (!from.exists() || from.isDirectory()) 
+			return false;
+		File to = new File(Static.replaceExtension(path, "nvram"));
+		if (to.exists()) 
+			return false;
+		Files.copy(from.toPath(), to.toPath());
+		return true;
 	}
 	
 	@Override

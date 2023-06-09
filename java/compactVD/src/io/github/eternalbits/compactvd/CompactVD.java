@@ -144,6 +144,9 @@ public class CompactVD implements DiskImageObserver {
 						clone.copy(image);
 						clone.removeObserver(this);
 						fileLock.release();
+						if (!isCancelled()) {
+							clone.copyNvram(image);
+						}
 					}
 					if (source != null) 
 						source.release();

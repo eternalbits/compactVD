@@ -261,8 +261,10 @@ class ListItem {
 									clone.copy(image);
 									clone.removeObserver(this);
 									fileLock.release();
-									if (!isCancelled())
+									if (!isCancelled()) {
+										clone.copyNvram(image);
 										app.addToList(outputFile);
+									}
 								}
 								if (source != null)
 									source.release();
