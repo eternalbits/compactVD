@@ -50,6 +50,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -70,6 +71,7 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import io.github.eternalbits.compactvd.Static;
 import io.github.eternalbits.disk.DiskImage;
@@ -114,13 +116,14 @@ public class FrontEnd extends JFrame {
 	
 	private final JProgressBar progress = new JProgressBar();
 	
-	private final FileDialog fileDialog = new FileDialog(this);
+	private final FileDialog dialog = new FileDialog(this);
 	
 	private transient int savedListIndex = -1;
 	private transient final boolean isWindows;
 	private transient final boolean isMac;
 	
 	final Settings settings;
+	JFileChooser chooser;
 	ResourceBundle res;
 	
 	/**
@@ -150,7 +153,7 @@ public class FrontEnd extends JFrame {
 		setupProgressBar();
 		getContentPane().add(progress, BorderLayout.PAGE_END);
 
-		fileDialog.setDirectory(settings.lastDirectory);
+		dialog.setDirectory(settings.lastDirectory);
 		setupFileDialog(settings.filterImageFiles);
 		setupFileDrop();
 		
@@ -182,6 +185,22 @@ public class FrontEnd extends JFrame {
 		UIManager.put("OptionPane.yesButtonText", res.getString("yes_text"));
 		UIManager.put("OptionPane.noButtonText", res.getString("no_text"));
 		UIManager.put("OptionPane.okButtonText", res.getString("ok_text"));
+		
+		UIManager.put("FileChooser.acceptAllFileFilterText", res.getString("accept_all"));
+		UIManager.put("FileChooser.directoryOpenButtonText", res.getString("open_text"));
+		UIManager.put("FileChooser.openButtonText", res.getString("open_text"));
+		UIManager.put("FileChooser.saveButtonText", res.getString("save_text"));
+		UIManager.put("FileChooser.cancelButtonText", res.getString("cancel_text"));
+		UIManager.put("FileChooser.lookInLabelText", res.getString("file_look"));
+		UIManager.put("FileChooser.saveInLabelText", res.getString("file_save"));
+		UIManager.put("FileChooser.fileNameLabelText", res.getString("file_name"));
+		UIManager.put("FileChooser.filesOfTypeLabelText", res.getString("file_type"));
+		UIManager.put("FileChooser.win32.newFolder", res.getString("new_folder"));
+		UIManager.put("FileChooser.win32.newFolder.subsequent", res.getString("new_folder") + " ({0})");
+		UIManager.put("FileChooser.saveDialogFileNameLabelText", res.getString("file_save"));	// mac
+		UIManager.put("FileChooser.newFolderButtonText", res.getString("new_folder"));			// mac
+		chooser = new JFileChooser(settings.lastDirectory);
+		chooser.setFileFilter(new FileNameExtensionFilter(res.getString("accept_disk"), "vdi", "vmdk", "vhd", "raw"));
 		
 		setTitle(res.getString("title"));
 		getContentPane().add(setupToolBar(tb), BorderLayout.PAGE_START);
@@ -336,6 +355,7 @@ public class FrontEnd extends JFrame {
 
 				listData.addElement(new ListItem(this, file, image.getView()));
 				list.setSelectedIndex(listData.getSize() - 1);
+				settings.lastDirectory = file.getParent();
 				
 			} catch (IOException e) {
 				JOptionPane.showMessageDialog(this, 
@@ -434,7 +454,6 @@ public class FrontEnd extends JFrame {
 	void saveSettings() {
 		settings.windowRect = getBounds();
 		settings.splitLocation = split.getDividerLocation();
-		settings.lastDirectory = fileDialog.getDirectory();
 		settings.write();
 	}
 
@@ -611,12 +630,19 @@ public class FrontEnd extends JFrame {
 	}
 
 	private void openDiskImage() {
-		fileDialog.setFile(isWindows && settings.filterImageFiles? WINDOWS_FILE_FILTER: null);
-		fileDialog.setTitle(res.getString("open_msg"));
-		fileDialog.setMode(FileDialog.LOAD);
-		fileDialog.setMultipleMode(true);
-		fileDialog.setVisible(true);
-		for (File file: fileDialog.getFiles()) {
+		if (settings.filterImageFiles) {
+			dialog.setFile(isWindows ? WINDOWS_FILE_FILTER : null);
+			dialog.setTitle(res.getString("open_msg"));
+			dialog.setMode(FileDialog.LOAD);
+			dialog.setMultipleMode(true);
+			dialog.setVisible(true);
+		} else {
+			chooser.setDialogTitle(res.getString("open_msg"));
+			chooser.setMultiSelectionEnabled(true);
+			if (chooser.showOpenDialog(this) != JFileChooser.APPROVE_OPTION)
+				return;
+		}
+		for (File file : settings.filterImageFiles ? dialog.getFiles() : chooser.getSelectedFiles()) {
 			addToList(file);
 		}
 	}
@@ -639,30 +665,38 @@ public class FrontEnd extends JFrame {
 		int s = list.getSelectedIndex();
 		if (s != -1) {
 			String source = listData.get(s).getFile().getName();
-			fileDialog.setFile(String.format(res.getString("copy_dup"), source));
-			fileDialog.setTitle(res.getString("copy_msg"));
-			fileDialog.setMode(FileDialog.SAVE);
-			fileDialog.setMultipleMode(false);
-			fileDialog.setVisible(true);
-			for (File file: fileDialog.getFiles()) {
-				if (file.compareTo(listData.get(s).getFile()) == 0) {
-					JOptionPane.showMessageDialog(this, 
-							String.format(res.getString("error_old_image"), file.getName()), 
-							res.getString("error"), JOptionPane.ERROR_MESSAGE);
-				} else {
-					if (Static.getExtension(file.getName()).length() == 0)
-						file = new File(file.getPath()+"."+Static.getExtension(source));
-					String type = Static.getExtension(file.getName()).toUpperCase();
-					if (!ListItem.IMAGE_TYPE.contains(type)) {
-						JOptionPane.showMessageDialog(this, 
-								String.format(res.getString("error_image_type"), type), 
-								res.getString("error"), JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					listData.get(s).copyTo(file, type);
-					break;
-				}
+			File file;
+			if (settings.filterImageFiles) {
+				dialog.setFile(String.format(res.getString("copy_dup"), source));
+				dialog.setTitle(res.getString("copy_msg"));
+				dialog.setMode(FileDialog.SAVE);
+				dialog.setMultipleMode(false);
+				dialog.setVisible(true);
+				file = new File(dialog.getFile());
+			} else {
+				chooser.setSelectedFile(new File(String.format(res.getString("copy_dup"), source)));
+				chooser.setDialogTitle(res.getString("copy_msg"));
+				chooser.setMultiSelectionEnabled(false);
+				if (chooser.showSaveDialog(this) != JFileChooser.APPROVE_OPTION)
+					return;
+				file = chooser.getSelectedFile();
 			}
+			if (file.compareTo(listData.get(s).getFile()) == 0) {
+				JOptionPane.showMessageDialog(this, 
+						String.format(res.getString("error_old_image"), file.getName()), 
+						res.getString("error"), JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			if (Static.getExtension(file.getName()).length() == 0)
+				file = new File(file.getPath()+"."+Static.getExtension(source));
+			String type = Static.getExtension(file.getName()).toUpperCase();
+			if (!ListItem.IMAGE_TYPE.contains(type)) {
+				JOptionPane.showMessageDialog(this, 
+						String.format(res.getString("error_image_type"), type), 
+						res.getString("error"), JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			listData.get(s).copyTo(file, type);
 		}
 	}
 
@@ -738,13 +772,13 @@ public class FrontEnd extends JFrame {
 	 */
 	private void setupFileDialog(boolean filter) {
 		if (filter)
-			fileDialog.setFilenameFilter(new FilenameFilter() {
+			dialog.setFilenameFilter(new FilenameFilter() {
 				@Override
 				public boolean accept(File dir, String name) {
 					return name.matches(DEFAULT_FILE_FILTER);
 				}
 			});
-		else fileDialog.setFilenameFilter(null);
+		else dialog.setFilenameFilter(null);
 	}
 
 	/**
