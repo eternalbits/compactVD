@@ -186,6 +186,22 @@ public class FrontEnd extends JFrame {
 		UIManager.put("OptionPane.noButtonText", res.getString("no_text"));
 		UIManager.put("OptionPane.okButtonText", res.getString("ok_text"));
 		
+		setFileChooser();
+		setTitle(res.getString("title"));
+		getContentPane().add(setupToolBar(tb), BorderLayout.PAGE_START);
+		setComponentPopupMenu(main);
+		try {
+			about.setContentType("text/html; charset=utf-8");
+			about.setPage(getResource(res.getString("about_html")));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 *  Create a new JFileChooser.
+	 */
+	private void setFileChooser() {
 		UIManager.put("FileChooser.acceptAllFileFilterText", res.getString("accept_all"));
 		UIManager.put("FileChooser.directoryOpenButtonText", res.getString("open_text"));
 		UIManager.put("FileChooser.openButtonText", res.getString("open_text"));
@@ -199,18 +215,36 @@ public class FrontEnd extends JFrame {
 		UIManager.put("FileChooser.win32.newFolder.subsequent", res.getString("new_folder") + " ({0})");
 		UIManager.put("FileChooser.saveDialogFileNameLabelText", res.getString("file_save"));	// mac
 		UIManager.put("FileChooser.newFolderButtonText", res.getString("new_folder"));			// mac
-		chooser = new JFileChooser(settings.lastDirectory);
-		chooser.setFileFilter(new FileNameExtensionFilter(res.getString("accept_disk"), "vdi", "vmdk", "vhd", "raw"));
 		
-		setTitle(res.getString("title"));
-		getContentPane().add(setupToolBar(tb), BorderLayout.PAGE_START);
-		setComponentPopupMenu(main);
-		try {
-			about.setContentType("text/html; charset=utf-8");
-			about.setPage(getResource(res.getString("about_html")));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		chooser = new JFileChooser(settings.lastDirectory) {
+			private static final long serialVersionUID = 1L;
+			@Override
+			public void approveSelection() {
+				if (getDialogType() == OPEN_DIALOG) {
+					for (File file : getSelectedFiles()) {
+						if (!file.exists()) {
+							JOptionPane.showConfirmDialog(this, 
+								String.format(res.getString("error_not_found"), file.getName()), 
+								res.getString("open_msg"), JOptionPane.DEFAULT_OPTION, 
+								JOptionPane.WARNING_MESSAGE);
+							return;
+						}
+					}
+				} else { // getDialogType() == SAVE_DIALOG
+					File file = getSelectedFile();
+					if (file.exists()) {
+						if (JOptionPane.showConfirmDialog(this, 
+								String.format(res.getString("error_same_copy"), file.getName()), 
+								res.getString("copy_msg"), JOptionPane.YES_NO_OPTION, 
+								JOptionPane.WARNING_MESSAGE) != JOptionPane.YES_OPTION) {
+							return;							
+						}						
+					}
+				}
+				super.approveSelection();
+			}
+		};
+		chooser.setFileFilter(new FileNameExtensionFilter(res.getString("accept_disk"), "vdi", "vmdk", "vhd", "raw"));
 	}
 
 	/**
