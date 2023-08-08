@@ -244,7 +244,7 @@ public class FrontEnd extends JFrame {
 				super.approveSelection();
 			}
 		};
-		chooser.setFileFilter(new FileNameExtensionFilter(res.getString("accept_disk"), "vdi", "vmdk", "vhd", "raw"));
+		chooser.setFileFilter(new FileNameExtensionFilter(res.getString("accept_disk"), "vdi", "vmdk", "vhd", "raw", "lnk"));
 	}
 
 	/**
@@ -588,7 +588,7 @@ public class FrontEnd extends JFrame {
 	private JToolBar setupToolBar(JToolBar tb) {
 		tb.invalidate();
 		tb.removeAll();
-		pack();
+		validate();
 		
 		tb.add(openButton = new JToolButton(res.getString("open"), "open.png", 
 				res.getString("open_msg") + ": " + res.getString("open_txt")));
