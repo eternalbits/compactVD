@@ -36,6 +36,7 @@ public class MbrDiskLayout extends DiskLayout { // https://en.wikipedia.org/wiki
 	private static final int EXTENDED_DOS = 0x05;
 	private static final int EXTENDED_LBA = 0x0F;
 	private static final int EXTENDED_LINUX = 0x85;
+	private static final int LINUX_DATA = 0x83;
 	private static final int LINUX_LVM = 0x8E;
 	
 	// Non File Systems ////////////////////////
@@ -131,7 +132,8 @@ public class MbrDiskLayout extends DiskLayout { // https://en.wikipedia.org/wiki
 			case LINUX_SWAP:
 				getFileSystems().add(new NullFileSystem(this, offset, length, "SWAP", partDesc[type]));
 				break;
-			case LINUX_LVM: // TODO LinuxSwapSpace extends NullFileSystem, because LVM has no "swap type"?
+			case LINUX_DATA:
+			case LINUX_LVM:
 				try {
 					LvmSimpleDiskLayout lvm = new LvmSimpleDiskLayout(image, offset, length);
 					for (DiskFileSystem fs: lvm.getFileSystems()) getFileSystems().add(fs);

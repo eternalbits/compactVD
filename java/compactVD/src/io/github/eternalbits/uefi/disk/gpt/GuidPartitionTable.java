@@ -34,6 +34,7 @@ class GuidPartitionTable {
 	private static final UUID EFI_SYSTEM_GUID = new UUID(0x11D2F81FC12A7328L, 0x3BC93EC9A0004BBAL);		// C12A7328-F81F-11D2-BA4B-00A0C93EC93B
 	private static final UUID BIOS_BOOT_GUID = new UUID(0X6E6F644921686148L, 0X4946456465654E74L);		// 21686148-6449-6E6F-744E-656564454649
 	private static final UUID LINUX_SWAP_GUID = new UUID(0x43C4A4AB0657FD6DL, 0x4F4F4BC83309E584L);		// 0657FD6D-A4AB-43C4-84E5-0933C84B4F4F
+	private static final UUID LINUX_DATA_GUID = new UUID(0x477284830FC63DAFL, 0xE47D47D8693D798EL);		// 0FC63DAF-8483-4772-8E79-3D69D8477DE4
 	private static final UUID LINUX_LVM_GUID = new UUID(0x44C2F507E6D6D379L, 0x28F93D2A8F233CA2L);		// E6D6D379-F507-44C2-A23C-238F2A3DF928
 	private static final UUID NULL_UUID = new UUID(0, 0);
 	private static final int NAME_SIZE = 72;
@@ -74,7 +75,7 @@ class GuidPartitionTable {
 					if (array[i].partitionType.equals(LINUX_SWAP_GUID)) {
 						addNullFileSystem(offset, length, "SWAP", "Linux Swap Space");
 					} else
-					if (array[i].partitionType.equals(LINUX_LVM_GUID)) {
+					if (array[i].partitionType.equals(LINUX_LVM_GUID) || array[i].partitionType.equals(LINUX_DATA_GUID)) {
 						try {
 							LvmSimpleDiskLayout lvm = new LvmSimpleDiskLayout(gpt.getImage(), offset, length);
 							for (DiskFileSystem fs: lvm.getFileSystems()) gpt.getFileSystems().add(fs);
