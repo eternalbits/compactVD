@@ -714,7 +714,7 @@ public class FrontEnd extends JFrame {
 				dialog.setMode(FileDialog.SAVE);
 				dialog.setMultipleMode(false);
 				dialog.setVisible(true);
-				file = new File(dialog.getFile());
+				file = new File(dialog.getDirectory(), dialog.getFile());
 			} else {
 				chooser.setSelectedFile(new File(String.format(res.getString("copy_dup"), source)));
 				chooser.setDialogTitle(res.getString("copy_msg"));
@@ -728,14 +728,14 @@ public class FrontEnd extends JFrame {
 			if (file.compareTo(listData.get(s).getFile()) == 0) {
 				JOptionPane.showMessageDialog(this, 
 						String.format(res.getString("error_old_image"), file.getName()), 
-						res.getString("error"), JOptionPane.ERROR_MESSAGE);
+						res.getString("copy_msg"), JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 			String type = Static.getExtension(file.getName()).toUpperCase();
 			if (!ListItem.IMAGE_TYPE.contains(type)) {
 				JOptionPane.showMessageDialog(this, 
 						String.format(res.getString("error_image_type"), type), 
-						res.getString("error"), JOptionPane.ERROR_MESSAGE);
+						res.getString("copy_msg"), JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 			listData.get(s).copyTo(file, type);
