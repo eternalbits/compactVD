@@ -308,7 +308,7 @@ public class VhdDiskImage extends DiskImage {
 		Arrays.fill(reverseMap, -1);
 		
 		for (int i = 0, s = header.maxTableEntries; i < s; i++) {
-			if (blockTable.get(i) != 0) {
+			if (blockTable.get(i) != -1) {
 				reverseMap[indexOf(blockTable.get(i))] = i;
 			}
 		}

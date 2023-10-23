@@ -714,6 +714,8 @@ public class FrontEnd extends JFrame {
 				dialog.setMode(FileDialog.SAVE);
 				dialog.setMultipleMode(false);
 				dialog.setVisible(true);
+				if (dialog.getFile() == null)
+					return;
 				file = new File(dialog.getDirectory(), dialog.getFile());
 			} else {
 				chooser.setSelectedFile(new File(String.format(res.getString("copy_dup"), source)));
