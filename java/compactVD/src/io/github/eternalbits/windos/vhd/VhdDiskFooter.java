@@ -40,7 +40,7 @@ public class VhdDiskFooter {
 	private final VhdDiskImage image;							// Parent object
 
 	/* Virtual Hard Disk Image Format Specification
-	 *	https://technet.microsoft.com/en-us/virtualization/bb676673.aspx
+	 *	https://www.microsoft.com/en-us/download/details.aspx?id=23850
 	 */
 	long	cookie;					// Original creator of the hard disk image.
 	int		features;				// The second bit must always be set to 1. 

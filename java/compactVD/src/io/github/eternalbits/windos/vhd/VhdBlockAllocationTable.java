@@ -51,6 +51,7 @@ class VhdBlockAllocationTable extends DiskImageBlockTable {
 			
 			BitSet bitmap = new BitSet(header.maxTableEntries);
 			blockMap = new int[header.maxTableEntries];
+			getVirtualBox(in);
 			
 			for (int i = 0, s = blockMap.length; i < s; i++) {
 				int sector = blockMap[i] = in.getInt();
@@ -70,7 +71,28 @@ class VhdBlockAllocationTable extends DiskImageBlockTable {
 		throw new InitializationException(getClass(), image.toString());
 	}
 
-	
+	/**
+	 * The VHD includes extra bitmap blocks of length 4096 of the Windows length
+	 *  in addition to the normal 512. Does not include size combinations.
+	 * 
+	 * @param in	the bitmap block
+	 */
+	private void getVirtualBox(ByteBuffer in) {
+		if (in.getInt(0) != header.firstSector) {
+			int getInt = Integer.MAX_VALUE, sector;
+			for (int i = 0, s = in.capacity(); i < s; i+=4) {
+				if ((sector = in.getInt(i)) != -1) {
+					if (getInt > sector)
+						getInt = sector;
+				}
+			}
+			if (getInt != header.firstSector) {
+				header.firstSector = getInt;
+				header.blockSectors += 7;
+			}
+		}
+	}
+
 	int read(int blockNumber, int blockOffset, byte[] in, int start, int length) throws IOException {
 		if (blockMap[blockNumber] < header.firstSector || blockMap[blockNumber] >= header.nextSector) {
 			Arrays.fill(in, start, start + length, (byte)0);

@@ -36,7 +36,7 @@ class VhdDiskHeader {
 	private final VhdDiskImage image;							// Parent object
 
 	/* Virtual Hard Disk Image Format Specification
-	 *	https://technet.microsoft.com/en-us/virtualization/bb676673.aspx
+	 *	https://www.microsoft.com/en-us/download/details.aspx?id=23850
 	 */
 	long	cookie;					// This field holds the value "cxsparse".
 	long	dataOffset;				// Offset to the next structure. Should be set to 0xFFFFFFFF.
@@ -56,7 +56,7 @@ class VhdDiskHeader {
 	 */
 	int		nextSector; 			// Sector number where the next block of data will be written.
 	int		firstSector;			// First sector for data blocks.
-	int		bitmapSectors;			// The size of the block bitmap, in sectors. 1 for blocks <= 2MB.
+	int		bitmapSectors;			// The size of the block bitmap, in sectors. 1 or 8 for blocks <= 2MB.
 	int		blockSectors;			// The size of each block, in sectors, including the block bitmap.
 	
 	VhdDiskHeader(VhdDiskImage vhd, long diskSize) {
@@ -76,8 +76,8 @@ class VhdDiskHeader {
 		parentLocators		= new byte[0];
 		reserved2			= new byte[0];
 
+		bitmapSectors		= 1;
 		firstSector			= (int) Static.ceilDiv(tableOffset + maxTableEntries * 4L, SECTOR_SIZE);
-		bitmapSectors		= (int) Static.ceilDiv(blockSize / SECTOR_SIZE / 8, SECTOR_SIZE);
 		blockSectors		= blockSize / SECTOR_SIZE + bitmapSectors;
 		nextSector			= firstSector;
 	}
@@ -113,11 +113,11 @@ class VhdDiskHeader {
 					throw new InitializationException(String.format("%s: Not a dynamic base image file.", vhd.toString()));
 				
 				/* The VHD specification is not explicit about the location of the "data section", and whether or not
-				 *  data blocks are adjacent. It is assumed that data blocks are allocated continuously just before
+				 *  data blocks are adjacent. Data blocks are assumed to be allocated continuously and include
 				 *  the footer. This is validated when the allocation table is initialized.
 				 */
+				bitmapSectors		= 1;
 				firstSector			= (int) Static.ceilDiv(tableOffset + maxTableEntries * 4L, SECTOR_SIZE); // Or greater
-				bitmapSectors		= (int) Static.ceilDiv(blockSize / SECTOR_SIZE / 8, SECTOR_SIZE);
 				blockSectors		= blockSize / SECTOR_SIZE + bitmapSectors;
 				nextSector			= (int) (footerLocation / SECTOR_SIZE);
 				int allocated		= (nextSector - firstSector) / blockSectors;
