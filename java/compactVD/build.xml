@@ -20,8 +20,8 @@
                 <attribute name="Class-Path" value="."/>
             </manifest>
             <fileset dir="${dir.buildfile}/bin"/>
-            <zipfileset excludes="META-INF/**" src="${dir.buildfile}/lib/commons-cli-1.5.0.jar"/>
-            <zipfileset includes="META-INF/NOTICE*" src="${dir.buildfile}/lib/commons-cli-1.5.0.jar"/>
+            <zipfileset excludes="META-INF/**" src="${dir.buildfile}/lib/commons-cli-1.6.0.jar"/>
+            <zipfileset includes="META-INF/NOTICE*" src="${dir.buildfile}/lib/commons-cli-1.6.0.jar"/>
         	<metainf dir="${dir.buildfile}" includes="LICENSE*"/>
         </jar>
     </target>
