@@ -412,16 +412,17 @@ public abstract class DiskImage implements AutoCloseable {
 			
 			// Each block is zeroed if all the bytes in the block are zero
 
-			byte[] buffer = new byte[getImageBlockSize()];
+			int img = getImageBlockSize();
+			byte[] buffer = new byte[img];
 			
 			for (int i = 0, s = getImageBlocksCount(); i < s && !thisThread.isInterrupted(); i++) {
 				if (imageTable.exists(i)) {
 					progress.step(ZW);
 					media.seek(imageTable.getOffset(i));
-					media.readFully(buffer, 0, 4096);
-					if (isZero(buffer, 0, 4096)) {
-						media.readFully(buffer, 4096, buffer.length - 4096);
-						if (isZero(buffer, 4096, buffer.length - 4096)) {
+					media.readFully(buffer, 0, img);
+					if (isZero(buffer, 0, img)) {
+						media.readFully(buffer, img, buffer.length - img);
+						if (isZero(buffer, img, buffer.length - img)) {
 							imageTable.free(i);
 							blocksZeroed++;
 							dirty = true;
