@@ -42,7 +42,8 @@ import io.github.eternalbits.disks.DiskLayouts;
 public class RawDiskImage extends DiskImage {
 	private static final int MAX_BUFFER_SIZE = 0x100000;
 	
-	final long diskSize;
+	long diskStart;
+	long diskSize;
 	final int blockSize;
 	final int clusterSize;
 	final int clustersCount;
@@ -59,6 +60,7 @@ public class RawDiskImage extends DiskImage {
 			path = file.getPath();
 			readOnly = false;
 			
+			this.diskStart = 0L;
 			this.diskSize = diskSize;
 			this.blockSize = blockSize;
 			this.clusterSize = bestBufferSize();
@@ -83,7 +85,9 @@ public class RawDiskImage extends DiskImage {
 			readOnly = mode.equals("r");
 			path = file.getPath();
 			
+			this.diskStart = 0L;
 			this.diskSize = file.length();
+			otherSmallDifferences(media);
 			this.blockSize = blockSize;
 			this.clusterSize = bestBufferSize();
 			this.clustersCount = (int)(diskSize / clusterSize);
@@ -91,7 +95,7 @@ public class RawDiskImage extends DiskImage {
 			imageTable = clusterTable;
 			
 			// Check the first sector of the image, otherwise any file is classified as raw
-			if (!canBeADiskImage(readMetadata(0L, 512)))
+			if (!canBeADiskImage(readMetadata(diskStart, 512)))
 				throw new WrongHeaderException(getClass(), toString());
 			
 			setLayout(DiskLayouts.open(this));
@@ -100,6 +104,54 @@ public class RawDiskImage extends DiskImage {
 			media.close();
 			throw e;
 		}
+	}
+	
+	/**
+	 * A VDI structure occupying the entire schema follows the same principles as a simple,
+	 *  dynamic structure that has all blocks filled and ordered.
+	 * <br>
+	 * In the case of VHD, the initial image is the disk image adding a 512 byte structure
+	 *  of the "conectix" type.
+	 * <br>
+	 * In the case of VMDK the structure is simply the complete disk image.
+	 * 
+	 * @param media		the media where the file system is mapped.
+	 * @throws IOException if some I/O error occurs.
+	 */
+	private void otherSmallDifferences(RandomAccessFile media) throws IOException {
+		if (media.length() >= 512) {
+			byte[] buffer = new byte[512];
+			
+			int read = read(0, buffer, 0, 512);
+			ByteBuffer in = ByteBuffer.wrap(buffer, 0, read).order(ByteOrder.LITTLE_ENDIAN);
+			if (in.getInt(64) == 0xBEDA107F 								// VDI signature
+					&& in.getInt(76) == 2) {								// Pre-allocate full size
+				if (vdiBlockTable(media, in.getInt(340), in.getInt(384))) {	// 340=offsetBlocks, 384=blocksCount
+					diskStart = in.getInt(344);
+					diskSize = in.getLong(368);
+					return;
+				}
+			}
+			
+			read = read(media.length() - 512, buffer, 0, 512);
+			in = ByteBuffer.wrap(buffer, 0, read).order(ByteOrder.BIG_ENDIAN);
+			if (in.getLong(0) == 0x636F6E6563746978L 						// VHD signature "conectix"
+					&& in.getInt(60) == 2 									// Pre-allocate full size
+					&& in.getLong(40) == media.length() - 512) {			// Binary level less 512
+				diskSize -= 512;
+				return;
+			}
+		}
+	}
+	
+	private boolean vdiBlockTable(RandomAccessFile media, int offsetBlocks, int blocksCount) throws IOException {
+		byte[] buffer = new byte[blocksCount*4];
+		int read = read(offsetBlocks, buffer, 0, blocksCount*4);
+		ByteBuffer in = ByteBuffer.wrap(buffer, 0, read).order(ByteOrder.LITTLE_ENDIAN);
+		for (int i = 0, s = buffer.length/4; i < s; i++) 
+			if (in.getInt() != i) 
+				return false;
+		return true;
 	}
 	
 	private static boolean isValidBlockSize(int blockSize) {
@@ -190,7 +242,7 @@ public class RawDiskImage extends DiskImage {
 
 	@Override
 	protected int read(long offset, byte[] in, int start, int length) throws IOException {
-		media.seek(offset);
+		media.seek(diskStart + offset);
 		return media.read(in, start, length);
 	}
 

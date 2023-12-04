@@ -54,7 +54,7 @@ class RawVirtualBlockTable extends DiskImageBlockTable {
 	@Override
 	protected long getOffset(int blockNumber) {
 		if (exists(blockNumber))
-			return blockNumber * (long)image.clusterSize;
+			return image.diskStart + blockNumber * (long)image.clusterSize;
 		return -1L;
 	}
 

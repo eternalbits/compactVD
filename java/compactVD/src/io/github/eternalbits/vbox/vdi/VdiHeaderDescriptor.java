@@ -32,6 +32,7 @@ class VdiHeaderDescriptor {
 	private static final int HEADER_SIGNATURE = 0xBEDA107F;		// VDI signature
 	private static final int CURRENT_VERSION = 0x10001;			// Version 1.1
 	private static final int VDI_IMAGE_TYPE_STANDARD = 1;		// Normal dynamically growing base image file
+	private static final int VDI_IMAGE_TYPE_FIXED = 2;			// Preallocated base image file of a fixed size
 	private static final int VDI_GEOMETRY_SECTOR_SIZE = 512;	// Currently only 512 bytes sectors are supported
 	
 	private final VdiDiskImage image;							// Parent object
@@ -151,6 +152,8 @@ class VdiHeaderDescriptor {
 					&& blockExtraSize == 0
 					&& Static.ceilDiv(diskSize, blockSize) == blocksCount) {
 				
+				if (imageType == VDI_IMAGE_TYPE_FIXED)
+					throw new WrongHeaderException(getClass(), image.toString());
 				if (imageType != VDI_IMAGE_TYPE_STANDARD)
 					throw new InitializationException(String.format("%s: Not a dynamic base image file.", vdi.toString()));
 				

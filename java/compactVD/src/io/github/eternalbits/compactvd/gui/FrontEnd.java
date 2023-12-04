@@ -252,7 +252,8 @@ public class FrontEnd extends JFrame {
 				super.approveSelection();
 			}
 		};
-		chooser.setFileFilter(new FileNameExtensionFilter(res.getString("accept_disk"), "vdi", "vmdk", "vhd", "raw", "lnk"));
+		chooser.setFileFilter(new FileNameExtensionFilter
+				(res.getString("accept_disk"), "vdi", "vmdk", "vhd", "raw", "lnk"));
 	}
 
 	/**

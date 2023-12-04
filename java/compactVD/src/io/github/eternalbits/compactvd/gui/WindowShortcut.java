@@ -72,8 +72,8 @@ class WindowShortcut {	// https://winprotocoldoc.blob.core.windows.net/productio
 						}
 						
 					}
-				} catch (RuntimeException e) { e.printStackTrace(); }
-			} catch (IOException e) { e.printStackTrace(); }
+				} catch (RuntimeException e) { }
+			} catch (IOException e) { }
 		}
 		
 		return data;
