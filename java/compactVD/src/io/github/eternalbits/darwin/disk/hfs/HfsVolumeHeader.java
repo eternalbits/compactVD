@@ -29,14 +29,16 @@ class HfsVolumeHeader {
 	
 	private static final short HFSPLUS_SIGNATURE = 0x482B;
 	private static final short HFSPLUS_VERSION = 0x0004;
+	private static final short HFSX_SIGNATURE = 0x4858;
+	private static final short HFSX_VERSION = 0x0005;
 	
 	private static final int ATTRIBUTE_UNMOUNTED = 0x100;
 	private static final int ATTRIBUTE_JOURNALED = 0x2000;
 
 	final HfsFileSystem fileSystem;
 
-	short 		signature;				// H+
-	short 		version;				// 4
+	short 		signature;				// H+ or HX
+	short 		version;				// 4 or 5
 	int 		attributes;				// 
 	int 		lastMountedVersion;		// 10.0
 	int 		journalInfoBlock;		//
@@ -90,7 +92,8 @@ class HfsVolumeHeader {
 			encodingsBitmap 	= in.getLong();
 			finderInfo 			= Static.getInts(in, 8);
 			
-			if (signature == HFSPLUS_SIGNATURE && version == HFSPLUS_VERSION
+			if (((signature == HFSPLUS_SIGNATURE && version == HFSPLUS_VERSION) 
+				|| (signature == HFSX_SIGNATURE && version == HFSX_VERSION))
 					&& fileCount >=0 && folderCount >= 0
 					&& blockSize >= 512 && Static.isPower2(blockSize)
 					&& totalBlocks == fileSystem.getLength() / blockSize
