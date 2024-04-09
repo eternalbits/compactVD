@@ -262,7 +262,7 @@ class ExtVolumeHeader {
 				
 				if ((featureCompat & COMPAT_UNKNOWN) != 0 || (featureIncompat & INCOMPAT_UNKNOWN) != 0 || (featureROCompat & RO_COMPAT_UNKNOWN) != 0)
 					throw new InitializationException("Incompatible features found");
-				if ((featureCompat & COMPAT_HAS_JOURNAL) != 0 && !isJournalEmpty())
+				if ((featureCompat & COMPAT_HAS_JOURNAL) == 0 || !isJournalEmpty())
 					throw new InitializationException("The journal is not empty");
 				if ((featureIncompat & INCOMPAT_META_BG) != 0)
 					throw new InitializationException("Meta block groups are not supported");
