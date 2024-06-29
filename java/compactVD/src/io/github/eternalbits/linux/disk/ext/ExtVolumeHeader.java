@@ -129,12 +129,13 @@ class ExtVolumeHeader {
 	int 	userQuotaInode;			// Inode number of user quota file
 	int 	groupQuotaInode;		// Inode number of group quota file
 	int 	overheadBlocks;			// Overhead blocks/clusters in the file system. This field is always zero?
-	long 	backupBG;				// Block groups containing super block backups (if sparse_super2)
+	long 	backupBgs;				// Block groups containing super block backups (if sparse_super2)
 	int 	encryptAlgos;			// Encryption algorithms in use. There can be up to four algorithms in use at any time
 	byte[] 	encryptPwSalt;			// Salt for the string2key algorithm for encryption [16 bytes]
-	int 	lostFoundInode;			// Inode number of lost+found
+	int 	lpfIno;					// Inode number of lost+found
+	int 	prjQuotaInum;			// Inode that tracks project quotas
 	int 	checksumSeed;			// Checksum seed used for metadata_csum calculations. This value is crc32c(~0, $orig_fs_uuid)
-	byte[] 	reserved;				// Padding to the end of the block [396 bytes]
+	byte[] 	reserved;				// Padding to the end of the block [392 bytes]
 	int 	checksum;				// Super block checksum
 	
 	final int[] bitmapBlockOrMaker;
@@ -231,12 +232,13 @@ class ExtVolumeHeader {
 			userQuotaInode 		= in.getInt();
 			groupQuotaInode 	= in.getInt();
 			overheadBlocks 		= in.getInt();
-			backupBG 			= in.getLong();
+			backupBgs 			= in.getLong();
 			encryptAlgos 		= in.getInt();
 			encryptPwSalt 		= Static.getBytes(in, 16);
-			lostFoundInode 		= in.getInt();
+			lpfIno 				= in.getInt();
+			prjQuotaInum 		= in.getInt();
 			checksumSeed 		= in.getInt();
-			in.position(in.position() + 396);
+			in.position(in.position() + 392);
 			checksum 			= in.getInt();
 			
 			if (descSize == 0)
