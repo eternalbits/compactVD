@@ -103,7 +103,7 @@ class HfsVolumeHeader {
 					&& (attributes & ATTRIBUTE_UNMOUNTED) != 0
 					&&((attributes & ATTRIBUTE_JOURNALED) == 0 || journalInfoBlock > 0)) {
 
-				allocationFile 		= new HfsForkData(blockSize, "AllocationFile", HfsForkData.TYPE_DATA, in);
+				allocationFile 		= new HfsForkData(blockSize, HfsForkData.ALLOCATION_FILE, HfsForkData.TYPE_DATA, in);
 				extentsFile 		= new HfsForkData(blockSize, "ExtentsFile", HfsForkData.TYPE_DATA, in);
 				catalogFile 		= new HfsForkData(blockSize, "CatalogFile", HfsForkData.TYPE_DATA, in);
 				attributesFile 		= new HfsForkData(blockSize, "AttributesFile", HfsForkData.TYPE_DATA, in);

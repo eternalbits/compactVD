@@ -35,7 +35,7 @@ class WindowShortcut {	// https://winprotocoldoc.blob.core.windows.net/productio
 	 */
 	public static File linkFile(File data) {
 		
-		if (data.length() > 76 && data.length() < 4096) {
+		if (data.length() > 76 && data.length() < 8192) {
 			try (RandomAccessFile check = new RandomAccessFile(data, "r")) {
 				
 				byte in[] = new byte[(int)data.length()];

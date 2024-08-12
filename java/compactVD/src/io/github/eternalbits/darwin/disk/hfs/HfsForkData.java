@@ -22,6 +22,8 @@ import java.nio.ByteBuffer;
 import io.github.eternalbits.disk.InitializationException;
 
 class HfsForkData {
+	static final String ALLOCATION_FILE = "AllocationFile";
+	
 	static final byte TYPE_DATA = (byte)0x00;
 	static final byte TYPE_RSRC = (byte)0xFF;
 	
@@ -62,13 +64,17 @@ class HfsForkData {
 					throw new InitializationException(getClass(), path);
 				if (extentStart[i] > 0 || extentCount[i] > 0)
 					size = i + 1;
-				blockCount += extentCount[i]; 
+				blockCount += extentCount[i];
 			}
 			
-			// TODO: add more extents from the overflow file; this is very unlikely
+			// Do not add more extents from the overflow file; this is very unlikely
 			//	to be needed because only the allocation file is really used
-			if (logicalSize >= 0 && totalBlocks >= 0 && blockCount == totalBlocks) {
-				return;
+			if (forkPath.equals(ALLOCATION_FILE)) {
+				if (logicalSize >= 0 && totalBlocks >= 0 && blockCount == totalBlocks) 
+					return;
+			} else {
+				if (logicalSize >= 0 && totalBlocks >= 0) 
+					return;
 			}
 		}
 		
