@@ -2,6 +2,12 @@
 
 #### To reduce the size of virtual disk images
 
+### How to Install CompactVD
+
+You can find a brief description on the [`share`](https://github.com/eternalbits/compactVD/tree/master/share/)
+ page. The installation of CompactVD must be done on the host-related part. Just
+ drag a vdi or vmdk disk image into the main window.
+
 ### What is CompactVD?
 
 CompactVD is a utility to optimize the size of dynamic disk images, based on
