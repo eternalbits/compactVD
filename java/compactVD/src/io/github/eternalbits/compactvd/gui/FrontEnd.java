@@ -215,6 +215,8 @@ public class FrontEnd extends JFrame {
 		UIManager.put("FileChooser.win32.newFolder.subsequent", res.getString("new_folder") + " ({0})");
 		UIManager.put("FileChooser.saveDialogFileNameLabelText", res.getString("file_save"));	// mac
 		UIManager.put("FileChooser.newFolderButtonText", res.getString("new_folder"));			// mac
+		UIManager.put("FileChooser.byNameText", res.getString("name_text"));					// mac
+		UIManager.put("FileChooser.byDateText", res.getString("date_text"));					// mac
 		
 		chooser = new JFileChooser(settings.lastDirectory) {
 			private static final long serialVersionUID = 1L;
