@@ -37,13 +37,21 @@ public class ApfsFileSystem extends DiskFileSystem { // https://developer.apple.
 		this.diskLength	= length;
 		
 		header = new ApfsVolumeHeader(this, readImage(0, HEADER_SIZE));
+		long maxc = (header.nx_xp_desc_base + header.nx_xp_desc_blocks) * header.nx_block_size;
+		long maxa = (header.nx_xp_data_base + header.nx_xp_data_blocks) * header.nx_block_size;
 		long desc = (header.nx_xp_desc_base + header.nx_xp_desc_index) * header.nx_block_size;
 		long data = (header.nx_xp_data_base + header.nx_xp_data_index) * header.nx_block_size;
-		for (int i = 0; i < header.nx_xp_desc_len; i++)
-			new ApfsVolumeDescData(this, readImage(desc + i * HEADER_SIZE, HEADER_SIZE));
-		for (int i = 0; i < header.nx_xp_data_len; i++)
-			new ApfsVolumeDescData(this, readImage(data + i * HEADER_SIZE, HEADER_SIZE));
 		spaceman = new ApfsSpacemanPhys(this, readImage(data, HEADER_SIZE));
+		for (int i = 0; i < header.nx_xp_desc_len; i++) {
+			if (desc + i * HEADER_SIZE == maxc) 
+				desc = header.nx_xp_desc_base * header.nx_block_size - i * HEADER_SIZE;
+			new ApfsVolumeDescData(this, readImage(desc + i * HEADER_SIZE, HEADER_SIZE));
+		}
+		for (int i = 0; i < header.nx_xp_data_len; i++) {
+			if (data + i * HEADER_SIZE == maxa) 
+				data = header.nx_xp_data_base * header.nx_block_size - i * HEADER_SIZE;
+			new ApfsVolumeDescData(this, readImage(data + i * HEADER_SIZE, HEADER_SIZE));
+		}
 	}
 	
 	@Override
