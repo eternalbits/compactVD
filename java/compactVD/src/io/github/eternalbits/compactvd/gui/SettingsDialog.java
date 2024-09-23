@@ -84,7 +84,7 @@ class SettingsDialog extends JDialog {
 				return new Locale(language, country);
 			}
 		}
-		return new Locale("", "");
+		return new Locale("en", "US");
 	}
 	
 	static int LanguageCode(String language, String country) {

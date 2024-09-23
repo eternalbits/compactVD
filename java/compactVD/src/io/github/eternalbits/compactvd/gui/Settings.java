@@ -25,6 +25,7 @@ import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.Locale;
 
 import io.github.eternalbits.compactvd.Static;
 
@@ -43,8 +44,8 @@ class Settings implements Serializable {
 	
 	// File dialog
 	String lastDirectory = null;
-	String selectedLanguage = "en";
-	String selectedCountry = "US";
+	String selectedLanguage = Locale.getDefault().getLanguage();
+	String selectedCountry = Locale.getDefault().getCountry();
 	boolean filterImageFiles = true;
 	
 	// Open options
