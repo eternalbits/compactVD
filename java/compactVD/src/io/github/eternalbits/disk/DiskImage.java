@@ -484,14 +484,16 @@ public abstract class DiskImage implements AutoCloseable {
 	 * @return	true if copied successfully, false otherwise.
 	 * @throws	IOException if some I/O error occurs.
 	 */
-	public boolean copyNvram(DiskImage file) throws IOException {
+	public boolean copyNvram(DiskImage file) {
 		File from = new File(Static.replaceExtension(file.path, "nvram"));
 		if (!from.exists() || from.isDirectory()) 
 			return false;
 		File to = new File(Static.replaceExtension(path, "nvram"));
 		if (to.exists()) 
 			return false;
-		Files.copy(from.toPath(), to.toPath());
+		try {	// Just try, if you don't succeed it's okay
+			Files.copy(from.toPath(), to.toPath());
+		} catch (IOException e) {}
 		return true;
 	}
 	

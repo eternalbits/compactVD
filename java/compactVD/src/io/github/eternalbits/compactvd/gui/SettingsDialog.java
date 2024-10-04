@@ -81,10 +81,10 @@ class SettingsDialog extends JDialog {
 	static Locale Languages(String language, String country) {
 		for (int i = 0; i < languages.length; i++) {
 			if (languages[i].language.equals(language) && languages[i].country.equals(country)) {
-				return new Locale(language, country);
+				return new Locale.Builder().setLanguage(language).setRegion(country).build();
 			}
 		}
-		return new Locale("en", "US");
+		return new Locale.Builder().setLanguage("en").setRegion("US").build();
 	}
 	
 	static int LanguageCode(String language, String country) {
