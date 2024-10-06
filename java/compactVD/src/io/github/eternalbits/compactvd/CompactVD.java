@@ -130,8 +130,8 @@ public class CompactVD implements DiskImageObserver {
 				if (type == null) type = image.getType();
 				try (DiskImage clone = DiskImages.create(type, to, image.getDiskSize())) {
 					copy = to; // copy open by DiskImage
-					FileLock source = null;
-					if (mode.equals("rw"))
+					FileLock source = null, fileLock = null;
+					if (macVolumes(from) && mode.equals("rw"))
 						source = image.tryLock();
 					verboseProgress(SEARCHING_SPACE);
 					image.addObserver(this, false);
@@ -139,11 +139,13 @@ public class CompactVD implements DiskImageObserver {
 					image.removeObserver(this);
 					if (!isCancelled()) {
 						verboseProgress("Copying "+from.getName()+" to "+to.getName());
-						FileLock fileLock = clone.tryLock();
+						if (macVolumes(to))
+							fileLock = clone.tryLock();
 						clone.addObserver(this, false);
 						clone.copy(image);
 						clone.removeObserver(this);
-						fileLock.release();
+						if (fileLock != null) 
+							fileLock.release();
 						if (!isCancelled()) {
 							clone.copyNvram(image);
 						}
@@ -354,7 +356,12 @@ public class CompactVD implements DiskImageObserver {
 		formatter.setLongOptPrefix(" "+prefix);
 		formatter.printHelp("java -jar "+jar, header, options, footer, true);
 	}
-
+	
+	public static boolean macVolumes(File file) {
+		return file.getPath().startsWith("/Volumes/") == false || 
+				System.getProperty("os.name").toLowerCase().indexOf("mac") < 0;
+	}
+	
 	public static void dump(Object obj) { dump(obj, ""); }
 	private static void dump(Object obj, String in) {
 		for (Field fld: obj.getClass().getDeclaredFields()) {

@@ -172,8 +172,6 @@ class ListItem {
 	}
 
 	class DiskImageWorker extends SwingWorker<Void, Void> implements DiskImageObserver {
-	// SwingWorker is only used as a thread pool, other functionalities are not used
-	// Something like Executors.newFixedThreadPool(10) // TODO consider ExecutorService
 
 		private final int task;
 		private String outputType;
@@ -247,8 +245,8 @@ class ListItem {
 						try (DiskImage image = DiskImages.open(view.imageType, file, mode)) {
 							try (DiskImage clone = DiskImages.create(outputType, outputFile, image.getDiskSize())) {
 								copy = outputFile; // copy open by DiskImage
-								FileLock source = null;
-								if (mode.equals("rw"))
+								FileLock source = null, fileLock = null;
+								if (CompactVD.macVolumes(file) && mode.equals("rw"))
 									source = image.tryLock();
 								image.addObserver(this, false);
 								image.optimize(lastViewOptions);
@@ -256,11 +254,13 @@ class ListItem {
 								update(image.getView());
 								if (!isCancelled()) {
 									progressString = String.format(app.res.getString("copying"), file.getName(), outputFile.getName());
-									FileLock fileLock = clone.tryLock();
+									if (CompactVD.macVolumes(outputFile))
+										fileLock = clone.tryLock();
 									clone.addObserver(this, false);
 									clone.copy(image);
 									clone.removeObserver(this);
-									fileLock.release();
+									if (fileLock != null) 
+										fileLock.release();
 									if (!isCancelled()) {
 										clone.copyNvram(image);
 										app.addToList(outputFile);
