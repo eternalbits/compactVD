@@ -65,10 +65,27 @@ class WindowShortcut {	// https://winprotocoldoc.blob.core.windows.net/productio
 					 */	
 						if (link.getInt(target + 4) < 36) {	//	LinkInfoHeaderSize
 							link.position(link.getInt(target + 16) + target);	//	LocalBasePathOffset
-							return new File(Static.getString(link, info - link.position(), StandardCharsets.ISO_8859_1));
+							File file = new File(Static.getString(link, info - link.position(), StandardCharsets.ISO_8859_1));
+							if (file.isFile()) 
+								return file;
+						/* When a folder is shared the path is divided into two parts, one is the shared part
+						 *  and the other is the rest of the path to the hard disk file type.
+						 */
+							link.position(link.getInt(target + 24) + target);	//	CommonPathSuffixOffset
+							File suffix = new File(Static.getString(link, info - link.position(), StandardCharsets.ISO_8859_1));
+							file = new File(file.toString(), suffix.toString());
+							if (file.isFile()) 
+								return file;
 						} else {
 							link.position(link.getInt(target + 28) + target);	//	LocalBasePathOffsetUnicode
-							return new File(Static.getString(link, info - link.position(), StandardCharsets.UTF_16LE));
+							File file = new File(Static.getString(link, info - link.position(), StandardCharsets.UTF_16LE));
+							if (file.isFile()) 
+								return file;
+							link.position(link.getInt(target + 32) + target);	//	CommonPathSuffixOffsetUnicode
+							File suffix = new File(Static.getString(link, info - link.position(), StandardCharsets.UTF_16LE));
+							file = new File(file.toString(), suffix.toString());
+							if (file.isFile()) 
+								return file;
 						}
 						
 					}
