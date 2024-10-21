@@ -8,6 +8,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry combineaccessrules="false" kind="src" path="/compactTU"/>
-	<classpathentry kind="lib" path="lib/commons-cli-1.6.0.jar"/>
+	<classpathentry kind="lib" path="lib/commons-cli-1.9.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
