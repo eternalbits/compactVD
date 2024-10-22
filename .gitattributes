@@ -3,5 +3,6 @@
 
 # Will always have LF line
 universalJavaApplicationStub text eol=lf
+*.desktop text eol=lf
 *.plist text eol=lf
 *.sh text eol=lf
