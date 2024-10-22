@@ -2,4 +2,6 @@
 * text=auto
 
 # Will always have LF line
+universalJavaApplicationStub text eol=lf
+*.plist text eol=lf
 *.sh text eol=lf

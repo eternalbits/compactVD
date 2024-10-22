@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+	<dict>
+		<key>CFBundleDevelopmentRegion</key>		<string>English</string>
+		<key>CFBundleExecutable</key>				<string>universalJavaApplicationStub</string>
+		<key>CFBundleName</key>						<string>CompactVD</string>
+		<key>CFBundleGetInfoString</key>			<string>CompactVD version 2.8, Copyright 2016-2024 Rui Baptista</string>
+		<key>CFBundleIconFile</key>					<string>CompactVD.icns</string>
+		<key>CFBundleIdentifier</key>				<string>eternalbits.compactvd</string>
+		<key>CFBundleInfoDictionaryVersion</key>	<string>6.0</string>
+		<key>CFBundlePackageType</key>				<string>APPL</string>
+		<key>CFBundleLongVersionString</key>		<string>2.8, Copyright 2016-2024 Rui Baptista</string>
+		<key>CFBundleShortVersionString</key>		<string>2.8</string>
+		<key>CSResourcesFileMapped</key>			<true/>
+		<key>LSRequiresCarbon</key>					<true/>
+		<key>NSHumanReadableCopyright</key>			<string>Copyright 2016-2024 Rui Baptista</string>
+		<key>NSPrincipalClass</key>					<string>NSApplication</string>
+		<key>NSHighResolutionCapable</key>			<true/>
+		<key>JavaX</key>
+		<dict>
+			<key>MainClass</key>					<string>io.github.eternalbits.compactvd.CompactVD</string>
+			<key>JVMVersion</key>					<string>11+</string>
+			<key>ClassPath</key>					<string>$JAVAROOT/CompactVD.jar</string>
+			<key>WorkingDirectory</key>				<string>$JAVAROOT</string>
+		</dict>
+	</dict>
+</plist>
