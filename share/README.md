@@ -12,7 +12,8 @@ From the [`Releases`](https://github.com/eternalbits/compactVD/releases/) page d
 
 ### Install on Apple macOS
 
-From the [`Releases`](https://github.com/eternalbits/compactVD/releases/) page download `compactVD-x.y-mac.dmg`.  Copy `CompactVD` to the `Applications` folder. 
+From the [`Releases`](https://github.com/eternalbits/compactVD/releases/) page download `compactVD-x.y-mac.dmg`. Copy `CompactVD` to the `Applications` folder.
+ 
 When first opened, close the window and go to `System Settings > Privacy & Security`. Click on `Security` and then press `Open Anyway`.
 
 ### Install on Linux
