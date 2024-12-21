@@ -242,7 +242,7 @@ public class FrontEnd extends JFrame {
 							return;							
 						}						
 					} else {
-						String type = Static.getExtension(file.getName()).toUpperCase();
+						String type = Static.getExtension(file).toUpperCase();
 						if (!type.isEmpty() && !ListItem.IMAGE_TYPE.contains(type)) {
 							JOptionPane.showMessageDialog(this, 
 									String.format(res.getString("error_image_type"), type), 
@@ -728,7 +728,7 @@ public class FrontEnd extends JFrame {
 					return;
 				file = chooser.getSelectedFile();
 			}
-			if (Static.getExtension(file.getName()).length() == 0)
+			if (Static.getExtension(file).length() == 0)
 				file = new File(file.getPath()+"."+Static.getExtension(source));
 			if (file.compareTo(listData.get(s).getFile()) == 0) {
 				JOptionPane.showMessageDialog(this, 
@@ -736,7 +736,7 @@ public class FrontEnd extends JFrame {
 						res.getString("copy_msg"), JOptionPane.ERROR_MESSAGE);
 				return;
 			}
-			String type = Static.getExtension(file.getName()).toUpperCase();
+			String type = Static.getExtension(file).toUpperCase();
 			if (!ListItem.IMAGE_TYPE.contains(type)) {
 				JOptionPane.showMessageDialog(this, 
 						String.format(res.getString("error_image_type"), type), 

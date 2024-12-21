@@ -4,8 +4,9 @@
 
 ### How to Install CompactVD
 
-You can find a brief description on the [`share`](https://github.com/eternalbits/compactVD/tree/master/share/)
- page. The installation of CompactVD must be done on the host-related part. Just
+You can find a brief description on the
+ [`share`](https://github.com/eternalbits/compactVD/tree/master/share/) page.
+ The installation of CompactVD must be done on the host-related part. Just
  drag a vdi or vmdk disk image into the main window.
 
 ### What is CompactVD?
@@ -53,7 +54,15 @@ The format of the new disk image can be select in the Copy Disk Image dialog wit
 
 ### Copyright Notices
 
-Licensed under the Apache License, Version 2.0.
+Copyright © 2016-2024 Rui Baptista
+
+Licensed under the Apache License, Version 2.0. You may obtain a copy of the License
+ released under the Apache License 2.0. Software distributed under the License is
+ distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ either express or implied.
+ 
+This product includes Apache Commons CLI software Copyright 2002-2024 The Apache 
+Software Foundation.
 
 The application icon is a derivative work of original made by Susumu Yoshida
  (Copyright © 2009 McDo DESIGN.com).

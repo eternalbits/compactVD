@@ -127,7 +127,6 @@ public class CompactVD implements DiskImageObserver {
 			// If writable, source is open in write mode for an exclusive file lock
 			String mode = from.canWrite()? "rw": "r";
 			try (DiskImage image = DiskImages.open(from, mode)) {
-				if (type == null) type = image.getType();
 				try (DiskImage clone = DiskImages.create(type, to, image.getDiskSize())) {
 					copy = to; // copy open by DiskImage
 					FileLock source = null, fileLock = null;
@@ -276,6 +275,19 @@ public class CompactVD implements DiskImageObserver {
 					return;
 				}
 			}
+			if (args.length == 2) {
+				opt |= DiskImage.FREE_BLOCKS_ZEROED;
+				File from = new File(args[0]);
+				File to = new File(args[1]);
+				if ((from.exists() && from.isFile())
+						&& !to.exists()) {
+					String f = Static.getExtension(to).toLowerCase();
+					if (!Arrays.asList(DEFAULT_FILE_FILTER).contains(f))
+						throw new ParseException(INCORRECT_COMMAND);
+					copy(from, opt, to, f);
+					return;
+				}
+			}
 			
 			CommandLine cmd = new DefaultParser().parse(helpers, args, true);
 			if (cmd.hasOption("version")) {
@@ -289,14 +301,13 @@ public class CompactVD implements DiskImageObserver {
 			
 			cmd = new DefaultParser().parse(options, args);
 			
-			if (cmd.hasOption("U")) opt &= ~DiskImage.FREE_BLOCKS_UNUSED;
+			opt = 0;
+			if (cmd.hasOption("u")) opt = DiskImage.FREE_BLOCKS_UNUSED;
 			if (cmd.hasOption("z")) opt |= DiskImage.FREE_BLOCKS_ZEROED;
 			
 			verbose = cmd.hasOption("v");
 			
 			if (cmd.hasOption("c")) {
-				opt |= DiskImage.FREE_BLOCKS_ZEROED; // drop-zeroed is implied
-				
 				if (!cmd.hasOption("w"))
 					throw new ParseException(INCORRECT_COMMAND);
 				
@@ -312,6 +323,8 @@ public class CompactVD implements DiskImageObserver {
 				String f = cmd.hasOption("f")? cmd.getOptionValue("f").toLowerCase(): null;
 				if (cmd.hasOption("f") && cmd.getOptionValues("f").length != 1)
 					throw new ParseException(String.format(TOO_MANY_OPTIONS, "f"));
+				if (f == null) 
+					f = Static.getExtension(to).toLowerCase();
 				if (!Arrays.asList(DEFAULT_FILE_FILTER).contains(f))
 					throw new ParseException(INCORRECT_COMMAND);
 				
@@ -352,7 +365,8 @@ public class CompactVD implements DiskImageObserver {
 		String header = "\nTo reduce the size of dynamic disk images. Version "+version+"\n\n";
 		String footer = ("\nOne of ^inplace, ^copy or ^dump is required. For ^inplace and ^dump"
 				+ " the default options are ^drop-unused ^keep-zeroed. For ^copy the default"
-				+ " is ^drop-unused and ^drop-zeroed is implied.\n").replace("^", prefix);
+				+ " is ^drop-unused and ^drop-zeroed is implied. Options with parameters"
+				+ " are entirely the user's responsibility.\n").replace("^", prefix);
 		formatter.setLongOptPrefix(" "+prefix);
 		formatter.printHelp("java -jar "+jar, header, options, footer, true);
 	}

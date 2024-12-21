@@ -128,7 +128,11 @@ public class Static {
 	}
 	
 	public static String getExtension(String path) {
-		String name = new File(path).getName();
+		return getExtension(new File(path));
+	}
+	
+	public static String getExtension(File path) {
+		String name = path.getName();
 		String part = name.replaceFirst("([^.]+)[.][^.]+$", "$1");
 		return part.equals(name)? "": name.substring(part.length()+1);
 	}
