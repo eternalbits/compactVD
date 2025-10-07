@@ -39,12 +39,12 @@ public abstract class DiskImage implements AutoCloseable {
 	
 	protected DiskImageBlockTable imageTable = null;
 	
-	protected RandomAccessFile media = null;
-	protected String path = null;
+	protected RandomAccessFile media = null;// All inputs and outputs are done through a RandomAccessFile.
+	protected String path = null;			// Converts this abstract pathname into a pathname string.
 
 	protected long diskPointer = 0;			// The public disk pointer. Changed by seek, read and write.
 	
-	protected boolean readOnly = true;		// 
+	protected boolean readOnly = true;		// Read mode: this can be false ("r" mode) or true ("rw" mode)
 	protected boolean touched = false;		// Indicates if the image was ever changed by this object.
 	protected boolean dirty = false;		// Indicates if the image metadata has uncommitted changes.
 	
