@@ -22,14 +22,15 @@ import java.nio.ByteOrder;
 
 import io.github.eternalbits.disk.DiskFileSystem;
 import io.github.eternalbits.disk.DiskLayout;
+import io.github.eternalbits.disk.InitializationException;
 import io.github.eternalbits.disk.WrongHeaderException;
 
 public class ApfsFileSystem extends DiskFileSystem { // https://developer.apple.com/support/downloads/Apple-File-System-Reference.pdf
 	static final ByteOrder BYTE_ORDER = ByteOrder.LITTLE_ENDIAN;
-	final static int HEADER_SIZE = 4096;
+	static final int HEADER_SIZE = 4096;
 	
 	final ApfsVolumeHeader header;
-	final ApfsSpacemanPhys spaceman;
+	ApfsSpacemanPhys spaceman;
 
 	public ApfsFileSystem(DiskLayout layout, long offset, long length) throws IOException, WrongHeaderException {
 		this.layout		= layout;
@@ -41,7 +42,6 @@ public class ApfsFileSystem extends DiskFileSystem { // https://developer.apple.
 		long maxa = (header.nx_xp_data_base + header.nx_xp_data_blocks) * header.nx_block_size;
 		long desc = (header.nx_xp_desc_base + header.nx_xp_desc_index) * header.nx_block_size;
 		long data = (header.nx_xp_data_base + header.nx_xp_data_index) * header.nx_block_size;
-		spaceman = new ApfsSpacemanPhys(this, readImage(data, HEADER_SIZE));
 		for (int i = 0; i < header.nx_xp_desc_len; i++) {
 			if (desc + i * HEADER_SIZE == maxc) 
 				desc = header.nx_xp_desc_base * header.nx_block_size - i * HEADER_SIZE;
@@ -50,8 +50,13 @@ public class ApfsFileSystem extends DiskFileSystem { // https://developer.apple.
 		for (int i = 0; i < header.nx_xp_data_len; i++) {
 			if (data + i * HEADER_SIZE == maxa) 
 				data = header.nx_xp_data_base * header.nx_block_size - i * HEADER_SIZE;
-			new ApfsVolumeDescData(this, readImage(data + i * HEADER_SIZE, HEADER_SIZE));
+			ByteBuffer spacemanBuffer = readImage(data + i * HEADER_SIZE, HEADER_SIZE);
+			if (spacemanBuffer.getInt(24) == ApfsSpacemanPhys.SPACEMAN)
+				spaceman = new ApfsSpacemanPhys(this, spacemanBuffer);
+			new ApfsVolumeDescData(this, spacemanBuffer);
 		}
+		if (spaceman == null)
+			throw new InitializationException("A troubled Spaceman was found");
 	}
 	
 	@Override

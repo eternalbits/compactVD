@@ -27,8 +27,8 @@ import io.github.eternalbits.disk.WrongHeaderException;
 
 public class ApfsSpacemanPhys {
 	
-	private static final int SPACEMAN = 0x80000005;			// The object's type and flags.
 	private static final int BLOCK_COUNT = 32768;			// 32768 bytes are expected, i.e. a reset of 32768 * 4096 bytes.
+	static final int SPACEMAN = 0x80000005;					// The object's type and flags.
 	
 	long[] ph_space = null;									// This is a long list with bitmap representation. One case requires attention:
 															// There is representation of zero through 0, which is an empty bitmap.
@@ -65,7 +65,7 @@ public class ApfsSpacemanPhys {
 						&& sm_type == SPACEMAN 
 						&& sm_xid == ph_xid) {
 					
-					ArrayList<Long> space =  new ArrayList<Long>();
+					ArrayList<Long> space = new ArrayList<Long>();
 					int index = 0;
 					long step = 0;
 					
@@ -95,6 +95,7 @@ public class ApfsSpacemanPhys {
 					ph_space = new long[space.size()];
 					for (int i = 0; i < space.size(); i++) 
 						ph_space[i] = space.get(i);
+					in.rewind();
 					return;
 				}
 			}
