@@ -347,7 +347,7 @@ public class CompactVD implements DiskImageObserver {
 			
 		} catch (ParseException | IOException e) {
 			printHelp(options);
-			System.out.println("\n\n"+Static.simpleString(e));
+			System.out.println("\n"+Static.simpleString(e));
 			System.exit(1);
 		}
 
