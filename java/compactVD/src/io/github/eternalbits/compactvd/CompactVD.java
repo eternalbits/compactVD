@@ -204,8 +204,8 @@ public class CompactVD implements DiskImageObserver {
 		return new File(cmd.getOptionValue(opt));
 	}
 	
-	private static final String version = "2.8";
-	private static final String year = "2024";
+	private static final String version = "2.9";
+	private static final String year = "-2026";
 	private static final String jar = new java.io.File(CompactVD.class.getProtectionDomain()
 			.getCodeSource().getLocation().getPath()).getName();
 
@@ -354,7 +354,7 @@ public class CompactVD implements DiskImageObserver {
 	}
 
 	private static void printAbout() {
-		System.out.println("CompactVD version "+version+" copyright 2016-"+year+" Rui Baptista");
+		System.out.println("CompactVD version "+version+" copyright 2016"+year+" Rui Baptista");
 		System.out.println("Licensed under the Apache License, Version 2.0.");
 	}
 	
