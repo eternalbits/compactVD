@@ -346,6 +346,8 @@ public abstract class DiskImage implements AutoCloseable {
 	public static final int FREE_BLOCKS_ZEROED = 1;
 	/** Option for {@link #optimize(int)} method -- to detect blocks not in use. */
 	public static final int FREE_BLOCKS_UNUSED = 2;
+	/** Option for {@link #optimize(int)} method -- to detect journal empty. */
+	public static final int FREE_JOURNAL_EMPTY = 4;
 	
 	/**
 	 * Scans the disk image to detect blocks of data that are filled with zeros or are

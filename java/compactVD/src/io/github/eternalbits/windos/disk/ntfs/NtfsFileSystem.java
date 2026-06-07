@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import io.github.eternalbits.compactvd.gui.Settings;
 import io.github.eternalbits.disk.DiskFileSystem;
 import io.github.eternalbits.disk.DiskLayout;
 import io.github.eternalbits.disk.InitializationException;
@@ -32,6 +33,8 @@ public class NtfsFileSystem extends DiskFileSystem {
 	
 	private static final int CLUSTER_BITMAP_FILE = 6;
 	private static final int LOG_FILE = 2;
+	
+	Settings settings = Settings.getInstance();;
 	
 	final NtfsBootSector header;
 	final NtfsFileRecord bitmapFile;
@@ -51,7 +54,8 @@ public class NtfsFileSystem extends DiskFileSystem {
 		if ("$Bitmap".equals(bitmapFile.fileName) && "$LogFile".equals(logFile.fileName)) {
 			
 			if (!isJournalEmpty())
-				throw new InitializationException("The journal is not empty");
+				if (settings != null && settings.isKeepJournalEmpty())
+					throw new InitializationException("The journal is not empty");
 			return;
 			
 		}

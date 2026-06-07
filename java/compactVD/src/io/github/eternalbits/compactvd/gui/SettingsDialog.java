@@ -34,8 +34,11 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
+
+import io.github.eternalbits.compactvd.Static;
 
 class SettingsDialog extends JDialog {
 	private static final long serialVersionUID = -6334838729023774629L;
@@ -46,6 +49,7 @@ class SettingsDialog extends JDialog {
 	private final JCheckBox visibleCompactCopy;	
 	private final JCheckBox findBlocksNotInUse;
 	private final JCheckBox findBlocksZeroed;
+	private final JCheckBox keepJournalEmpty;
 	
 	private final JCheckBox compactBlocksNotInUse;
 	private final JCheckBox compactBlocksZeroed;
@@ -98,6 +102,7 @@ class SettingsDialog extends JDialog {
 	
 	SettingsDialog(final FrontEnd app) {
 		super(app, app.res.getString("set_settings"), ModalityType.APPLICATION_MODAL);
+		boolean journalEmpty = app.settings.keepJournalEmpty;
 		
 		getContentPane().setLayout(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -117,6 +122,7 @@ class SettingsDialog extends JDialog {
 		open.add(visibleCompactCopy = new JCheckBox(app.res.getString("set_same_as_open"), app.settings.visibleCompactCopy));
 		open.add(findBlocksNotInUse = new JCheckBox(app.res.getString("set_find_unused"), app.settings.findBlocksNotInUse));
 		open.add(findBlocksZeroed 	= new JCheckBox(app.res.getString("set_find_zeroed"), app.settings.findBlocksZeroed));
+		open.add(keepJournalEmpty 	= new JCheckBox(app.res.getString("set_journal"), app.settings.keepJournalEmpty));
 		
 		Box compact = Box.createVerticalBox();
 		compact.setBorder(new TitledBorder(boxBorder, app.res.getString("compact")));
@@ -162,12 +168,22 @@ class SettingsDialog extends JDialog {
 		apply.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				if (journalEmpty && !keepJournalEmpty.isSelected()) {
+					if (JOptionPane.showConfirmDialog(app, 
+							Static.wordWrap(app.res.getString("journal_empty")), 
+							app.res.getString("set_settings"), 
+							JOptionPane.YES_NO_OPTION, 
+							JOptionPane.WARNING_MESSAGE) 
+							!= JOptionPane.YES_OPTION)
+						return;
+				}
 				app.settings.selectedLanguage 		= ((Language)selectedString.getSelectedItem()).language;
 				app.settings.selectedCountry 		= ((Language)selectedString.getSelectedItem()).country;
 				app.settings.filterImageFiles 		= filterImageFiles.isSelected();
 				app.settings.visibleCompactCopy 	= visibleCompactCopy.isSelected();
 				app.settings.findBlocksNotInUse 	= findBlocksNotInUse.isSelected();
 				app.settings.findBlocksZeroed 		= findBlocksZeroed.isSelected();
+				app.settings.keepJournalEmpty 		= keepJournalEmpty.isSelected();
 				if (visibleCompactCopy.isSelected()) {
 					app.settings.compactBlocksNotInUse 	= findBlocksNotInUse.isSelected();
 					app.settings.compactBlocksZeroed 	= findBlocksZeroed.isSelected();
@@ -179,6 +195,7 @@ class SettingsDialog extends JDialog {
 					app.settings.ignoreBlocksNotInUse 	= ignoreBlocksNotInUse.isSelected();
 					app.settings.ignoreBlocksZeroed 	= ignoreBlocksZeroed.isSelected();
 				}
+				
 				dispose();
 			}
 		});
