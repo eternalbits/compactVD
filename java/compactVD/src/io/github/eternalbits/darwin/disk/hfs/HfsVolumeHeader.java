@@ -113,7 +113,7 @@ class HfsVolumeHeader {
 				startupFile 		= new HfsForkData(blockSize, "StartupFile", HfsForkData.TYPE_DATA, in);
 				
 				if ((attributes & ATTRIBUTE_JOURNALED) != 0 && !isJournalEmpty())
-					if (settings != null && settings.isKeepJournalEmpty())
+					if (settings == null || settings.isKeepJournalEmpty())
 						throw new InitializationException("The journal is not empty");
 
 				return;

@@ -54,7 +54,7 @@ public class NtfsFileSystem extends DiskFileSystem {
 		if ("$Bitmap".equals(bitmapFile.fileName) && "$LogFile".equals(logFile.fileName)) {
 			
 			if (!isJournalEmpty())
-				if (settings != null && settings.isKeepJournalEmpty())
+				if (settings == null || settings.isKeepJournalEmpty())
 					throw new InitializationException("The journal is not empty");
 			return;
 			
