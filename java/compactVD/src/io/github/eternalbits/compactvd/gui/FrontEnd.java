@@ -502,22 +502,6 @@ public class FrontEnd extends JFrame {
 		settings.write();
 	}
 
-	int getOptimizeOptions(int task) {
-		switch (task) {
-		case DiskImageProgress.OPTIMIZE:
-			return (settings.findBlocksNotInUse? DiskImage.FREE_BLOCKS_UNUSED: 0) |
-					(settings.findBlocksZeroed? DiskImage.FREE_BLOCKS_ZEROED: 0);
-		case DiskImageProgress.COMPACT:
-			return (settings.compactBlocksNotInUse? DiskImage.FREE_BLOCKS_UNUSED: 0) |
-					(settings.compactBlocksZeroed? DiskImage.FREE_BLOCKS_ZEROED: 0);
-		case DiskImageProgress.COPY:
-			return (settings.ignoreBlocksNotInUse? DiskImage.FREE_BLOCKS_UNUSED: 0) |
-					(settings.ignoreBlocksZeroed? DiskImage.FREE_BLOCKS_ZEROED: 0);
-		default:
-			return 0;
-		}
-	}
-	
 	void onSelectListItem() {
 		boolean sel = list.getSelectedIndex() != -1;
 		deck.show(main, sel? "view": "about");
@@ -692,6 +676,30 @@ public class FrontEnd extends JFrame {
 		}
 	}
 	
+	/**
+	 * Calculates the system level according to the chosen options
+	 * 
+	 * @return	the system level.
+	 */
+	int getOptimizeOptions(int task) {
+		switch (task) {
+		case DiskImageProgress.OPTIMIZE:
+			return (settings.findBlocksNotInUse? DiskImage.FREE_BLOCKS_UNUSED: 0) |
+					(settings.findBlocksZeroed? DiskImage.FREE_BLOCKS_ZEROED: 0);
+		case DiskImageProgress.COMPACT:
+			return (settings.compactBlocksNotInUse? DiskImage.FREE_BLOCKS_UNUSED: 0) |
+					(settings.compactBlocksZeroed? DiskImage.FREE_BLOCKS_ZEROED: 0);
+		case DiskImageProgress.COPY:
+			return (settings.ignoreBlocksNotInUse? DiskImage.FREE_BLOCKS_UNUSED: 0) |
+					(settings.ignoreBlocksZeroed? DiskImage.FREE_BLOCKS_ZEROED: 0);
+		default:
+			return 0;
+		}
+	}
+	
+	/**
+	 * It is called whenever you change the level row 
+	 */
 	void updateDiskImage() {
 		int s = list.getSelectedIndex();
 		if (s != -1) {
@@ -699,6 +707,9 @@ public class FrontEnd extends JFrame {
 		}
 	}
 
+	/**
+	 * It is called whenever a level is compacted
+	 */
 	void compactDiskImage() {
 		int s = list.getSelectedIndex();
 		if (s != -1) {
@@ -706,6 +717,9 @@ public class FrontEnd extends JFrame {
 		}
 	}
 	
+	/**
+	 * It is called whenever a level is copied
+	 */
 	void copyDiskImage() {
 		int s = list.getSelectedIndex();
 		if (s != -1) {

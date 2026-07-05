@@ -29,8 +29,8 @@ public class VhdDiskFooter {
 	static final int DYNAMIC_HARD_DISK = 3;
 
 	private static final long STD_COOKIE = 0x636F6E6563746978L;	// Some applications want "conectix" here
-	private static final int MY_SIGNATURE = 0x63766420;			// "cvd "
-	private static final int MY_HOST = 0x4A617661;				// "Java"
+	private static final int MY_SIGNATURE = 0x4a617661;			// "Java"
+	private static final int MY_HOST = 0x5769326b;				// "Wi2k"
 	
 	private static final int FEATURES_RESERVED = 2;				// Always set
 	private static final int CURRENT_VERSION = 0x10000;			// Version 1.0
