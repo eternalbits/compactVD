@@ -19,7 +19,6 @@ package io.github.eternalbits.windos.vhd;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
-import java.util.BitSet;
 
 import io.github.eternalbits.disk.DiskImageBlockTable;
 import io.github.eternalbits.disk.InitializationException;
@@ -33,6 +32,12 @@ class VhdBlockAllocationTable extends DiskImageBlockTable {
 	private final int[] blockMap;
 	private int dataBlocksCount;
 
+	boolean equalValues;				// All data blocks are separated by 512 bytes
+	private final int[] reverseData;	// Keeping the data when equalValues is false
+	private final int[] reverseMap;		// Keeping the map when equalValues is false
+	private final int dataBlocksStart;	// Save the initial block count when equalValues is false
+	private int nextSector;				// Save the next sector when equalValues is false
+	
 	VhdBlockAllocationTable(VhdDiskImage vhd) {
 		image 	= vhd;
 		header 	= image.header;
@@ -40,6 +45,11 @@ class VhdBlockAllocationTable extends DiskImageBlockTable {
 		blockMap = new int[header.maxTableEntries];
 		Arrays.fill(blockMap, -1);
 		dataBlocksCount = 0;
+		dataBlocksStart = 0;
+		equalValues = true;
+		reverseData = null;
+		reverseMap = null;
+		nextSector = -1;
 	}
 	
 	VhdBlockAllocationTable(VhdDiskImage vhd, ByteBuffer in) throws IOException {
@@ -49,48 +59,65 @@ class VhdBlockAllocationTable extends DiskImageBlockTable {
 		if (in.remaining() >= header.maxTableEntries * 4) {
 			in.order(VhdDiskImage.BYTE_ORDER);
 			
-			BitSet bitmap = new BitSet(header.maxTableEntries);
+			int[] blockCopy = new int[header.maxTableEntries];
 			blockMap = new int[header.maxTableEntries];
-			getVirtualBox(in);
+			dataBlocksCount = 0;
 			
 			for (int i = 0, s = blockMap.length; i < s; i++) {
-				int sector = blockMap[i] = in.getInt();
+				blockMap[i] = blockCopy[i] = in.getInt();
+				if (blockMap[i] != -1)
+					dataBlocksCount++;
+			}
+			Arrays.sort(blockCopy);	// Sort blockCopy in ascending order
+			dataBlocksStart = dataBlocksCount;
+			equalValues = true;
+			nextSector = -1;
+			
+			for (int i = 0, s = blockCopy.length; i < s; i++) {
+				int sector = blockCopy[i];
 				if (sector != -1) {
-					int block = image.indexOf(sector);
-					if (sector < header.firstSector || sector >= header.nextSector 
-							|| (sector - header.firstSector) % header.blockSectors != 0 || bitmap.get(block))
+					if (nextSector == -1) {
+						header.nextSector = blockCopy[header.maxTableEntries -1] + header.blockSectors;
+						header.firstSector = sector;
+						nextSector = sector;
+					}
+					if (sector < header.firstSector || sector >= header.nextSector)
 						throw new InitializationException(getClass(), image.toString());
-					bitmap.set(block);
+					if (sector < nextSector || sector > nextSector + 7)
+						throw new InitializationException(getClass(), image.toString());
+					if (sector != nextSector) equalValues = false;
+					nextSector = sector + header.blockSectors;
 				}
 			}
 			
-			dataBlocksCount = bitmap.cardinality();
+			if (equalValues) {
+				reverseData = null;
+				reverseMap = null;
+			} else {
+				reverseData = new int[dataBlocksStart];
+				reverseMap = new int[dataBlocksStart];
+				for (int i = 0, j = 0, s = blockCopy.length; i < s; i++) {
+					if (blockCopy[i] != -1) {
+						reverseData[j] = blockCopy[i];
+						reverseMap[j] = j++;
+					}
+				}
+			}
+			
 			return;
 		}
 		
 		throw new InitializationException(getClass(), image.toString());
 	}
 
-	/**
-	 * The VHD includes extra bitmap blocks of length 4096 of the Windows length
-	 *  in addition to the normal 512. Does not include size combinations.
-	 * 
-	 * @param in	the bitmap block
-	 */
-	private void getVirtualBox(ByteBuffer in) {
-		if (in.getInt(0) != header.firstSector) {
-			int getInt = Integer.MAX_VALUE, sector;
-			for (int i = 0, s = in.capacity(); i < s; i+=4) {
-				if ((sector = in.getInt(i)) != -1) {
-					if (getInt > sector)
-						getInt = sector;
-				}
-			}
-			if (getInt != header.firstSector) {
-				header.firstSector = getInt;
-				header.blockSectors += 7;
-			}
-		}
+	int indexOf(int sector) {
+		if (sector == nextSector) return dataBlocksStart;
+		return Arrays.binarySearch(reverseData, sector);
+	}
+
+	int sectorOf(int index) {
+		if (index == reverseMap.length) return nextSector;
+		return reverseData[Arrays.binarySearch(reverseMap, index)];
 	}
 
 	int read(int blockNumber, int blockOffset, byte[] in, int start, int length) throws IOException {
