@@ -9,6 +9,11 @@ You can find a brief description on the
  The installation of CompactVD must be done on the host-related part. Just
  drag a vdi or vmdk disk image into the main window.
 
+### Windows and Bitlocker disk encryption
+
+You can find an interpretation of what's happening in
+ [`media`](https://github.com/eternalbits/compactVD/tree/master/media/) page.
+
 ### What is CompactVD?
 
 CompactVD is a utility to optimize the size of dynamic disk images, based on
