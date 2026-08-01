@@ -3,6 +3,25 @@
 From 2024 onwards, unless I'm mistaken, the Pro version may feature the Windows BitLocker feature,
  which indicates that your system volume is encrypted to protect data.
 
+### BitLocker from Command Prompt (administrator rights)
+
+Type `manage-bde -status` to see if your drive is decrypted, in progress, or fully encrypted.
+You can check a specific drive by adding the letter, such as `manage-bde -status C:`.
+
+You will get, among other things, the message `Conversion Status: Fully Decrypted`.
+This means there will be no problems using this machine.
+
+If, on the other hand, the message is `Conversion Status: Encryption in Progress` or
+`Conversion Status: Fully Encrypted`, you will need to decrypt the machine for it to
+operate correctly. To do this, use `manage-bde -off C:`.
+
+The response will be `Decryption is now in progress`. We have a reasonable amount of time
+for the decryption process to complete. We can always use `manage-bde -status` again, which
+will show `Conversion Status: Encryption in Progress` with the `Percentage Encrypted`
+decreasing, until the message is `Conversion Status: Fully Decrypted`.
+
+### BitLocker from the User Interface (standard desktop)
+
 You can check this through `Settings > Privacy & security > Device encryption > BitLocker drive encryption`,
  or through `Control Panel > System and Security > BitLocker Drive Encryption`.
 
