@@ -42,7 +42,9 @@ import io.github.eternalbits.disks.DiskLayouts;
  * The format was created by Connectix for their Virtual PC product. Microsoft has acquired
  *  Connectix and has made the VHD Image Format Specification available to third parties
  *  under the Microsoft Open Specification Promise.
- *  <p>
+ * <p>
+ * Regarding the difference between +1 and +8 observed between the data blocks,
+ *  +1 is always assumed, except in cases where the difference is significant.
  */
 public class VhdDiskImage extends DiskImage {
 	static final ByteOrder BYTE_ORDER = ByteOrder.BIG_ENDIAN;
@@ -163,7 +165,9 @@ public class VhdDiskImage extends DiskImage {
 	 * @return			The zero based block number.
 	 */
 	int indexOf(int sector) {
-		return (sector - header.firstSector) / header.blockSectors;
+		if (blockTable.equalValues)
+			return (sector - header.firstSector) / header.blockSectors;
+		return blockTable.indexOf(sector);
 	}
 	
 	/**
@@ -172,7 +176,9 @@ public class VhdDiskImage extends DiskImage {
 	 * @return			The first sector of the block.
 	 */
 	int sectorOf(int index) {
-		return header.firstSector + index * header.blockSectors;
+		if (blockTable.equalValues)
+			return header.firstSector + index * header.blockSectors;
+		return blockTable.sectorOf(index);
 	}
 
 	@Override
@@ -290,6 +296,8 @@ public class VhdDiskImage extends DiskImage {
 
 	@Override
 	public long getOptimizedLength() {
+	//	getOptimizedLength is not true if equalValues is equal to false;
+	//	however, the difference is small and this only counts as a prediction
 		return (header.firstSector + (long)blockTable.getDataBlocksCount() 
 			* header.blockSectors) * SECTOR_SIZE + VhdDiskFooter.FOOTER_SIZE;
 	}

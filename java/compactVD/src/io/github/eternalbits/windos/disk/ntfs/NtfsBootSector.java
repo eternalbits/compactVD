@@ -21,6 +21,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
 import io.github.eternalbits.compactvd.Static;
+import io.github.eternalbits.disk.InitializationException;
 import io.github.eternalbits.disk.WrongHeaderException;
 
 /**
@@ -110,15 +111,19 @@ class NtfsBootSector {
 			if (bytesPerSector >= 512 && bytesPerSector <= 8192
 					&& Static.isPower2(bytesPerSector) && Static.isPower2(sectorsPerCluster&0xFF)
 					&& reservedSectors == 0 && tablesCount == 0 && rootDirEntries == 0 
-					&& sectorsCount2 == 0 && sectorsPerTable == 0 && sectorsCount4 == 0
-					&& sectorsCount > 0) {
+					&& sectorsCount2 == 0 && sectorsPerTable == 0 && sectorsCount4 == 0) {
 				
-				clustersCount = sectorsCount / (sectorsPerCluster&0xFF);
-				clusterSize = bytesPerSector * (sectorsPerCluster&0xFF);
-				recordSize = decodeByte(encodedRS);
-				indexSize = decodeByte(encodedIS);
-				if (recordSize > 0 && indexSize > 0) {
-					return;
+				if (oemIdentifier.equals("-FVE-FS-")) 
+					throw new InitializationException("Bitlocker disk encryption");
+				
+				if (sectorsCount > 0) {
+					clustersCount = sectorsCount / (sectorsPerCluster&0xFF);
+					clusterSize = bytesPerSector * (sectorsPerCluster&0xFF);
+					recordSize = decodeByte(encodedRS);
+					indexSize = decodeByte(encodedIS);
+					if (recordSize > 0 && indexSize > 0) {
+						return;
+					}
 				}
 			}
 		}
