@@ -90,6 +90,7 @@ public class Settings implements Serializable {
 				) {
 			
 			Settings.instance = (Settings) in.readObject();
+			Settings.instance.keepJournalEmpty = true;
 			return Settings.instance;
 			
 		} catch (FileNotFoundException e) {
