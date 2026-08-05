@@ -59,25 +59,25 @@ class VhdBlockAllocationTable extends DiskImageBlockTable {
 		if (in.remaining() >= header.maxTableEntries * 4) {
 			in.order(VhdDiskImage.BYTE_ORDER);
 			
-			int[] blockCopy = new int[header.maxTableEntries];
+			int[][] blockCopy = new int[header.maxTableEntries][2];
 			blockMap = new int[header.maxTableEntries];
 			dataBlocksCount = 0;
 			
 			for (int i = 0, s = blockMap.length; i < s; i++) {
-				blockMap[i] = blockCopy[i] = in.getInt();
+				blockMap[i] = blockCopy[i][0] = blockCopy[i][1] = in.getInt();
 				if (blockMap[i] != -1)
 					dataBlocksCount++;
 			}
-			Arrays.sort(blockCopy);	// Sort blockCopy in ascending order
+			Arrays.sort(blockCopy, (a, b) -> a[1] - b[1]);	// Sort blockCopy in ascending order
 			dataBlocksStart = dataBlocksCount;
 			equalValues = true;
 			nextSector = -1;
 			
 			for (int i = 0, s = blockCopy.length; i < s; i++) {
-				int sector = blockCopy[i];
+				int sector = blockCopy[i][1];
 				if (sector != -1) {
 					if (nextSector == -1) {
-						header.nextSector = blockCopy[header.maxTableEntries -1] + header.blockSectors;
+						header.nextSector = blockCopy[header.maxTableEntries -1][1] + header.blockSectors;
 						header.firstSector = sector;
 						nextSector = sector;
 					}
@@ -86,6 +86,7 @@ class VhdBlockAllocationTable extends DiskImageBlockTable {
 					if (sector < nextSector || sector > nextSector + 7)
 						throw new InitializationException(getClass(), image.toString());
 					if (sector != nextSector) equalValues = false;
+					blockCopy[i][0] = nextSector;
 					nextSector = sector + header.blockSectors;
 				}
 			}
@@ -97,9 +98,10 @@ class VhdBlockAllocationTable extends DiskImageBlockTable {
 				reverseData = new int[dataBlocksStart];
 				reverseMap = new int[dataBlocksStart];
 				for (int i = 0, j = 0, s = blockCopy.length; i < s; i++) {
-					if (blockCopy[i] != -1) {
-						reverseData[j] = blockCopy[i];
-						reverseMap[j] = j++;
+					if (blockCopy[i][1] != -1) {
+						reverseData[j] = blockCopy[i][1];
+						reverseMap[j] = blockCopy[i][0];
+						j++;
 					}
 				}
 			}
@@ -116,10 +118,15 @@ class VhdBlockAllocationTable extends DiskImageBlockTable {
 	}
 
 	int sectorOf(int index) {
-		if (index == reverseMap.length) return nextSector;
-		return reverseData[Arrays.binarySearch(reverseMap, index)];
+		if (index == reverseData.length) return nextSector;
+		return reverseData[index];
 	}
-
+	
+	int regionOf(int index) {
+		if (index == reverseMap.length) return nextSector;
+		return reverseMap[index];
+	}
+	
 	int read(int blockNumber, int blockOffset, byte[] in, int start, int length) throws IOException {
 		if (blockMap[blockNumber] < header.firstSector || blockMap[blockNumber] >= header.nextSector) {
 			Arrays.fill(in, start, start + length, (byte)0);

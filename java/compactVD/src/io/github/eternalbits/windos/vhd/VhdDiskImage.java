@@ -181,6 +181,17 @@ public class VhdDiskImage extends DiskImage {
 		return blockTable.sectorOf(index);
 	}
 
+	/**
+	 * Returns the first sector of the block number {@code index}.
+	 * @param index		The zero based block number.
+	 * @return			The first map of the block.
+	 */
+	int regionOf(int index) {
+		if (blockTable.equalValues)
+			return header.firstSector + index * header.blockSectors;
+		return blockTable.regionOf(index);
+	}
+
 	@Override
 	public String getType() {
 		return "VHD";
@@ -353,12 +364,12 @@ public class VhdDiskImage extends DiskImage {
 			}
 		}
 		
-		if (needsFinalUpdate || header.nextSector > sectorOf(s) 
-				|| media.length() > sectorOf(s) * (long)SECTOR_SIZE + VhdDiskFooter.FOOTER_SIZE) {
+		if (needsFinalUpdate || header.nextSector > regionOf(s) 
+				|| media.length() > regionOf(s) * (long)SECTOR_SIZE + VhdDiskFooter.FOOTER_SIZE) {
 			
 			// s is unreliable if the task was interrupted
-			if (header.nextSector > sectorOf(s))
-				header.nextSector = sectorOf(s);
+			if (header.nextSector > regionOf(s))
+				header.nextSector = regionOf(s);
 			
 			journaledUpdate(header.nextSector * (long)SECTOR_SIZE + VhdDiskFooter.FOOTER_SIZE);
 			media.setLength(header.nextSector * (long)SECTOR_SIZE + VhdDiskFooter.FOOTER_SIZE);
