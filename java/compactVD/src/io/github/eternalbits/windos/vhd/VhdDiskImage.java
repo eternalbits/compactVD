@@ -373,6 +373,7 @@ public class VhdDiskImage extends DiskImage {
 			
 			journaledUpdate(header.nextSector * (long)SECTOR_SIZE + VhdDiskFooter.FOOTER_SIZE);
 			media.setLength(header.nextSector * (long)SECTOR_SIZE + VhdDiskFooter.FOOTER_SIZE);
+			progress.stop();
 		}
 		
 		progress.end();

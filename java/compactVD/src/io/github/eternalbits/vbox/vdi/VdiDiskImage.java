@@ -316,6 +316,7 @@ public class VdiDiskImage extends DiskImage {
 			
 			journaledUpdate(header.offsetData + header.blocksAllocated * length);
 			media.setLength(header.offsetData + header.blocksAllocated * length);
+			progress.stop();
 		}
 		
 		progress.end();

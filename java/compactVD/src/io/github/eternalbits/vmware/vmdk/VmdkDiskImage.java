@@ -356,6 +356,7 @@ public class VmdkDiskImage extends DiskImage {
 			
 			journaledUpdate(header.nextSector * VmdkSparseHeader.SECTOR_LONG);
 			media.setLength(header.nextSector * VmdkSparseHeader.SECTOR_LONG);
+			progress.stop();
 		}
 		
 		progress.end();

@@ -654,6 +654,16 @@ public abstract class DiskImage implements AutoCloseable {
 			}
 		}
 		
+		public void stop() {
+			if (obsProgress.size() > 0 && value >= 0) {
+				lastValue = System.currentTimeMillis();
+				notifyProgress(new DiskImageProgress(task, start, 1F));
+				if (task == DiskImageProgress.COMPACT) {
+					fakeCompactView(0F);
+				}
+			}
+		}
+		
 		private void fakeCompactView(float pct) { // Could this be real?
 			int n = blocksUnused == null? 0: blocksUnused - Math.round(unused * pct);
 			int z = blocksZeroed == null? 0: blocksZeroed - Math.round(zeroed * pct);
