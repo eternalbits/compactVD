@@ -121,12 +121,12 @@ class VhdBlockAllocationTable extends DiskImageBlockTable {
 		if (index == reverseData.length) return nextSector;
 		return reverseData[index];
 	}
-	
+
 	int regionOf(int index) {
 		if (index == reverseMap.length) return nextSector;
 		return reverseMap[index];
 	}
-	
+
 	int read(int blockNumber, int blockOffset, byte[] in, int start, int length) throws IOException {
 		if (blockMap[blockNumber] < header.firstSector || blockMap[blockNumber] >= header.nextSector) {
 			Arrays.fill(in, start, start + length, (byte)0);
