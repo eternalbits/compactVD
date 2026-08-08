@@ -21,6 +21,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import io.github.eternalbits.compactvd.Static;
+import io.github.eternalbits.compactvd.gui.Settings;
 import io.github.eternalbits.disk.InitializationException;
 import io.github.eternalbits.disk.WrongHeaderException;
 
@@ -34,6 +35,8 @@ class HfsVolumeHeader {
 	
 	private static final int ATTRIBUTE_UNMOUNTED = 0x100;
 	private static final int ATTRIBUTE_JOURNALED = 0x2000;
+	
+	private Settings settings = Settings.getInstance();
 
 	final HfsFileSystem fileSystem;
 
@@ -110,7 +113,8 @@ class HfsVolumeHeader {
 				startupFile 		= new HfsForkData(blockSize, "StartupFile", HfsForkData.TYPE_DATA, in);
 				
 				if ((attributes & ATTRIBUTE_JOURNALED) != 0 && !isJournalEmpty())
-					throw new InitializationException("The journal is not empty");
+					if (settings == null || settings.isKeepJournalEmpty())
+						throw new InitializationException("The journal is not empty");
 
 				return;
 			}

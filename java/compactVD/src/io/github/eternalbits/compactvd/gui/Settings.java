@@ -34,8 +34,9 @@ import io.github.eternalbits.compactvd.Static;
  *  under the user home folder.
  * <p>
  */
-class Settings implements Serializable {
+public class Settings implements Serializable {
 	private static final long serialVersionUID = -7557970546910169483L;
+	private static Settings instance;	// Creates a static field to save the global instance
 	
 	// Window geometry
 	Rectangle windowRect = new Rectangle(20, 20, 20, 20);
@@ -47,6 +48,7 @@ class Settings implements Serializable {
 	String selectedLanguage = Locale.getDefault().getLanguage();
 	String selectedCountry = Locale.getDefault().getCountry();
 	boolean filterImageFiles = true;
+	boolean keepJournalEmpty = true;
 	
 	// Open options
 	boolean visibleCompactCopy = true;
@@ -69,6 +71,7 @@ class Settings implements Serializable {
 				ObjectOutputStream out = new ObjectOutputStream(cfg);
 				) {
 			
+			keepJournalEmpty = true;	// At the end of the day, this always ends up with the true value
 			out.writeObject(this);
 			
 		} catch (Exception e) {
@@ -86,7 +89,9 @@ class Settings implements Serializable {
 				ObjectInputStream in = new ObjectInputStream(cfg);
 				) {
 			
-			return (Settings) in.readObject();
+			Settings.instance = (Settings) in.readObject();
+			Settings.instance.keepJournalEmpty = true;
+			return Settings.instance;
 			
 		} catch (FileNotFoundException e) {
 		} catch (Exception e) {
@@ -98,11 +103,23 @@ class Settings implements Serializable {
 	/**
 	 * Returns a File to save the application user preferences. The location is operating
 	 *  system dependent, with {@code <user.home>/.config/eternalbits/compactvd.ser}
-	 *  as default. 
+	 *  as default.
 	 * @return	The settings file path.
 	 */
 	static File getConfigFile() {
 		return new File(Static.getWorkingDirectory(), "compactvd.ser");
 	}
 	
+	/**
+	 * Global method for any class to access
+	 * 
+	 * @return	The settings.
+	 */
+	public static Settings getInstance() {
+		return instance;
+	}
+	
+	public boolean isKeepJournalEmpty() {
+		return keepJournalEmpty;
+	}
 }

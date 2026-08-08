@@ -685,13 +685,16 @@ public class FrontEnd extends JFrame {
 		switch (task) {
 		case DiskImageProgress.OPTIMIZE:
 			return (settings.findBlocksNotInUse? DiskImage.FREE_BLOCKS_UNUSED: 0) |
-					(settings.findBlocksZeroed? DiskImage.FREE_BLOCKS_ZEROED: 0);
+					(settings.findBlocksZeroed? DiskImage.FREE_BLOCKS_ZEROED: 0) |
+					(settings.keepJournalEmpty? DiskImage.FREE_JOURNAL_EMPTY: 0);
 		case DiskImageProgress.COMPACT:
 			return (settings.compactBlocksNotInUse? DiskImage.FREE_BLOCKS_UNUSED: 0) |
-					(settings.compactBlocksZeroed? DiskImage.FREE_BLOCKS_ZEROED: 0);
+					(settings.compactBlocksZeroed? DiskImage.FREE_BLOCKS_ZEROED: 0) |
+					(settings.keepJournalEmpty? DiskImage.FREE_JOURNAL_EMPTY: 0);
 		case DiskImageProgress.COPY:
 			return (settings.ignoreBlocksNotInUse? DiskImage.FREE_BLOCKS_UNUSED: 0) |
-					(settings.ignoreBlocksZeroed? DiskImage.FREE_BLOCKS_ZEROED: 0);
+					(settings.ignoreBlocksZeroed? DiskImage.FREE_BLOCKS_ZEROED: 0) |
+					(settings.keepJournalEmpty? DiskImage.FREE_JOURNAL_EMPTY: 0);
 		default:
 			return 0;
 		}
