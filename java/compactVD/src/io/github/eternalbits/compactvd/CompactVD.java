@@ -213,12 +213,16 @@ public class CompactVD implements DiskImageObserver {
 		
 		DiskImageJournal.scanDirectory(Static.getWorkingDirectory());
 		
-		if (args.length == 0 && !GraphicsEnvironment.isHeadless()) {
+		if (argsLength(args) && !GraphicsEnvironment.isHeadless()) {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-					new FrontEnd();
+					try {
+						new FrontEnd(args);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 				}
 			});
 			return;
@@ -226,6 +230,15 @@ public class CompactVD implements DiskImageObserver {
 		
 		new CompactVD().commandLine(args);
 		
+	}
+	
+	private static boolean argsLength(String[] args) {
+		for (int i = 0; i < args.length; i++) {
+			if (!new File(args[i]).exists()) {
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	private static Options buildHelpers() {
@@ -267,28 +280,6 @@ public class CompactVD implements DiskImageObserver {
 			options.addOption(opt);
 		}
 		try {
-			int opt = DiskImage.FREE_BLOCKS_UNUSED;
-			if (args.length == 1) {
-				File file = new File(args[0]);
-				if (file.exists() && file.isFile()) {
-					showView(file, opt);
-					return;
-				}
-			}
-			if (args.length == 2) {
-				opt |= DiskImage.FREE_BLOCKS_ZEROED;
-				File from = new File(args[0]);
-				File to = new File(args[1]);
-				if ((from.exists() && from.isFile())
-						&& !to.exists()) {
-					String f = Static.getExtension(to).toLowerCase();
-					if (!Arrays.asList(DEFAULT_FILE_FILTER).contains(f))
-						throw new ParseException(INCORRECT_COMMAND);
-					copy(from, opt, to, f);
-					return;
-				}
-			}
-			
 			CommandLine cmd = new DefaultParser().parse(helpers, args, true);
 			if (cmd.hasOption("version")) {
 				printAbout();
@@ -301,15 +292,23 @@ public class CompactVD implements DiskImageObserver {
 			
 			cmd = new DefaultParser().parse(options, args);
 			
-			opt = 0;
-			if (cmd.hasOption("u")) opt = DiskImage.FREE_BLOCKS_UNUSED;
-			if (cmd.hasOption("z")) opt |= DiskImage.FREE_BLOCKS_ZEROED;
+			boolean OPT = true;
+			int opt = 0;
+			if (cmd.hasOption("u") || cmd.hasOption("U") || cmd.hasOption("z") || cmd.hasOption("Z")) {
+				if (cmd.hasOption("u")) opt = DiskImage.FREE_BLOCKS_UNUSED;
+				if (cmd.hasOption("z")) opt |= DiskImage.FREE_BLOCKS_ZEROED;
+				OPT = false;
+			} else { // options with these parameters
+				opt = DiskImage.FREE_BLOCKS_UNUSED;
+			}
 			
 			verbose = cmd.hasOption("v");
 			
 			if (cmd.hasOption("c")) {
 				if (!cmd.hasOption("w"))
 					throw new ParseException(INCORRECT_COMMAND);
+				if (OPT)
+					opt |= DiskImage.FREE_BLOCKS_ZEROED; // drop-zeroed is implied
 				
 				File from = getOptionValues(cmd, "c");
 				File to = getOptionValues(cmd, "w");
@@ -365,8 +364,8 @@ public class CompactVD implements DiskImageObserver {
 		String header = "\nTo reduce the size of dynamic disk images. Version "+version+"\n\n";
 		String footer = ("\nOne of ^inplace, ^copy or ^dump is required. For ^inplace and ^dump"
 				+ " the default options are ^drop-unused ^keep-zeroed. For ^copy the default"
-				+ " is ^drop-unused and ^drop-zeroed is implied. Options with parameters"
-				+ " are entirely the user's responsibility.\n").replace("^", prefix);
+				+ " is ^drop-unused and ^drop-zeroed is implied. Options with these"
+				+ " parameters are entirely the user's responsibility.\n").replace("^", prefix);
 		formatter.setLongOptPrefix(" "+prefix);
 		formatter.printHelp("java -jar "+jar, header, options, footer, true);
 	}
