@@ -83,7 +83,8 @@ class VhdBlockAllocationTable extends DiskImageBlockTable {
 					}
 					if (sector < header.firstSector || sector >= header.nextSector)
 						throw new InitializationException(getClass(), image.toString());
-					if (sector < nextSector || sector > nextSector + 7)
+					// Do not limit the spacing between data entries to 512 bytes; accept everything that comes after that.
+					if (sector < nextSector)// || sector > nextSector + 7)
 						throw new InitializationException(getClass(), image.toString());
 					if (sector != nextSector) equalValues = false;
 					blockCopy[i][0] = nextSector;
