@@ -1,4 +1,5 @@
 @echo off
+rem There is an error in the VHD function call, however everything seems to be working
 
 call oneTest.cmd 3hfs.vdi   VDI  E17E0B405B3A42E8DFAF97AF116D792B F0710009C9E347D2BBF36A65975D062A
 call oneTest.cmd 3ext.vmdk  VMDK 54685344D7F21F364AB6F054470ECE7C EDAAD87F83D932961AE2BFC9FA58A700

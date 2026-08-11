@@ -5,13 +5,13 @@
 		<key>CFBundleDevelopmentRegion</key>		<string>English</string>
 		<key>CFBundleExecutable</key>				<string>universalJavaApplicationStub</string>
 		<key>CFBundleName</key>						<string>CompactVD</string>
-		<key>CFBundleGetInfoString</key>			<string>CompactVD version 2.9, Copyright 2016-2026 Rui Baptista</string>
+		<key>CFBundleGetInfoString</key>			<string>CompactVD version 3.0, Copyright 2016-2026 Rui Baptista</string>
 		<key>CFBundleIconFile</key>					<string>CompactVD.icns</string>
 		<key>CFBundleIdentifier</key>				<string>eternalbits.compactvd</string>
 		<key>CFBundleInfoDictionaryVersion</key>	<string>6.0</string>
 		<key>CFBundlePackageType</key>				<string>APPL</string>
-		<key>CFBundleLongVersionString</key>		<string>2.9, Copyright 2016-2026 Rui Baptista</string>
-		<key>CFBundleShortVersionString</key>		<string>2.9</string>
+		<key>CFBundleLongVersionString</key>		<string>3.0, Copyright 2016-2026 Rui Baptista</string>
+		<key>CFBundleShortVersionString</key>		<string>3.0</string>
 		<key>CSResourcesFileMapped</key>			<true/>
 		<key>LSRequiresCarbon</key>					<true/>
 		<key>NSHumanReadableCopyright</key>			<string>Copyright 2016-2026 Rui Baptista</string>
