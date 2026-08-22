@@ -246,11 +246,12 @@ public class CompactVD implements DiskImageObserver {
 			if (new File(parm[j]).exists()) {
 				done = true;
 				j = i + 1;
-			} else
-			if (i + 1 < parm.length) {
-				parm[j] += " " + parm[i + 1];
-				parm[i + 1] = null;
+			} else {
 				done = false;
+				if (i + 1 < parm.length) {
+					parm[j] += " " + parm[i + 1];
+					parm[i + 1] = null;
+				}
 			}
 		}
 		return done;
