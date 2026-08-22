@@ -204,10 +204,11 @@ public class CompactVD implements DiskImageObserver {
 		return new File(cmd.getOptionValue(opt));
 	}
 	
-	private static final String version = "3.0";
-	private static final String year = "-2026";
-	private static final String jar = new java.io.File(CompactVD.class.getProtectionDomain()
+	private final static String version = "3.0";
+	private final static String year = "-2026";
+	private final static String jar = new java.io.File(CompactVD.class.getProtectionDomain()
 			.getCodeSource().getLocation().getPath()).getName();
+	private static String[] parm = null;
 
 	public static void main(String[] args) throws Exception {
 		
@@ -219,7 +220,7 @@ public class CompactVD implements DiskImageObserver {
 				@Override
 				public void run() {
 					try {
-						new FrontEnd(args);
+						new FrontEnd(parm);
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -232,13 +233,27 @@ public class CompactVD implements DiskImageObserver {
 		
 	}
 	
+	/**
+	 * It attempts to reconstruct arguments from file paths that were incorrectly split by spaces.
+	 * 
+	 * @param args	the supplied command-line arguments.
+	 * @return	{@code true} if all paths point to a file, {@code false} otherwise.
+	 */
 	private static boolean argsLength(String[] args) {
-		for (int i = 0; i < args.length; i++) {
-			if (!new File(args[i]).exists()) {
-				return false;
+		boolean done = true;
+		parm = args.clone();
+		for (int i = 0, j = 0; i < parm.length; i++) {
+			if (new File(parm[j]).exists()) {
+				done = true;
+				j = i + 1;
+			} else
+			if (i + 1 < parm.length) {
+				parm[j] += " " + parm[i + 1];
+				parm[i + 1] = null;
+				done = false;
 			}
 		}
-		return true;
+		return done;
 	}
 	
 	private static Options buildHelpers() {

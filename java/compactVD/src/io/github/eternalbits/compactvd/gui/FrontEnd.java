@@ -174,7 +174,8 @@ public class FrontEnd extends JFrame {
 		pack();
 		setVisible(true);
 		for (int i = 0; i < args.length; i++) {
-			addToList((new File(args[i])).getCanonicalFile());
+			if (args[i] != null) 
+				addToList((new File(args[i])).getCanonicalFile());
 		}
 		onSelectListItem();
 	}
