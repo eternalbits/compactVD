@@ -37,9 +37,15 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
@@ -177,6 +183,7 @@ public class FrontEnd extends JFrame {
 			if (args[i] != null) 
 				addToList((new File(args[i])).getCanonicalFile());
 		}
+		seeFutureVersions();
 		onSelectListItem();
 	}
 
@@ -288,7 +295,34 @@ public class FrontEnd extends JFrame {
 		});
 
 	}
-
+	
+	/**
+	 * Try checking if a more recent version is available.
+	 */
+	private void seeFutureVersions() {
+		if (settings.instantOfDate != null) {
+			if (settings.instantOfDate.isAfter(LocalDate.now()))
+				return;
+			try {
+				String uri = "https://github.com/eternalbits/compactVD/releases/latest";
+				HttpClient client = HttpClient.newHttpClient();
+				HttpRequest request = HttpRequest.newBuilder(URI.create(uri)).build();
+				HttpResponse<?> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+				if (response.statusCode() != 302) // The resource temporarily lives at a different URI
+					return;
+				Optional<String> location = response.headers().firstValue("location");
+				if (location.isPresent() && !location.get().endsWith("/v3.0")) {
+					Desktop.getDesktop().browse(new URI(uri));
+				}
+			} catch (IOException | InterruptedException | URISyntaxException e) {
+				e.printStackTrace();
+				return;
+			}
+		}
+		settings.instantOfDate = LocalDate.now().plusDays(15);
+		saveSettings();
+	}
+	
 	/**
 	 * The progress bar is set to always show a description. The Windows progress bar UI
 	 *  has a bulky resolution and is replaced by a smoother user interface. 

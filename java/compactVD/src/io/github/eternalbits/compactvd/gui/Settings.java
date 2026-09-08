@@ -25,6 +25,7 @@ import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Locale;
 
 import io.github.eternalbits.compactvd.Static;
@@ -49,6 +50,7 @@ public class Settings implements Serializable {
 	String selectedCountry = Locale.getDefault().getCountry();
 	boolean filterImageFiles = true;
 	boolean keepJournalEmpty = true;
+	LocalDate instantOfDate = null;
 	
 	// Open options
 	boolean visibleCompactCopy = true;
